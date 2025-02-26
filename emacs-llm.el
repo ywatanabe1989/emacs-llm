@@ -37,10 +37,7 @@ Ignores any directories in `--lle-excluded-dirs`."
           ((name
             (file-name-nondirectory dir)))
         (when
-            (and
-             (file-directory-p dir)
-             (not
-              (member name --lle-excluded-dirs)))
+            (file-directory-p dir)
           ;; (message "Adding to load-path: %s" dir)
           (add-to-list 'load-path dir))))))
 

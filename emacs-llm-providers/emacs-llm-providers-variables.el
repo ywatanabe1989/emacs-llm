@@ -1,11 +1,51 @@
 ;;; -*- coding: utf-8; lexical-binding: t -*-
 ;;; Author: ywatanabe
-;;; Timestamp: <2025-02-26 14:19:24>
+;;; Timestamp: <2025-02-26 16:20:04>
 ;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/emacs-llm-providers/emacs-llm-providers-variables.el
 
 ;; Used
 ;; ----------------------------------------
 
+(defcustom --el-default-provider "google"
+  "Default provider"
+  :type 'string
+  :group 'el)
+
+(defcustom --el-default-engine "gemini-2.0-flash-thinking-exp-01-21"
+  "Default engine"
+  :type 'string
+  :group 'el)
+
+;; (defcustom --el-api-key
+;;   (getenv "OPENAI_API_KEY")
+;;   "API key for OpenAI services."
+;;   :type 'string
+;;   :group 'emacs-llm)
+
+;; (defcustom --el-model "gpt-4o"
+;;   "Default model to use for OpenAI."
+;;   :type 'string
+;;   :group 'emacs-llm)
+
+(defcustom --el-temperature 0.7
+  "Temperature setting for LLM responses."
+  :type 'float
+  :group 'emacs-llm)
+
+(defcustom --el-max-tokens 4096
+  "Maximum number of tokens for LLM responses."
+  :type 'integer
+  :group 'emacs-llm)
+
+(defcustom --el-provider "openai"
+  "Default LLM provider to use."
+  :type
+  '(choice
+    (const :tag "OpenAI" "openai")
+    (const :tag "Anthropic" "anthropic")
+    (const :tag "Google" "google")
+    (const :tag "DeepSeek" "deepseek"))
+  :group 'emacs-llm)
 ;; (defcustom --el-google-api-key
 ;;   (getenv "GOOGLE_API_KEY")
 ;;   "API key for Google Gemini services."
@@ -156,23 +196,23 @@
 ;; Available Engines
 ;; ----------------------------------------
 
-(defvar --el-openai-available-engines
+(defvar --el-openai-models
   (mapcar #'car --el-openai-engine-max-tokens-alist)
   "List of available models for the openai provider.")
 
-(defvar --el-anthropic-available-engines
+(defvar --el-anthropic-models
   (mapcar #'car --el-anthropic-engine-max-tokens-alist)
   "List of available models for the anthropic provider.")
 
-(defvar --el-google-available-engines
+(defvar --el-google-models
   (mapcar #'car --el-google-engine-max-tokens-alist)
   "List of available models for the google provider.")
 
-(defvar --el-deepseek-available-engines
+(defvar --el-deepseek-models
   (mapcar #'car --el-deepseek-engine-max-tokens-alist)
   "List of available models for the deepseek provider.")
 
-(defvar --el-groq-available-engines
+(defvar --el-groq-models
   (mapcar #'car --el-groq-engine-max-tokens-alist)
   "List of available models for the groq provider.")
 
@@ -181,6 +221,18 @@
   "API key for Anthropic services."
   :type 'string
   :group 'el)
+
+(defvar --el-openai-model nil
+  "Selected OpenAI model.")
+
+(defvar --el-anthropic-model nil
+  "Selected Anthropic model.")
+
+(defvar --el-google-model nil
+  "Selected Google model.")
+
+(defvar --el-deepseek-model nil
+  "Selected DeepSeek model.")
 
 (provide 'emacs-llm-providers-variables)
 
