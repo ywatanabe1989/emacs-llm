@@ -1,47 +1,43 @@
 ;;; -*- coding: utf-8; lexical-binding: t -*-
 ;;; Author: ywatanabe
-;;; Timestamp: <2025-02-26 12:16:29>
-;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/emacs-llm-variables.el
+;;; Timestamp: <2025-02-26 14:19:24>
+;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/emacs-llm-providers/emacs-llm-providers-variables.el
 
-;;; Copyright (C) 2024-2025 Yusuke Watanabe (ywatanabe@alumni.u-tokyo.ac.jp)
-
-(defcustom el-use-stream t
-  "Whether to use streaming APIs by default."
-  :type 'boolean
-  :group 'emacs-llm)
-
-(defcustom el-anthropic-api-key
-  (getenv "ANTHROPIC_API_KEY")
-  "API key for Anthropic Claude."
-  :type 'string
-  :risky t
-  :group 'emacs-llm)
-
-(defcustom el-provider "openai"
-  "Default LLM provider to use."
-  :type
-  '(choice
-    (const :tag "OpenAI" "openai")
-    (const :tag "Anthropic" "anthropic"))
-  :group 'emacs-llm)
-
-(defcustom el-anthropic-model "claude-3-7-sonnet-20250219"
-  "Default Anthropic model to use for AI interactions."
-  :type 'string
-  :group 'emacs-llm)
-
-;; Global default provider and engine
+;; Used
 ;; ----------------------------------------
 
-(defcustom --el-default-provider "google"
-  "Default provider"
-  :type 'string
-  :group 'lle-llm)
+;; (defcustom --el-google-api-key
+;;   (getenv "GOOGLE_API_KEY")
+;;   "API key for Google Gemini services."
+;;   :type 'string
+;;   :group 'el)
 
-(defcustom --el-default-engine "gemini-2.0-flash-thinking-exp-01-21"
-  "Default engine"
-  :type 'string
-  :group 'lle-llm)
+;; (defcustom --el-deepseek-api-key
+;;   (getenv "DEEPSEEK_API_KEY")
+;;   "API key for Deepseek Gemini services."
+;;   :type 'string
+;;   :group 'el)
+
+;; (defcustom --el-anthropic-model "claude-3-7-sonnet-20250219"
+;;   "Default model to use for Anthropic Claude."
+;;   :type 'string
+;;   :group 'el)
+
+;; (defvar --el-openai-models
+;;   '("gpt-4o" "gpt-4-turbo" "gpt-3.5-turbo" "gpt-4" "o1-mini" "o1" "o3-mini")
+;;   "Available OpenAI models.")
+
+;; (defvar --el-anthropic-models
+;;   '("claude-3-7-sonnet-20250219" "claude-3-5-sonnet-20241022" "claude-3-5-haiku-20241022")
+;;   "Available Anthropic Claude models.")
+
+;; (defvar --el-google-models
+;;   '("gemini-2.0-flash" "gemini-2.0-pro" "gemini-1.5-pro")
+;;   "Available Google Gemini models.")
+
+;; (defvar --el-deepseek-models
+;;   '("deepseek-chat" "deepseek-coder" "deepseek-reasoner")
+;;   "Available DeepSeek models.")
 
 ;; Timeout
 ;; ----------------------------------------
@@ -57,35 +53,35 @@
   "API key for OpenAI."
   :type 'string
   :risky t
-  :group 'lle-llm)
+  :group 'el)
 
 (defcustom --el-api-key-anthropic
   (getenv "ANTHROPIC_API_KEY")
   "API key for Anthropic Claude."
   :type 'string
   :risky t
-  :group 'lle-llm)
+  :group 'el)
 
 (defcustom --el-api-key-google
   (getenv "GOOGLE_API_KEY")
   "API key for Google Claude."
   :type 'string
   :risky t
-  :group 'lle-llm)
+  :group 'el)
 
 (defcustom --el-api-key-deepseek
   (getenv "DEEPSEEK_API_KEY")
   "API key for DeepSeek."
   :type 'string
   :risky t
-  :group 'lle-llm)
+  :group 'el)
 
 (defcustom --el-api-key-groq
   (getenv "GROQ_API_KEY")
   "API key for Groq."
   :type 'string
   :risky t
-  :group 'lle-llm)
+  :group 'el)
 
 ;; Default Engines
 ;; ----------------------------------------
@@ -94,31 +90,31 @@
   (getenv "OPENAI_ENGINE")
   "Deafult model for OpenAI."
   :type 'string
-  :group 'lle-llm)
+  :group 'el)
 
 (defcustom --el-default-engine-anthropic
   (getenv "ANTHROPIC_ENGINE")
   "Deafult model for Anthropic Claude."
   :type 'string
-  :group 'lle-llm)
+  :group 'el)
 
 (defcustom --el-default-engine-google
   (getenv "GOOGLE_ENGINE")
   "Deafult model for Google Claude."
   :type 'string
-  :group 'lle-llm)
+  :group 'el)
 
 (defcustom --el-default-engine-deepseek
   (getenv "DEEPSEEK_ENGINE")
   "Deafult model for DeepSeek."
   :type 'string
-  :group 'lle-llm)
+  :group 'el)
 
 (defcustom --el-default-engine-groq
   (getenv "GROQ_ENGINE")
   "Deafult model for Groq."
   :type 'string
-  :group 'lle-llm)
+  :group 'el)
 
 ;; Available Engines and Max Tokens
 ;; ----------------------------------------
@@ -180,23 +176,16 @@
   (mapcar #'car --el-groq-engine-max-tokens-alist)
   "List of available models for the groq provider.")
 
-;; Callers
-;; ----------------------------------------
-(defcustom --el-google-script
-  (expand-file-name "call-gemini.py"
-                    (file-name-directory
-                     (or load-file-name buffer-file-name)))
-  "Python script for calling Gemini"
+(defcustom --el-anthropic-api-key
+  (getenv "ANTHROPIC_API_KEY")
+  "API key for Anthropic services."
   :type 'string
-  :group 'lle-llm)
+  :group 'el)
 
-(defvar --lle-prompt-recipes nil
-  "List of prompt recipe definitions loaded from recipe files.")
-
-(provide 'emacs-llm-variables)
+(provide 'emacs-llm-providers-variables)
 
 (when
     (not load-file-name)
-  (message "emacs-llm-variables.el loaded."
+  (message "emacs-llm-providers-variables.el loaded."
            (file-name-nondirectory
             (or load-file-name buffer-file-name))))

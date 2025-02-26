@@ -1,31 +1,32 @@
 ;;; -*- coding: utf-8; lexical-binding: t -*-
 ;;; Author: ywatanabe
-;;; Timestamp: <2025-02-26 13:17:18>
-;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/emacs-llm-anthropic.el
+;;; Timestamp: <2025-02-26 14:19:23>
+;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/emacs-llm-providers/emacs-llm-providers-anthropic.el
 
 ;; Main
 ;; ----------------------------------------
 
-(defun el--send-anthropic-stream
+(defun --el--send-anthropic-stream
     (prompt)
   "Send PROMPT to Anthropic API via streaming."
   (let*
       ((buffer-name
-        (get-buffer-create el-buffer-name))
+        (get-buffer-create --el-buffer-name))
        (temp-buffer
         (generate-new-buffer " *anthropic-temp-output*"))
        (payload
-        (el--construct-anthropic-payload prompt))
+        (--el--construct-anthropic-payload prompt))
        (payload-oneline
         (replace-regexp-in-string "\n" " " payload))
        (escaped-payload
         (replace-regexp-in-string "'" "\\\\'" payload-oneline))
        (curl-command
         (format "curl -N 'https://api.anthropic.com/v1/messages' -H 'Content-Type: application/json' -H 'anthropic-version: 2023-06-01' -H 'anthropic-beta: output-128k-2025-02-19' -H 'x-api-key: %s' -d '%s'"
-                el-anthropic-api-key
+                (or --el-api-key-anthropic --el-anthropic-api-key)
                 escaped-payload))
        (proc
-        (start-process-shell-command "el-anthropic-stream" temp-buffer curl-command)))
+        (start-process-shell-command "--el-anthropic-stream" temp-buffer curl-command)))
+
     ;; (message "DEBUG: Curl command: %s" curl-command)
     (with-current-buffer buffer-name
       (unless
@@ -38,27 +39,30 @@
            (point-min)
            (point-max))
         (insert "\n\n"))
-      (insert el-separator)
+      (insert --el-separator)
       (insert "\n\n")
       (insert
-       (format "Provider: %s | Model: %s\n\n" "ANTHROPIC" el-anthropic-model))
+       (format "Provider: %s | Model: %s\n\n" "ANTHROPIC"
+               (or --el-default-engine-anthropic --el-anthropic-model)))
       (insert
        (format "Prompt: %s\n\n" prompt))
-      (insert "Response: ")
+      (insert "Response: \n")
       (display-buffer
        (current-buffer)))
+
     (process-put proc 'target-buffer buffer-name)
     (process-put proc 'temp-buffer temp-buffer)
     (process-put proc 'content "")
-    (set-process-filter proc #'el--anthropic-filter)
-    (set-process-sentinel proc #'el--process-sentinel)
-    (el--append-to-history "user" prompt)
+    (set-process-filter proc #'--el--anthropic-filter)
+    (set-process-sentinel proc #'--el--process-sentinel)
+    (--el--start-spinner)
+    (--el--append-to-history "user" prompt)
     proc))
 
 ;; Helper
 ;; ----------------------------------------
 
-(defun el--parse-anthropic-chunk
+(defun --el--parse-anthropic-chunk
     (chunk)
   "Parse Anthropic JSON CHUNK and return text delta."
   ;; (message "Parsing Anthropic chunk: %s"
@@ -96,30 +100,37 @@
                (alist-get 'thinking delta))))
            (t nil)))))))
 
-(defun el--anthropic-filter
+(defun --el--anthropic-filter
     (proc chunk)
   "Filter for Anthropic stream PROC processing CHUNK."
-  (el--process-chunk proc chunk #'el--parse-anthropic-chunk))
+  (--el--process-chunk proc chunk #'--el--parse-anthropic-chunk))
 
-(defun el--construct-anthropic-payload
+(defun --el--construct-anthropic-payload
     (prompt)
   "Construct the JSON payload for Anthropic API with PROMPT."
-  (json-encode
-   `(("model" . ,el-anthropic-model)
-     ("max_tokens" . 128000)
-     ("stream" . t)
-     ;; ("temperature" . ,el-temperature)
-     ("thinking" .
-      (("type" . "enabled")
-       ("budget_tokens" . 32000)))
-     ("messages" .
-      [(("role" . "user")
-        ("content" . ,prompt))]))))
+  (let*
+      ((mod--el-name
+        (or --el-default-engine-anthropic --el-anthropic-model))
+       (max-tokens
+        (or
+         (alist-get mod--el-name --el-anthropic-engine-max-tokens-alist nil nil 'string=)
+         128000)))
+    (json-encode
+     `(("model" . ,mod--el-name)
+       ("max_tokens" . ,max-tokens)
+       ("stream" . t)
+       ;; ("temperature" . ,--el-temperature)
+       ("thinking" .
+        (("type" . "enabled")
+         ("budget_tokens" . 32000)))
+       ("messages" .
+        [(("role" . "user")
+          ("content" . ,prompt))])))))
 
-(provide 'emacs-llm-anthropic)
+(provide 'emacs-llm-providers-anthropic)
 
 (when
     (not load-file-name)
-  (message "emacs-llm-anthropic.el loaded."
+  (message "emacs-llm-providers-anthropic.el loaded."
            (file-name-nondirectory
             (or load-file-name buffer-file-name))))
