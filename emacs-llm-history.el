@@ -1,7 +1,10 @@
 ;;; -*- coding: utf-8; lexical-binding: t -*-
 ;;; Author: ywatanabe
-;;; Timestamp: <2025-02-26 21:30:20>
+;;; Timestamp: <2025-02-27 09:24:41>
 ;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/emacs-llm-history.el
+
+;; Variables
+;; ----------------------------------------
 
 (defcustom --el-history-dir
   (expand-file-name "history"
@@ -24,7 +27,7 @@
   :type 'number
   :group 'emacs-llm)
 
-(defcustom --el-max-history-interactions 10
+(defcustom --el-n-histories 10
   "Maximum number of interactions to include in API calls."
   :type 'integer
   :group 'emacs-llm)
@@ -33,14 +36,33 @@
   '()
   "List to keep track of conversation history.")
 
-(defun --el-ensure-history-dir
+;; History File Handling
+;; ----------------------------------------
+
+(defun --el-history-varidate-state
+    ()
+  "Ensure history directory exists."
+  (--el-history-ensure-dir)
+  (--el-history-ensure-file)
+  (--el-history-backup-file-if))
+
+(defun --el-history-ensure-dir
     ()
   "Ensure history directory exists."
   (unless
       (file-exists-p --el-history-dir)
     (make-directory --el-history-dir t)))
 
-(defun --el-backup-history-file
+(defun --el-history-ensure-file
+    ()
+  "Ensure history file exists."
+  (--el-history-ensure-file)
+  (unless
+      (file-exists-p --el-history-file)
+    (with-temp-file history-file
+      (insert ""))))
+
+(defun --el-history-backup-file-if
     ()
   "Backup history file with timestamp if it exceeds max size."
   (when
@@ -50,7 +72,7 @@
         (file-attribute-size
          (file-attributes --el-history-file))
         --el-history-max-size))
-    (--el-ensure-history-dir)
+    (--el-history-ensure-file)
     (let
         ((backup-file
           (expand-file-name
@@ -63,10 +85,22 @@
       (with-temp-file --el-history-file
         (insert "[]")))))
 
-(defun --el-load-history
+(defun el-history-clear
+    ()
+  "Clear the conversation history."
+  (interactive)
+  (setq --el-history
+        '())
+  (--el-history-save)
+  (message "Emacs-LLM conversation history cleared."))
+
+;; Loader/Saver
+;; ----------------------------------------
+
+(defun --el-history-load
     ()
   "Load conversation history from `--el-history-file`."
-  (--el-backup-history-file)
+  (--el-history-backup-file-if)
   (when
       (file-exists-p --el-history-file)
     (with-temp-buffer
@@ -75,15 +109,15 @@
             (json-read-from-string
              (buffer-string))))))
 
-(defun --el-save-history
+(defun --el-history-save
     ()
   "Save conversation history to `--el-history-file`."
-  (--el-ensure-history-dir)
+  (--el-history-ensure-file)
   (with-temp-file --el-history-file
     (insert
      (json-encode --el-history))))
 
-(defun --el-append-to-history
+(defun --el-history-append
     (role content &optional template)
   "Append a message with ROLE and CONTENT to the conversation history.
 If TEMPLATE is provided, include it as part of the metadata."
@@ -96,26 +130,17 @@ If TEMPLATE is provided, include it as part of the metadata."
     (setq --el-history
           (append --el-history
                   (list entry)))
-    (--el-save-history)))
-
-(defun --el-clear-history
-    ()
-  "Clear the conversation history."
-  (interactive)
-  (setq --el-history
-        '())
-  (--el-save-history)
-  (message "Emacs-LLM conversation history cleared."))
+    (--el-history-save)))
 
 ;;;###autoload
-(defun el-show-history
+(defun el-history-show
     (&optional num-interactions)
   "Display the conversation history in a buffer.
 Show NUM-INTERACTIONS most recent interactions (default: 20)."
   (interactive
    (list
     (read-number "Number of interactions to show: " 20)))
-  (--el-load-history)
+  (--el-history-load)
   (let*
       ((num
         (or num-interactions 20))
@@ -162,112 +187,22 @@ Show NUM-INTERACTIONS most recent interactions (default: 20)."
         (--el-history-mode)
         (display-buffer buffer)))))
 
-(defun --el-scroll-history
-    ()
-  "Scroll to current position in history buffer."
-  (interactive)
-  (when-let
-      ((history-buffer
-        (get-buffer "*Emacs-LLM History*")))
-    (with-current-buffer history-buffer
-      (let
-          ((window
-            (get-buffer-window history-buffer)))
-        (when window
-          (with-selected-window window
-            (recenter)))))))
-
-;; (defun --el-copy-last-response
-;;     ()
-;;   "Copy the last AI response from history to kill ring."
-;;   (interactive)
-;;   (--el-load-history)
-;;   (if --el-history
-;;       (let*
-;;           ((last-entries
-;;             (reverse --el-history))
-;;            (last-response
-;;             (cl-find-if
-;;              (lambda
-;;                (entry)
-;;                (string=
-;;                 (alist-get 'role entry)
-;;                 "assistant"))
-;;              last-entries)))
-;;         (if last-response
-;;             (let
-;;                 ((content
-;;                   (alist-get 'content last-response)))
-;;               (kill-new content)
-;;               (message "Last AI response copied to kill ring"))
-;;           (message "No AI response found in history")))
-;;     (message "No history found")))
-
-(defun --el-get-recent-history
-    ()
-  "Get the most recent conversation history limited by `--el-max-history-interactions`."
-  (--el-load-history)
+(defun --el-history-get-recent
+    (&optional n-histories)
+  "Get the most recent conversation history limited by `--el-n-histories`."
+  (--el-history-load)
   (let*
       ((history-length
         (length --el-history))
+       (n-histories
+        (or n-histories --el-n-histories))
        (start-index
         (max 0
-             (- history-length --el-max-history-interactions))))
+             (- history-length n-histories))))
     (if
         (> history-length 0)
         (cl-subseq --el-history start-index)
       nil)))
-
-;; (defun --el-scroll-history-forward
-;;     ()
-;;   "Scroll forward in history buffer."
-;;   (interactive)
-;;   (when-let
-;;       ((history-buffer
-;;         (get-buffer "*Emacs-LLM History*")))
-;;     (with-selected-window
-;;         (get-buffer-window history-buffer)
-;;       (scroll-up-command))))
-
-;; (defun --el-scroll-history-backward
-;;     ()
-;;   "Scroll backward in history buffer."
-;;   (interactive)
-;;   (when-let
-;;       ((history-buffer
-;;         (get-buffer "*Emacs-LLM History*")))
-;;     (with-selected-window
-;;         (get-buffer-window history-buffer)
-;;       (scroll-down-command))))
-
-;; (defun --el-history-mode
-;;     ()
-;;   "Major mode for viewing LLM conversation history."
-;;   (interactive)
-;;   (kill-all-local-variables)
-;;   (use-local-map
-;;    (let
-;;        ((map
-;;          (make-sparse-keymap)))
-;;      (define-key map
-;;                  (kbd "n")
-;;                  #'--el-scroll-history-forward)
-;;      (define-key map
-;;                  (kbd "p")
-;;                  #'--el-scroll-history-backward)
-;;      (define-key map
-;;                  (kbd "SPC")
-;;                  #'--el-scroll-history-forward)
-;;      (define-key map
-;;                  (kbd "S-SPC")
-;;                  #'--el-scroll-history-backward)
-;;      (define-key map
-;;                  (kbd "q")
-;;                  #'quit-window)
-;;      map))
-;;   (setq major-mode '--el-history-mode
-;;         mode-name "LLM-History")
-;;   (read-only-mode 1))
 
 (provide 'emacs-llm-history)
 
