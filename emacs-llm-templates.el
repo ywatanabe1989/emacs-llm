@@ -1,7 +1,10 @@
 ;;; -*- coding: utf-8; lexical-binding: t -*-
 ;;; Author: ywatanabe
-;;; Timestamp: <2025-02-26 23:31:14>
+;;; Timestamp: <2025-02-27 09:40:12>
 ;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/emacs-llm-templates.el
+
+;; Variables
+;; ----------------------------------------
 
 (defcustom --el-templates-dir
   (expand-file-name "templates"
@@ -22,11 +25,13 @@ Example: Template shortcuts can be customized as:
   '(alist :key-type string :value-type string)
   :group 'emacs-llm)
 
-;; Functions for template handling
-(defun --el-find-first-capital
+;; Helper
+;; ----------------------------------------
+
+(defun --el-template-find-first-capital
     (string)
   "Find first capital letter in STRING and return cons of (letter . position).
-Example: (--el-find-first-capital \"parapHrase.md\") => (h . 5)"
+Example: (--el-template-find-first-capital \"parapHrase.md\") => (h . 5)"
   (let*
       ((name
         (file-name-sans-extension string))
@@ -40,7 +45,7 @@ Example: (--el-find-first-capital \"parapHrase.md\") => (h . 5)"
                    (1+ capital-pos)))
        capital-pos))))
 
-(defun --el-fetch-templates
+(defun --el-template-fetch
     (dir)
   "Return list of formatted template names from DIR that contain capital letters."
   (when
@@ -55,7 +60,7 @@ Example: (--el-find-first-capital \"parapHrase.md\") => (h . 5)"
                     (substring f 0
                                (string-match "\\.md" f)))
                    (capital-info
-                    (--el-find-first-capital f))
+                    (--el-template-find-first-capital f))
                    (first-capital
                     (car capital-info))
                    (capital-pos
@@ -69,7 +74,7 @@ Example: (--el-find-first-capital \"parapHrase.md\") => (h . 5)"
             (directory-files dir nil ".*[A-Z].*\\.md$")))
      #'string<)))
 
-(defun --el-create-shortcuts
+(defun --el-template-create-shortcuts
     (templates)
   "Generate shortcuts for templates using numbers for duplicates."
   (let
@@ -168,14 +173,14 @@ Example: (--el-find-first-capital \"parapHrase.md\") => (h . 5)"
                                     string pred))))
     shortcuts))
 
-(defun --el-select-template
+(defun --el-template-select
     ()
   "Prompt the user to select a template type for the LLM engine."
   (unless
       (minibufferp)
     (let*
         ((capital-templates
-          (--el-fetch-templates --el-templates-dir))
+          (--el-template-fetch --el-templates-dir))
          (shortcuts
           (make-hash-table :test 'equal))
          (key-count
@@ -252,7 +257,7 @@ Example: (--el-find-first-capital \"parapHrase.md\") => (h . 5)"
            (get-buffer-create --el-buffer-name)))
         template-type))))
 
-(defun --el-apply-template
+(defun --el-template-apply
     (prompt template-name)
   "Apply template TEMPLATE-NAME to PROMPT.
 Returns a new prompt with the template applied."

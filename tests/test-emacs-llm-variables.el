@@ -16,11 +16,11 @@
 
 (ert-deftest test-emacs-llm-use-stream-defined
     ()
-  "Test that --el-use-stream is defined."
+  "Test that --el-flag-use-stream is defined."
   (should
-   (boundp '--el-use-stream))
+   (boundp '--el-flag-use-stream))
   (should
-   (booleanp --el-use-stream)))
+   (booleanp --el-flag-use-stream)))
 
 (ert-deftest test-emacs-llm-separator-defined
     ()

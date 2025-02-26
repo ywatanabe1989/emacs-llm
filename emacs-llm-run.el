@@ -1,6 +1,6 @@
 ;;; -*- coding: utf-8; lexical-binding: t -*-
 ;;; Author: ywatanabe
-;;; Timestamp: <2025-02-27 09:28:15>
+;;; Timestamp: <2025-02-27 09:42:50>
 ;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/emacs-llm-run.el
 
 (require 'emacs-llm-dired)
@@ -31,10 +31,10 @@ The response will be displayed in the *El* buffer."
               (read-string "Enter prompt: " "")))))
        (template-name
         (or template
-            (--el-select-template))))
+            (--el-template-select))))
 
     ;; Use the abstraction
-    (el-llm-call-stream prompt --el-actual-provider template-name)))
+    (el-llm-call prompt --el-actual-provider template-name)))
 
 (provide 'emacs-llm-run)
 

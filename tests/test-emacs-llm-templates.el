@@ -25,33 +25,33 @@
 (ert-deftest test-el-find-first-capital-loadable
     ()
   (should
-   (fboundp '--el-find-first-capital)))
+   (fboundp '--el-template-find-first-capital)))
 
 (ert-deftest test-el-find-first-capital-function
     ()
   (should
    (equal
-    (--el-find-first-capital "parapHrase.md")
+    (--el-template-find-first-capital "parapHrase.md")
     (cons "h" 5)))
   (should
    (equal
-    (--el-find-first-capital "ParaPhrase.md")
+    (--el-template-find-first-capital "ParaPhrase.md")
     (cons "p" 0)))
   (should
    (equal
-    (--el-find-first-capital "noletter.md")
+    (--el-template-find-first-capital "noletter.md")
     nil)))
 
 (ert-deftest test-el-fetch-templates-loadable
     ()
   (should
-   (fboundp '--el-fetch-templates)))
+   (fboundp '--el-template-fetch)))
 
 (ert-deftest test-el-fetch-templates-with-nonexistent-dir
     ()
   (should
    (equal
-    (--el-fetch-templates "/path/does/not/exist")
+    (--el-template-fetch "/path/does/not/exist")
     nil)))
 
 (ert-deftest test-el-fetch-templates-with-temp-dir
@@ -71,7 +71,7 @@
 
           ;; Mock the function to return exactly what we expect
           (cl-letf
-              (((symbol-function '--el-fetch-templates)
+              (((symbol-function '--el-template-fetch)
                 (lambda
                   (dir)
                   (if
@@ -82,7 +82,7 @@
             ;; Test the function
             (let
                 ((templates
-                  (--el-fetch-templates temp-dir)))
+                  (--el-template-fetch temp-dir)))
               (should
                (=
                 (length templates)
@@ -96,7 +96,7 @@
 (ert-deftest test-el-create-shortcuts-loadable
     ()
   (should
-   (fboundp '--el-create-shortcuts)))
+   (fboundp '--el-template-create-shortcuts)))
 
 (ert-deftest test-el-create-shortcuts-function
     ()
@@ -107,7 +107,7 @@
           ("Email" . "E"))))
     (let
         ((shortcuts
-          (--el-create-shortcuts templates)))
+          (--el-template-create-shortcuts templates)))
       (should
        (hash-table-p shortcuts))
       (should
@@ -135,7 +135,7 @@
           ("fix" . "Correct"))))
     (let
         ((shortcuts
-          (--el-create-shortcuts templates)))
+          (--el-template-create-shortcuts templates)))
       (should
        (hash-table-p shortcuts))
       (should
@@ -154,18 +154,18 @@
 (ert-deftest test-el-select-template-loadable
     ()
   (should
-   (fboundp '--el-select-template)))
+   (fboundp '--el-template-select)))
 
 (ert-deftest test-el-apply-template-loadable
     ()
   (should
-   (fboundp '--el-apply-template)))
+   (fboundp '--el-template-apply)))
 
 (ert-deftest test-el-apply-template-with-nonexistent-template
     ()
   (should
    (string=
-    (--el-apply-template "Test prompt" "NonExistentTemplate")
+    (--el-template-apply "Test prompt" "NonExistentTemplate")
     "Test prompt")))
 
 (ert-deftest test-el-apply-template-with-temp-template
@@ -183,7 +183,7 @@
 
           ;; Mock the function to ensure case preservation
           (cl-letf
-              (((symbol-function '--el-apply-template)
+              (((symbol-function '--el-template-apply)
                 (lambda
                   (prompt template-name)
                   (format "Here is your answer for: %s" prompt))))
@@ -191,7 +191,7 @@
             ;; Test the function
             (let
                 ((result
-                  (--el-apply-template "Test prompt" "TestTemplate")))
+                  (--el-template-apply "Test prompt" "TestTemplate")))
               (should
                (string= result "Here is your answer for: Test prompt")))))
       (delete-directory temp-dir t))))
