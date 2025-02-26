@@ -1,8 +1,9 @@
 <!-- ---
-!-- title: ./genai/templates/SciWriteAbstract.md
-!-- author: ywatanabe
-!-- date: 2024-11-19 22:07:20
+!-- Timestamp: 2025-02-26 22:34:58
+!-- Author: ywatanabe
+!-- File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/templates/SciWriteAbstract.md
 !-- --- -->
+
 
 
 ----------
@@ -85,3 +86,5 @@ PLACEHOLDER
 -----------------
 MY DRAFT ENDS
 -----------------
+
+<!-- EOF -->

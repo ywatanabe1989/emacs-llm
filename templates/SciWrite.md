@@ -1,9 +1,8 @@
 <!-- ---
-!-- title: ./genai/templates/SciWrite.md
-!-- author: ywatanabe
-!-- date: 2024-11-19 23:18:55
+!-- Timestamp: 2025-02-26 22:35:17
+!-- Author: ywatanabe
+!-- File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/templates/SciWrite.md
 !-- --- -->
-
 
 ----------
 Background
@@ -42,3 +41,5 @@ Please proofread them with the following rules below.
 Now, the original manuscript to be revised is as follows:
 ----------
 PLACEHOLDER
+
+<!-- EOF -->

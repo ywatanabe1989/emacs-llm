@@ -1,3 +1,10 @@
+<!-- ---
+!-- Timestamp: 2025-02-26 22:34:30
+!-- Author: ywatanabe
+!-- File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/templates/Paraphrase.md
+!-- --- -->
+
+
 ----------
 Background
 ----------
@@ -19,3 +26,4 @@ Now, the original draft to be paraphrased is as follows:
 ----------
 PLACEHOLDER
 
+<!-- EOF -->

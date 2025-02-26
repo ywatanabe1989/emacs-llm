@@ -1,7 +1,7 @@
 <!-- ---
-!-- title: ./genai/templates/RelentlessProgramming.md
-!-- author: ywatanabe
-!-- date: 2024-11-15 09:38:16
+!-- Timestamp: 2025-02-26 22:34:37
+!-- Author: ywatanabe
+!-- File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/templates/ProgrammingRelentlessly.md
 !-- --- -->
 
 
@@ -19,3 +19,5 @@ You are an experienced programmer. Please implement, revise, debug, or refactor 
 Now, my input is as follows:
 ----------
 PLACEHOLDER
+
+<!-- EOF -->

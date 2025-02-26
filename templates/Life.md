@@ -1,8 +1,9 @@
 <!-- ---
-!-- title: ./genai/templates/Life.md
-!-- author: ywatanabe
-!-- date: 2024-11-15 09:33:47
+!-- Timestamp: 2025-02-26 22:34:27
+!-- Author: ywatanabe
+!-- File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/templates/Life.md
 !-- --- -->
+
 
 
 ----------
@@ -34,3 +35,5 @@ Please follow the format below. For example, when my input is 'tansansui shareik
 Now, my input is as follows:
 ----------
 PLACEHOLDER
+
+<!-- EOF -->

@@ -1,14 +1,9 @@
 <!-- ---
-!-- Timestamp: 2025-02-25 01:15:22
+!-- Timestamp: 2025-02-26 22:34:51
 !-- Author: ywatanabe
-!-- File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/genai/templates/ProgrammingTest.md
+!-- File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/templates/ProgrammingTest.md
 !-- --- -->
 
-<!-- ---
-!-- title: ProgramTest.md
-!-- author: ywatanabe
-!-- date: 2024-11-03 02:44:43
-!-- --- -->
 
 
 ----------

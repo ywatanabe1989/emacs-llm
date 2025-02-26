@@ -1,3 +1,10 @@
+<!-- ---
+!-- Timestamp: 2025-02-26 22:34:22
+!-- Author: ywatanabe
+!-- File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/templates/Email.md
+!-- --- -->
+
+
 ----------
 Background
 ----------
@@ -56,3 +63,5 @@ You are an business email writer with scientific backgrounds with native levels 
 Now, my Email is as follows:
 ----------
 PLACEHOLDER
+
+<!-- EOF -->

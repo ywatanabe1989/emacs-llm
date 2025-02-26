@@ -1,15 +1,9 @@
 <!-- ---
-!-- Timestamp: 2025-01-18 05:11:24
+!-- Timestamp: 2025-02-26 22:34:34
 !-- Author: ywatanabe
-!-- File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/genai/templates/Programming.md
+!-- File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/templates/Programming.md
 !-- --- -->
-<!-- Time-stamp: "2025-01-18 05:11:24 (ywatanabe)" -->
-<!-- File: Programming.md -->
-<!-- ---
-!-- title: 2024-12-25 08:22:46
-!-- author: ywata-note-win
-!-- date: /home/ywatanabe/.dotfiles/.emacs.d/lisp/genai/templates/Programming.md
-!-- --- -->
+
 
 ----------
 Background
@@ -343,6 +337,5 @@ You are an experienced programmer. Please implement, revise, debug, or refactor 
 Now, my input is as follows:
 ----------
 PLACEHOLDER
-
 
 <!-- EOF -->

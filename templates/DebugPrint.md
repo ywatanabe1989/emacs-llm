@@ -1,7 +1,7 @@
 <!-- ---
-!-- title: ./genai/templates/prinT.md
-!-- author: ywatanabe
-!-- date: 2024-11-16 13:14:27
+!-- Timestamp: 2025-02-26 22:34:18
+!-- Author: ywatanabe
+!-- File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/templates/DebugPrint.md
 !-- --- -->
 
 
@@ -20,3 +20,5 @@ Now, my code is as follows:
 ----------------------------------------
 PLACEHOLDER
 ----------------------------------------
+
+<!-- EOF -->

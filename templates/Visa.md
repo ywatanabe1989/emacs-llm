@@ -1,3 +1,9 @@
+<!-- ---
+!-- Timestamp: 2025-02-26 22:35:28
+!-- Author: ywatanabe
+!-- File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/templates/Visa.md
+!-- --- -->
+
 ----------
 Background
 ----------
@@ -31,3 +37,5 @@ Since my first language is not English, please proofread my draft at the end of 
 Now, the original manuscript to be revised is as follows:
 ----------
 PLACEHOLDER
+
+<!-- EOF -->

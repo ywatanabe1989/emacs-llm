@@ -1,10 +1,10 @@
 <!-- ---
-!-- title: ./genai/templates/SciWriteDiscussion.md
-!-- author: ywatanabe
-!-- date: 2024-11-19 22:11:11
+!-- Timestamp: 2025-02-26 22:35:06
+!-- Author: ywatanabe
+!-- File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/templates/SciWriteDiscussion.md
 !-- --- -->
 
-
+----------
 Background
 ----------
 # Your Role
@@ -114,3 +114,5 @@ PLACEHOLDER
 -----------------
 MY DRAFT ENDS
 -----------------
+
+<!-- EOF -->
