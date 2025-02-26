@@ -4,30 +4,30 @@
 ;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/emacs-llm-bindings.el
 
 ;;;###autoload
-(defun el-setup-key-bindings
+(defun --el-setup-key-bindings
     ()
   "Set up key bindings for emacs-llm functions."
   (interactive)
   (global-set-key
    (kbd "C-c l q")
-   #'el-quick-menu)
+   #'--el-quick-menu)
   (global-set-key
    (kbd "C-c l o")
-   #'el-on-region)
+   #'--el-on-region)
   (global-set-key
    (kbd "C-c l s")
-   #'el-switch-provider)
+   #'--el-switch-provider)
   (global-set-key
    (kbd "C-c l h")
-   #'el-show-history)
+   #'--el-show-history)
   (global-set-key
    (kbd "C-c l c")
-   #'el-copy-last-response)
+   #'--el-copy-last-response)
   (message "emacs-llm key bindings set up."))
 
 (global-set-key
  (kbd "C-M-S-g")
- #'el-on-region)
+ #'--el-on-region)
 
 (provide 'emacs-llm-bindings)
 

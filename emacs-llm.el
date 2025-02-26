@@ -1,6 +1,6 @@
 ;;; -*- coding: utf-8; lexical-binding: t -*-
 ;;; Author: ywatanabe
-;;; Timestamp: <2025-02-26 13:02:12>
+;;; Timestamp: <2025-02-26 14:02:18>
 ;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/emacs-llm.el
 
 (defun --lle-load-file-silent
@@ -54,16 +54,15 @@ Ignores any directories in `--lle-excluded-dirs`."
 
 (add-to-list 'load-path "/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/")
 
+(require 'emacs-llm-variables)
 (require 'emacs-llm-bindings)
 (require 'emacs-llm-display)
-(require 'emacs-llm)
 (require 'emacs-llm-history)
-(require 'emacs-llm-openai)
+
+(require 'emacs-llm-providers)
 (require 'emacs-llm-run)
 (require 'emacs-llm-spinner)
-(require 'emacs-llm-streaming-helper)
 (require 'emacs-llm-switch)
-(require 'emacs-llm-variables)
 
 (provide 'emacs-llm)
 

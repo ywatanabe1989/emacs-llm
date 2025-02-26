@@ -1,13 +1,13 @@
 ;;; -*- coding: utf-8; lexical-binding: t -*-
 ;;; Author: ywatanabe
-;;; Timestamp: <2025-02-26 13:01:39>
+;;; Timestamp: <2025-02-26 14:19:07>
 ;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/emacs-llm-display.el
 
-(defun el--display-response
+(defun --el--display-response
     (content)
   "Display the AI CONTENT in the LLM buffer."
   (with-current-buffer
-      (get-buffer-create el-buffer-name)
+      (get-buffer-create --el-buffer-name)
     (goto-char
      (point-max))
     (unless
@@ -15,7 +15,7 @@
          (point-min)
          (point-max))
       (insert "\n\n"))
-    (insert el-separator)
+    (insert --el-separator)
     (insert "\n\n")
     (insert
      (propertize "AI:" 'face 'bold))
