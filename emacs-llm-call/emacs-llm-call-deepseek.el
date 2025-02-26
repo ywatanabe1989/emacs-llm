@@ -11,7 +11,7 @@ Optional TEMPLATE-NAME is the name of the template used."
       ((temp-buffer
         (generate-new-buffer " *deepseek-temp-output*"))
        (full-prompt
-        (--el-apply-template prompt template-name))
+        (--el-template-apply prompt template-name))
        (payload
         (--el-construct-deepseek-payload full-prompt))
        (payload-oneline

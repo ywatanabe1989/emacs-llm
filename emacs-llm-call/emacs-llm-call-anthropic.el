@@ -14,7 +14,7 @@ Optional TEMPLATE-NAME is the name of the template-name used."
       ((temp-buffer
         (generate-new-buffer " *anthropic-temp-output*"))
        (full-prompt
-        (--el-apply-template prompt template-name))
+        (--el-template-apply prompt template-name))
        (payload
         (--el-construct-anthropic-payload full-prompt))
        (payload-oneline

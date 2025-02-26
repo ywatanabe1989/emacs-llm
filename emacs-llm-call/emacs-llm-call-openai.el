@@ -13,7 +13,7 @@ Optional TEMPLATE-NAME is the name of the template used."
        ;; Apply template internally to get full prompt
        (full-prompt
         (if template-name
-            (--el-apply-template prompt template-name)
+            (--el-template-apply prompt template-name)
           prompt))
        (payload
         (--el-construct-openai-payload full-prompt))

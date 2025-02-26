@@ -20,7 +20,7 @@ Optional TEMPLATE-NAME is the name of the template used."
                 actual-engine
                 (or --el-api-key-google --el-google-api-key)))
        (full-prompt
-        (--el-apply-template prompt template-name))
+        (--el-template-apply prompt template-name))
        (payload
         (--el-construct-google-payload full-prompt))
        (args
