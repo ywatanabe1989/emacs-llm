@@ -81,8 +81,8 @@
           (process-get proc 'prompt))
          (provider
           (process-get proc 'provider))
-         (model
-          (process-get proc 'model))
+         (engine
+          (process-get proc 'engine))
          ;; Template is intentionally not used in history
          ;; (template
          ;;  (process-get proc 'template))
@@ -97,7 +97,7 @@
             (not
              (string-empty-p response))
           ;; Don't pass template to history for assistant responses either
-          (--el-append-to-history model response)))
+          (--el-append-to-history engine response)))
       ;; Clean up temp buffer
       (when-let
           ((tb

@@ -16,19 +16,19 @@
   "Test provider switching functionality."
   (let
       ((original-provider --el-provider)
-       (--el-openai-models
+       (--el-openai-engines
         '("gpt-4o" "gpt-4"))
-       (--el-anthropic-models
+       (--el-anthropic-engines
         '("claude-3"))
-       (--el-google-models
+       (--el-google-engines
         '("gemini-pro"))
-       (--el-deepseek-models
+       (--el-deepseek-engines
         '("deepseek-chat"))
        (--el-provider nil)
-       (--el-openai-model nil)
-       (--el-anthropic-model nil)
-       (--el-google-model nil)
-       (--el-deepseek-model nil)
+       (--el-openai-engine nil)
+       (--el-anthropic-engine nil)
+       (--el-google-engine nil)
+       (--el-deepseek-engine nil)
        (completing-read-args nil)
        (completing-read-result nil))
 
@@ -41,7 +41,7 @@
             (cond
              ((string=
                (car args)
-               "Select model: ")
+               "Select engine: ")
               (cond
                ((string= --el-provider "openai")
                 "gpt-4o")
@@ -60,7 +60,7 @@
       (should
        (string= --el-provider "openai"))
       (should
-       (string= --el-openai-model "gpt-4o"))
+       (string= --el-openai-engine "gpt-4o"))
 
       ;; Test with anthropic
       (setq completing-read-result "anthropic")
@@ -68,7 +68,7 @@
       (should
        (string= --el-provider "anthropic"))
       (should
-       (string= --el-anthropic-model "claude-3"))
+       (string= --el-anthropic-engine "claude-3"))
 
       ;; Test with google
       (setq completing-read-result "google")
@@ -76,7 +76,7 @@
       (should
        (string= --el-provider "google"))
       (should
-       (string= --el-google-model "gemini-pro"))
+       (string= --el-google-engine "gemini-pro"))
 
       ;; Test with deepseek
       (setq completing-read-result "deepseek")
@@ -84,7 +84,7 @@
       (should
        (string= --el-provider "deepseek"))
       (should
-       (string= --el-deepseek-model "deepseek-chat")))
+       (string= --el-deepseek-engine "deepseek-chat")))
 
     ;; Restore original provider
     (setq --el-provider original-provider)))

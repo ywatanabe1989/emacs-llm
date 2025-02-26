@@ -170,7 +170,7 @@ Example: (--el-find-first-capital \"parapHrase.md\") => (h . 5)"
 
 (defun --el-select-template
     ()
-  "Prompt the user to select a template type for the LLM model."
+  "Prompt the user to select a template type for the LLM engine."
   (unless
       (minibufferp)
     (let*

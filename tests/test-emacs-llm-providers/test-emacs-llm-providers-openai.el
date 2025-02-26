@@ -34,7 +34,7 @@
               (message "Parsed JSON data: %S" data)
               (should
                (string=
-                (alist-get 'model data)
+                (alist-get 'engine data)
                 "gpt-4o"))
               ;; Skip temperature check if it's not in the payload
               (when
@@ -81,7 +81,7 @@
     ()
   "Test parsing OpenAI API chunks."
   (let
-      ((chunk "{\"id\":\"test-id\",\"object\":\"chat.completion.chunk\",\"created\":1677825464,\"model\":\"gpt-4o\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"Hello\"},\"finish_reason\":null}]}"))
+      ((chunk "{\"id\":\"test-id\",\"object\":\"chat.completion.chunk\",\"created\":1677825464,\"engine\":\"gpt-4o\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"Hello\"},\"finish_reason\":null}]}"))
     (should
      (string=
       (--el-parse-openai-chunk chunk)

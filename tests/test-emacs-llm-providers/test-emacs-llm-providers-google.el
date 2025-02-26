@@ -133,9 +133,9 @@
             "{\"mock\":\"payload\"}"))
          ((symbol-function '--el-prepare-llm-buffer)
           (lambda
-            (prompt engine model template)
+            (prompt engine engine template)
             (setq prepared-buffer
-                  (list prompt engine model template))
+                  (list prompt engine engine template))
             "*mock-buffer*"))
          ((symbol-function '--el-start-spinner)
           (lambda

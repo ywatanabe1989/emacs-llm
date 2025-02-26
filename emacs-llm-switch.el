@@ -6,7 +6,7 @@
 ;;;###autoload
 (defun el-switch
     (provider)
-  "Switch the LLM provider and select a model."
+  "Switch the LLM provider and select a engine."
   (interactive
    (list
     (completing-read "Select LLM provider: "
@@ -15,31 +15,31 @@
   (setq --el-provider provider)
 
   (let*
-      ((provider-models
+      ((provider-engines
         (cond
          ((string= provider "openai")
-          --el-openai-models)
+          --el-openai-engines)
          ((string= provider "anthropic")
-          --el-anthropic-models)
+          --el-anthropic-engines)
          ((string= provider "google")
-          --el-google-models)
+          --el-google-engines)
          ((string= provider "deepseek")
-          --el-deepseek-models)))
-       (selected-model
-        (completing-read "Select model: " provider-models nil t)))
+          --el-deepseek-engines)))
+       (selected-engine
+        (completing-read "Select engine: " provider-engines nil t)))
 
     (cond
      ((string= provider "openai")
-      (setq --el-openai-model selected-model))
+      (setq --el-openai-engine selected-engine))
      ((string= provider "anthropic")
-      (setq --el-anthropic-model selected-model))
+      (setq --el-anthropic-engine selected-engine))
      ((string= provider "google")
-      (setq --el-google-model selected-model))
+      (setq --el-google-engine selected-engine))
      ((string= provider "deepseek")
-      (setq --el-deepseek-model selected-model))
+      (setq --el-deepseek-engine selected-engine))
      )
 
-    (message "Switched to %s using model: %s" provider selected-model)))
+    (message "Switched to %s using engine: %s" provider selected-engine)))
 
 (provide 'emacs-llm-switch)
 

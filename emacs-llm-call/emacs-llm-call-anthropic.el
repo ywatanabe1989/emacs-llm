@@ -25,10 +25,10 @@ Optional TEMPLATE-NAME is the name of the template-name used."
         (format "curl -N 'https://api.anthropic.com/v1/messages' -H 'Content-Type: application/json' -H 'anthropic-version: 2023-06-01' -H 'anthropic-beta: output-128k-2025-02-19' -H 'x-api-key: %s' -d '%s'"
                 (or --el-api-key-anthropic --el-anthropic-api-key)
                 escaped-payload))
-       (model-name
-        (or --el-anthropic-model --el-default-engine-anthropic))
+       (engine-name
+        (or --el-anthropic-engine --el-default-engine-anthropic))
        (buffer-name
-        (--el-prepare-llm-buffer prompt "ANTHROPIC" model-name template-name))
+        (--el-prepare-llm-buffer prompt "ANTHROPIC" engine-name template-name))
        (proc
         (start-process-shell-command "--el-anthropic-stream" temp-buffer curl-command)))
 
@@ -91,14 +91,14 @@ Optional TEMPLATE-NAME is the name of the template-name used."
     (prompt)
   "Construct the JSON payload for Anthropic API with PROMPT."
   (let*
-      ((model-name
-        (or --el-anthropic-model --el-default-engine-anthropic))
+      ((engine-name
+        (or --el-anthropic-engine --el-default-engine-anthropic))
        (max-tokens
         (or
-         (alist-get model-name --el-anthropic-engine-max-tokens-alist nil nil 'string=)
+         (alist-get engine-name --el-anthropic-engine-max-tokens-alist nil nil 'string=)
          128000)))
     (json-encode
-     `(("model" . ,model-name)
+     `(("engine" . ,engine-name)
        ("max_tokens" . ,max-tokens)
        ("stream" . t)
        ;; ("temperature" . ,--el-temperature)

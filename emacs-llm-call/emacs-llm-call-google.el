@@ -13,11 +13,11 @@ Optional TEMPLATE-NAME is the name of the template used."
   (let*
       ((temp-buffer
         (generate-new-buffer " *google-temp-output*"))
-       (model-name
-        (or --el-google-model --el-default-engine-google))
+       (engine-name
+        (or --el-google-engine --el-default-engine-google))
        (url
-        (format "https://generativelanguage.googleapis.com/v1beta/models/%s:streamGenerateContent?alt=sse&key=%s"
-                model-name
+        (format "https://generativelanguage.googleapis.com/v1beta/engines/%s:streamGenerateContent?alt=sse&key=%s"
+                engine-name
                 (or --el-api-key-google --el-google-api-key)))
        (full-prompt
         (--el-apply-template prompt template-name))
@@ -29,7 +29,7 @@ Optional TEMPLATE-NAME is the name of the template used."
               "-H" "Content-Type: application/json"
               "-d" payload))
        (buffer-name
-        (--el-prepare-llm-buffer prompt "GOOGLE" model-name template-name))
+        (--el-prepare-llm-buffer prompt "GOOGLE" engine-name template-name))
        (proc
         (apply #'start-process "--el-google-stream" temp-buffer "curl" args)))
 
@@ -242,11 +242,11 @@ Optional TEMPLATE-NAME is the name of the template used."
     (prompt)
   "Construct the JSON payload for Google Gemini API with PROMPT."
   (let*
-      ((model-name
-        (or --el-google-model --el-default-engine-google))
+      ((engine-name
+        (or --el-google-engine --el-default-engine-google))
        (max-tokens
         (or
-         (alist-get model-name --el-google-engine-max-tokens-alist nil nil 'string=)
+         (alist-get engine-name --el-google-engine-max-tokens-alist nil nil 'string=)
          100000))
        (recent-history
         (--el-get-recent-history))

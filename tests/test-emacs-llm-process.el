@@ -186,7 +186,7 @@
           (process-put test-proc 'target-buffer test-buffer)
           (process-put test-proc 'prompt "Test prompt")
           (process-put test-proc 'provider "test-provider")
-          (process-put test-proc 'model "test-model")
+          (process-put test-proc 'engine "test-engine")
           (process-put test-proc 'content "Test response")
 
           ;; Mock functions used by the sentinel
@@ -211,7 +211,7 @@
                (string-match-p "HISTORY: user - Test prompt"
                                (buffer-string)))
               (should
-               (string-match-p "HISTORY: test-model - Test response"
+               (string-match-p "HISTORY: test-engine - Test response"
                                (buffer-string))))))
       (kill-buffer test-buffer)
       (delete-process test-proc))))
@@ -235,7 +235,7 @@
           (process-put test-proc 'temp-buffer temp-buffer)
           (process-put test-proc 'prompt "Test prompt")
           (process-put test-proc 'provider "test-provider")
-          (process-put test-proc 'model "test-model")
+          (process-put test-proc 'engine "test-engine")
           (process-put test-proc 'content "Test response")
 
           ;; Mock functions used by the sentinel

@@ -14,7 +14,7 @@ curl https://api.anthropic.com/v1/messages \
      --header "content-type: application/json" \
      --data \
      '{
-    "model": "claude-3-7-sonnet-20250219",
+    "engine": "claude-3-7-sonnet-20250219",
     "max_tokens": 128000,
     "stream": true,
     "thinking": {
@@ -30,7 +30,7 @@ curl https://api.anthropic.com/v1/messages \
 }'
 
 # event: message_start
-# data: {"type":"message_start","message":{"id":"msg_01FWVuF9t1o5peo9Zz2B1seh","type":"message","role":"assistant","model":"claude-3-7-sonnet-20250219","content":[],"stop_reason":null,"stop_sequence":null,"usage":{"input_tokens":41,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"output_tokens":6}}          }
+# data: {"type":"message_start","message":{"id":"msg_01FWVuF9t1o5peo9Zz2B1seh","type":"message","role":"assistant","engine":"claude-3-7-sonnet-20250219","content":[],"stop_reason":null,"stop_sequence":null,"usage":{"input_tokens":41,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"output_tokens":6}}          }
 
 # event: content_block_start
 # data: {"type":"content_block_start","index":0,"content_block":{"type":"thinking","thinking":"","signature":""} }

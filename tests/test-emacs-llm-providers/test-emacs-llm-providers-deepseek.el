@@ -32,7 +32,7 @@
               (json-read-from-string payload)))
           (should
            (string=
-            (alist-get 'model data)
+            (alist-get 'engine data)
             "deepseek-chat"))
           (should
            (=

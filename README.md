@@ -8,7 +8,7 @@
 
 [![Build Status](https://github.com/ywatanabe1989/emacs-llm/workflows/tests/badge.svg)](https://github.com/ywatanabe1989/emacs-llm/actions)
 
-An Emacs interface for LLMs including OpenAI, Google, Anthropic and DeepSeek models.
+An Emacs interface for LLMs including OpenAI, Google, Anthropic and DeepSeek engines.
 
 ## Features
 
@@ -16,7 +16,7 @@ An Emacs interface for LLMs including OpenAI, Google, Anthropic and DeepSeek mod
 - Markdown rendering for AI responses
 - Conversation history management
 - Code block navigation and extraction
-- Provider and model switching
+- Provider and engine switching
 - Template system for prompts
 
 ## Installation
@@ -46,7 +46,7 @@ Set up API keys in your environment variables or in your Emacs configuration:
 (setq --el-api-key-google "your-google-api-key")
 (setq --el-api-key-deepseek "your-deepseek-api-key")
 
-;; Default provider and model
+;; Default provider and engine
 (setq --el-default-provider "google")
 (setq --el-default-engine "gemini-2.0-flash")
 ```
@@ -54,7 +54,7 @@ Set up API keys in your environment variables or in your Emacs configuration:
 ## Usage
 
 - `C-c l o` - Run LLM on region or prompt
-- `C-c l s` - Switch provider and model
+- `C-c l s` - Switch provider and engine
 - `C-c l h` - Show conversation history
 - `C-c l c` - Copy last LLM response
 - `C-c l q` - Quick menu for emacs-llm

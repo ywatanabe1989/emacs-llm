@@ -22,10 +22,10 @@ Optional TEMPLATE-NAME is the name of the template used."
         (format "curl -N 'https://api.deepseek.com/v1/chat/completions' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' -d '%s'"
                 --el-deepseek-api-key
                 escaped-payload))
-       (model-name
-        (or --el-deepseek-model --el-default-engine-deepseek))
+       (engine-name
+        (or --el-deepseek-engine --el-default-engine-deepseek))
        (buffer-name
-        (--el-prepare-llm-buffer prompt "DEEPSEEK" model-name template-name))
+        (--el-prepare-llm-buffer prompt "DEEPSEEK" engine-name template-name))
        (proc
         (start-process-shell-command "--el-deepseek-stream" temp-buffer curl-command)))
 
@@ -140,17 +140,17 @@ Optional TEMPLATE-NAME is the name of the template used."
 ;;     (prompt)
 ;;   "Construct the JSON payload for DeepSeek API with PROMPT."
 ;;   (let*
-;;       ((model-name
-;;         (or --el-deepseek-model --el-default-engine-deepseek))
+;;       ((engine-name
+;;         (or --el-deepseek-engine --el-default-engine-deepseek))
 ;;        (max-tokens
 ;;         (or
-;;          (alist-get model-name --el-deepseek-engine-max-tokens-alist nil nil 'string=)
+;;          (alist-get engine-name --el-deepseek-engine-max-tokens-alist nil nil 'string=)
 ;;          8192))
 ;;        (recent-history
 ;;         (--el-get-recent-history))
 ;;        (payload
 ;;         (json-encode
-;;          `(("model" . ,model-name)
+;;          `(("engine" . ,engine-name)
 ;;            ("messages" . ,(append recent-history
 ;;                                   (vector
 ;;                                    `(("role" . "user")
@@ -165,11 +165,11 @@ Optional TEMPLATE-NAME is the name of the template used."
     (prompt)
   "Construct the JSON payload for DeepSeek API with PROMPT."
   (let*
-      ((model-name
-        (or --el-deepseek-model --el-default-engine-deepseek))
+      ((engine-name
+        (or --el-deepseek-engine --el-default-engine-deepseek))
        (max-tokens
         (or
-         (alist-get model-name --el-deepseek-engine-max-tokens-alist nil nil 'string=)
+         (alist-get engine-name --el-deepseek-engine-max-tokens-alist nil nil 'string=)
          8192))
        (recent-history
         (--el-get-recent-history))
@@ -180,7 +180,7 @@ Optional TEMPLATE-NAME is the name of the template used."
                    ("content" . ,prompt)))))
        (payload
         (json-encode
-         `(("model" . ,model-name)
+         `(("engine" . ,engine-name)
            ("messages" . ,full-prompt)
            ("temperature" . ,--el-temperature)
            ("max_tokens" . ,max-tokens)

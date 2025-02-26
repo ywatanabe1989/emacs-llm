@@ -52,7 +52,7 @@ data/*
 **/*.pth
 **/*.pt
 **/*.chk
-**/*.model
+**/*.engine
 **/*.tiff
 **/*.wav
 **/*.jpg

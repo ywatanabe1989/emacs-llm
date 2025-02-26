@@ -19,9 +19,9 @@
 ;;         (format "curl -N 'https://api.openai.com/v1/chat/completions' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' -d %s"
 ;;                 (or --el-api-key-openai --el-api-key)
 ;;                 (shell-quote-argument payload)))
-;;        (model-name
-;;         (or --el-openai-model --el-default-engine-openai)))
-;;     (message "Using model: %s" model-name)
+;;        (engine-name
+;;         (or --el-openai-engine --el-default-engine-openai)))
+;;     (message "Using engine: %s" engine-name)
 ;;     (message "Curl command length: %d"
 ;;              (length curl-command))
 ;;     (message "Payload first 100 chars: %s"
@@ -30,7 +30,7 @@
 ;;                              (length payload))))
 ;;     (let*
 ;;         ((buffer-name
-;;           (--el-prepare-llm-buffer prompt "OPENAI" model-name template-name))
+;;           (--el-prepare-llm-buffer prompt "OPENAI" engine-name template-name))
 ;;          (proc
 ;;           (start-process-shell-command "--el-openai-stream" temp-buffer curl-command)))
 ;;       (message "Process started with PID: %s"
@@ -40,7 +40,7 @@
 ;;       (process-put proc 'content "")
 ;;       (process-put proc 'prompt prompt)
 ;;       (process-put proc 'provider "OPENAI")
-;;       (process-put proc 'model model-name)
+;;       (process-put proc 'engine engine-name)
 ;;       (process-put proc 'template template-name)
 ;;       (set-process-filter proc #'--el-openai-filter)
 ;;       (message "Process filter set")
@@ -70,9 +70,9 @@ Optional TEMPLATE-NAME is the name of the template used."
         (format "curl -N 'https://api.openai.com/v1/chat/completions' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' -d %s"
                 (or --el-api-key-openai --el-api-key)
                 (shell-quote-argument payload)))
-       (model-name
-        (or --el-openai-model --el-default-engine-openai)))
-    (message "Using model: %s" model-name)
+       (engine-name
+        (or --el-openai-engine --el-default-engine-openai)))
+    (message "Using engine: %s" engine-name)
     (message "Curl command length: %d"
              (length curl-command))
     (message "Payload first 100 chars: %s"
@@ -82,7 +82,7 @@ Optional TEMPLATE-NAME is the name of the template used."
     (let*
         (;; Pass original prompt for display purposes, not the template-augmented one
          (buffer-name
-          (--el-prepare-llm-buffer prompt "OPENAI" model-name template-name))
+          (--el-prepare-llm-buffer prompt "OPENAI" engine-name template-name))
          (proc
           (start-process-shell-command "--el-openai-stream" temp-buffer curl-command)))
       (message "Process started with PID: %s"
@@ -92,7 +92,7 @@ Optional TEMPLATE-NAME is the name of the template used."
       (process-put proc 'content "")
       (process-put proc 'prompt prompt)
       (process-put proc 'provider "OPENAI")
-      (process-put proc 'model model-name)
+      (process-put proc 'engine engine-name)
       ;; Don't store template name in process properties
       ;; (process-put proc 'template template-name)
       (set-process-filter proc #'--el-openai-filter)
@@ -173,15 +173,15 @@ Optional TEMPLATE-NAME is the name of the template used."
     (prompt)
   "Construct the JSON payload for OpenAI API with PROMPT."
   (let*
-      ((model-name
-        (or --el-openai-model --el-default-engine-openai))
+      ((engine-name
+        (or --el-openai-engine --el-default-engine-openai))
        (max-tokens
         (or
-         (alist-get model-name --el-openai-engine-max-tokens-alist nil nil 'string=)
+         (alist-get engine-name --el-openai-engine-max-tokens-alist nil nil 'string=)
          8192))
        ;; Parse engine for reasoning effort
        (engine-parts
-        (--el-parse-openai-engine model-name))
+        (--el-parse-openai-engine engine-name))
        (actual-engine
         (car engine-parts))
        (effort
@@ -197,7 +197,7 @@ Optional TEMPLATE-NAME is the name of the template used."
                    ("content" . ,prompt)))))
        ;; Base payload
        (payload
-        `(("model" . ,actual-engine)
+        `(("engine" . ,actual-engine)
           ("messages" . ,messages)
           ;; ("max_tokens" . ,max-tokens)
           ;; ("temperature" . ,--el-temperature)
@@ -218,7 +218,7 @@ Optional TEMPLATE-NAME is the name of the template used."
 
 (defun --el-parse-openai-engine
     (engine-string)
-  "Parse OpenAI engine string to get base model and effort level.
+  "Parse OpenAI engine string to get base engine and effort level.
 Returns (ACTUAL-ENGINE . EFFORT)."
   (let
       ((base nil)

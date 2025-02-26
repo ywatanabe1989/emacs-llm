@@ -1,9 +1,9 @@
 ;;; -*- coding: utf-8; lexical-binding: t -*-
 ;;; Author: ywatanabe
-;;; Timestamp: <2025-02-26 21:18:21>
+;;; Timestamp: <2025-02-26 22:32:48>
 ;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/emacs-llm-call/emacs-llm-call-variables.el
 
-;; Used
+;; General
 ;; ----------------------------------------
 
 (defcustom --el-default-provider "google"
@@ -16,16 +16,10 @@
   :type 'string
   :group 'el)
 
-;; (defcustom --el-api-key
-;;   (getenv "OPENAI_API_KEY")
-;;   "API key for OpenAI services."
-;;   :type 'string
-;;   :group 'emacs-llm)
-
-;; (defcustom --el-model "gpt-4o"
-;;   "Default model to use for OpenAI."
-;;   :type 'string
-;;   :group 'emacs-llm)
+(defcustom --el-request-timeout 300
+  "Timeout in seconds for LLM API requests"
+  :type 'int
+  :group 'emacs-llm)
 
 (defcustom --el-temperature 0.7
   "Temperature setting for LLM responses."
@@ -46,44 +40,6 @@
     (const :tag "Google" "google")
     (const :tag "DeepSeek" "deepseek"))
   :group 'emacs-llm)
-;; (defcustom --el-google-api-key
-;;   (getenv "GOOGLE_API_KEY")
-;;   "API key for Google Gemini services."
-;;   :type 'string
-;;   :group 'el)
-
-;; (defcustom --el-deepseek-api-key
-;;   (getenv "DEEPSEEK_API_KEY")
-;;   "API key for Deepseek Gemini services."
-;;   :type 'string
-;;   :group 'el)
-
-;; (defcustom --el-anthropic-model "claude-3-7-sonnet-20250219"
-;;   "Default model to use for Anthropic Claude."
-;;   :type 'string
-;;   :group 'el)
-
-;; (defvar --el-openai-models
-;;   '("gpt-4o" "gpt-4-turbo" "gpt-3.5-turbo" "gpt-4" "o1-mini" "o1" "o3-mini")
-;;   "Available OpenAI models.")
-
-;; (defvar --el-anthropic-models
-;;   '("claude-3-7-sonnet-20250219" "claude-3-5-sonnet-20241022" "claude-3-5-haiku-20241022")
-;;   "Available Anthropic Claude models.")
-
-;; (defvar --el-google-models
-;;   '("gemini-2.0-flash" "gemini-2.0-pro" "gemini-1.5-pro")
-;;   "Available Google Gemini models.")
-
-;; (defvar --el-deepseek-models
-;;   '("deepseek-chat" "deepseek-coder" "deepseek-reasoner")
-;;   "Available DeepSeek models.")
-
-;; Timeout
-;; ----------------------------------------
-
-(defvar --el-request-timeout 300
-  "Timeout in seconds for LLM API requests")
 
 ;; API keys
 ;; ----------------------------------------
@@ -126,31 +82,31 @@
 
 (defcustom --el-default-engine-openai
   (getenv "OPENAI_ENGINE")
-  "Deafult model for OpenAI."
+  "Deafult engine for OpenAI."
   :type 'string
   :group 'el)
 
 (defcustom --el-default-engine-anthropic
   (getenv "ANTHROPIC_ENGINE")
-  "Deafult model for Anthropic Claude."
+  "Deafult engine for Anthropic Claude."
   :type 'string
   :group 'el)
 
 (defcustom --el-default-engine-google
   (getenv "GOOGLE_ENGINE")
-  "Deafult model for Google Claude."
+  "Deafult engine for Google Claude."
   :type 'string
   :group 'el)
 
 (defcustom --el-default-engine-deepseek
   (getenv "DEEPSEEK_ENGINE")
-  "Deafult model for DeepSeek."
+  "Deafult engine for DeepSeek."
   :type 'string
   :group 'el)
 
 (defcustom --el-default-engine-groq
   (getenv "GROQ_ENGINE")
-  "Deafult model for Groq."
+  "Deafult engine for Groq."
   :type 'string
   :group 'el)
 
@@ -194,37 +150,37 @@
 ;; Available Engines
 ;; ----------------------------------------
 
-(defvar --el-openai-models
+(defvar --el-openai-engines
   (mapcar #'car --el-openai-engine-max-tokens-alist)
-  "List of available models for the openai provider.")
+  "List of available engines for the openai provider.")
 
-(defvar --el-anthropic-models
+(defvar --el-anthropic-engines
   (mapcar #'car --el-anthropic-engine-max-tokens-alist)
-  "List of available models for the anthropic provider.")
+  "List of available engines for the anthropic provider.")
 
-(defvar --el-google-models
+(defvar --el-google-engines
   (mapcar #'car --el-google-engine-max-tokens-alist)
-  "List of available models for the google provider.")
+  "List of available engines for the google provider.")
 
-(defvar --el-deepseek-models
+(defvar --el-deepseek-engines
   (mapcar #'car --el-deepseek-engine-max-tokens-alist)
-  "List of available models for the deepseek provider.")
+  "List of available engines for the deepseek provider.")
 
-(defvar --el-groq-models
+(defvar --el-groq-engines
   (mapcar #'car --el-groq-engine-max-tokens-alist)
-  "List of available models for the groq provider.")
+  "List of available engines for the groq provider.")
 
-(defvar --el-openai-model nil
-  "Selected OpenAI model.")
+(defvar --el-openai-engine nil
+  "Selected OpenAI engine.")
 
-(defvar --el-anthropic-model nil
-  "Selected Anthropic model.")
+(defvar --el-anthropic-engine nil
+  "Selected Anthropic engine.")
 
-(defvar --el-google-model nil
-  "Selected Google model.")
+(defvar --el-google-engine nil
+  "Selected Google engine.")
 
-(defvar --el-deepseek-model nil
-  "Selected DeepSeek model.")
+(defvar --el-deepseek-engine nil
+  "Selected DeepSeek engine.")
 
 (provide 'emacs-llm-call-variables)
 

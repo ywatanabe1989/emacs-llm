@@ -8,7 +8,7 @@
   "Test that the LLM buffer can be prepared correctly."
   (let
       ((buffer-name
-        (--el-prepare-llm-buffer "Test prompt" "TEST" "test-model")))
+        (--el-prepare-llm-buffer "Test prompt" "TEST" "test-engine")))
     (should
      (get-buffer buffer-name))
     (with-current-buffer buffer-name
@@ -18,7 +18,7 @@
        (string-match-p "Test prompt"
                        (buffer-string)))
       (should
-       (string-match-p "> test-model"
+       (string-match-p "> test-engine"
                        (buffer-string)))
       )
     (kill-buffer buffer-name)))
@@ -30,9 +30,9 @@
       ((--el-buffer-name "*Test-LLM*")
        (prompt "Test prompt")
        (provider "TEST-PROVIDER")
-       (model "test-model")
+       (engine "test-engine")
        (buffer-name
-        (--el-prepare-llm-buffer prompt provider model)))
+        (--el-prepare-llm-buffer prompt provider engine)))
 
     (should
      (get-buffer buffer-name))
@@ -53,7 +53,7 @@
         (should
          (string-match-p
           (regexp-quote
-           (format "\> %s" model))
+           (format "\> %s" engine))
           content))
         (should
          (string-match-p
@@ -73,10 +73,10 @@
       ((--el-buffer-name "*Test-LLM*")
        (prompt "Test prompt")
        (provider "TEST-PROVIDER")
-       (model "test-model")
+       (engine "test-engine")
        (template "test-template")
        (buffer-name
-        (--el-prepare-llm-buffer prompt provider model template)))
+        (--el-prepare-llm-buffer prompt provider engine template)))
 
     (should
      (get-buffer buffer-name))
@@ -106,7 +106,7 @@
       (insert "Initial content\n"))
 
     ;; Prepare buffer
-    (--el-prepare-llm-buffer "Test prompt" "TEST" "test-model")
+    (--el-prepare-llm-buffer "Test prompt" "TEST" "test-engine")
 
     (with-current-buffer buffer
       (should

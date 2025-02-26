@@ -4,11 +4,11 @@
 ;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/emacs-llm-display.el
 
 (defun --el-prepare-llm-buffer
-    (prompt provider model &optional template-name)
+    (prompt provider engine &optional template-name)
   "Prepare the LLM buffer for displaying a response.
 PROMPT is the user input.
 PROVIDER is the name of the LLM provider.
-MODEL is the model name.
+ENGINE is the engine name.
 Optional TEMPLATE-NAME is the name of the template used, if any."
   (let
       ((buffer-name
@@ -26,7 +26,7 @@ Optional TEMPLATE-NAME is the name of the template used, if any."
         (insert "\n\n"))
       (insert --el-separator)
       (insert
-       (format "\n\n > %s [Template: %s]" model template-name))
+       (format "\n\n > %s [Template: %s]" engine template-name))
       (insert
        (format "\n\n > %s\n\n" prompt))
       (display-buffer

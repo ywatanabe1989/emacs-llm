@@ -20,7 +20,7 @@
             (json-read-from-string payload)))
         (should
          (string=
-          (alist-get 'model data)
+          (alist-get 'engine data)
           "claude-3-5-sonnet-20241022"))
         (should
          (eq
