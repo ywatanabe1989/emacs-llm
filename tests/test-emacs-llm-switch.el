@@ -15,7 +15,7 @@
     ()
   "Test provider switching functionality."
   (let
-      ((original-provider --el-provider)
+      ((original-provider --el-actual-provider)
        (--el-openai-engines
         '("gpt-4o" "gpt-4"))
        (--el-anthropic-engines
@@ -24,7 +24,7 @@
         '("gemini-pro"))
        (--el-deepseek-engines
         '("deepseek-chat"))
-       (--el-provider nil)
+       (--el-actual-provider nil)
        (--el-openai-engine nil)
        (--el-anthropic-engine nil)
        (--el-google-engine nil)
@@ -43,13 +43,13 @@
                (car args)
                "Select engine: ")
               (cond
-               ((string= --el-provider "openai")
+               ((string= --el-actual-provider "openai")
                 "gpt-4o")
-               ((string= --el-provider "anthropic")
+               ((string= --el-actual-provider "anthropic")
                 "claude-3")
-               ((string= --el-provider "google")
+               ((string= --el-actual-provider "google")
                 "gemini-pro")
-               ((string= --el-provider "deepseek")
+               ((string= --el-actual-provider "deepseek")
                 "deepseek-chat")
                (t "unknown")))
              (t completing-read-result)))))
@@ -58,7 +58,7 @@
       (setq completing-read-result "openai")
       (call-interactively 'el-switch)
       (should
-       (string= --el-provider "openai"))
+       (string= --el-actual-provider "openai"))
       (should
        (string= --el-openai-engine "gpt-4o"))
 
@@ -66,7 +66,7 @@
       (setq completing-read-result "anthropic")
       (call-interactively 'el-switch)
       (should
-       (string= --el-provider "anthropic"))
+       (string= --el-actual-provider "anthropic"))
       (should
        (string= --el-anthropic-engine "claude-3"))
 
@@ -74,7 +74,7 @@
       (setq completing-read-result "google")
       (call-interactively 'el-switch)
       (should
-       (string= --el-provider "google"))
+       (string= --el-actual-provider "google"))
       (should
        (string= --el-google-engine "gemini-pro"))
 
@@ -82,12 +82,12 @@
       (setq completing-read-result "deepseek")
       (call-interactively 'el-switch)
       (should
-       (string= --el-provider "deepseek"))
+       (string= --el-actual-provider "deepseek"))
       (should
        (string= --el-deepseek-engine "deepseek-chat")))
 
     ;; Restore original provider
-    (setq --el-provider original-provider)))
+    (setq --el-actual-provider original-provider)))
 
 (provide 'test-emacs-llm-switch)
 

@@ -1,7 +1,7 @@
 ;;; -*- coding: utf-8; lexical-binding: t -*-
 ;;; Author: ywatanabe
-;;; Timestamp: <2025-02-26 21:18:20>
-;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/emacs-llm-call/emacs-llm-call-deepseek.el
+;;; Timestamp: <2025-02-27 01:20:53>
+;;; File: /home/ywatanabe/.emacs.d/lisp/emacs-llm/emacs-llm-call/emacs-llm-call-deepseek.el
 
 (defun --el-deepseek-stream
     (prompt &optional template-name)
@@ -22,32 +22,33 @@ Optional TEMPLATE-NAME is the name of the template used."
         (format "curl -N 'https://api.deepseek.com/v1/chat/completions' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' -d '%s'"
                 --el-deepseek-api-key
                 escaped-payload))
-       (engine-name
+       (actual-engine
         (or --el-deepseek-engine --el-default-engine-deepseek))
        (buffer-name
-        (--el-prepare-llm-buffer prompt "DEEPSEEK" engine-name template-name))
+        (--el-prepare-llm-buffer prompt "deepseek" actual-engine template-name))
        (proc
         (start-process-shell-command "--el-deepseek-stream" temp-buffer curl-command)))
-
     (process-put proc 'target-buffer buffer-name)
     (process-put proc 'temp-buffer temp-buffer)
     (process-put proc 'content "")
     (process-put proc 'partial-data "")
+    (process-put proc 'prompt prompt)
+    (process-put proc 'provider "deepseek")
+    (process-put proc 'engine actual-engine)
+    (process-put proc 'template template-name)
     (set-process-filter proc #'--el-deepseek-filter)
     (set-process-sentinel proc #'--el-process-sentinel)
     (--el-start-spinner)
-    (--el-append-to-history "user" prompt template-name)
+    (--el-history-append "user" prompt template-name)
     proc))
 
 ;; Helper
 ;; ----------------------------------------
+
 (defun --el-parse-deepseek-chunk
     (chunk)
   "Parse DeepSeek JSON CHUNK and return content."
-  ;; (message "DEBUG: Parsing DeepSeek chunk: %s"
-  ;;          (substring chunk 0
-  ;;                     (min 30
-  ;;                          (length chunk))))
+
   (when
       (and chunk
            (not
@@ -75,14 +76,13 @@ Optional TEMPLATE-NAME is the name of the template used."
                         0))
                 (alist-get 'delta
                            (aref choices 0)))))
-          ;; (message "DEBUG: DeepSeek delta: %s" delta)
+
           (alist-get 'content delta))))))
 
 (defun --el-deepseek-filter
     (proc chunk)
   "Filter for DeepSeek stream PROC processing CHUNK."
-  ;; (message "DEBUG: DeepSeek filter received chunk of length %d"
-  ;;          (length chunk))
+
   (let*
       ((partial
         (or
@@ -98,14 +98,11 @@ Optional TEMPLATE-NAME is the name of the template used."
             ""
           (car
            (last lines)))))
-
     (unless
         (string= incomplete "")
       (setq lines
             (butlast lines)))
-
     (process-put proc 'partial-data incomplete)
-
     (dolist
         (line lines)
       (when
@@ -136,52 +133,31 @@ Optional TEMPLATE-NAME is the name of the template used."
                                "")
                               text))))))))))
 
-;; (defun --el-construct-deepseek-payload
-;;     (prompt)
-;;   "Construct the JSON payload for DeepSeek API with PROMPT."
-;;   (let*
-;;       ((engine-name
-;;         (or --el-deepseek-engine --el-default-engine-deepseek))
-;;        (max-tokens
-;;         (or
-;;          (alist-get engine-name --el-deepseek-engine-max-tokens-alist nil nil 'string=)
-;;          8192))
-;;        (recent-history
-;;         (--el-get-recent-history))
-;;        (payload
-;;         (json-encode
-;;          `(("engine" . ,engine-name)
-;;            ("messages" . ,(append recent-history
-;;                                   (vector
-;;                                    `(("role" . "user")
-;;                                      ("content" . ,prompt)))))
-;;            ("temperature" . ,--el-temperature)
-;;            ("max_tokens" . ,max-tokens)
-;;            ("stream" . t)))))
-;;     ;; (message "DEBUG: Constructed DeepSeek payload: %s" payload)
-;;     payload))
-
 (defun --el-construct-deepseek-payload
     (prompt)
   "Construct the JSON payload for DeepSeek API with PROMPT."
   (let*
-      ((engine-name
+      ((actual-engine
         (or --el-deepseek-engine --el-default-engine-deepseek))
        (max-tokens
         (or
-         (alist-get engine-name --el-deepseek-engine-max-tokens-alist nil nil 'string=)
+         (alist-get actual-engine --el-deepseek-engine-max-tokens-alist nil nil 'string=)
          8192))
-       (recent-history
-        (--el-get-recent-history))
-       (full-prompt
-        (append recent-history
-                (list
-                 `(("role" . "user")
-                   ("content" . ,prompt)))))
+       ;; Add recent history as string
+       (conversation
+        (--el-history-get-recent-as-string))
+       ;; Combine history with prompt
+       (full-conversation
+        (if
+            (string-empty-p conversation)
+            prompt
+          (concat conversation "\n\n" prompt)))
        (payload
         (json-encode
-         `(("engine" . ,engine-name)
-           ("messages" . ,full-prompt)
+         `(("model" . ,actual-engine)
+           ("messages" . ,(list
+                           `(("role" . "user")
+                             ("content" . ,full-conversation))))
            ("temperature" . ,--el-temperature)
            ("max_tokens" . ,max-tokens)
            ("stream" . t)))))

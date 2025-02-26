@@ -1,6 +1,6 @@
 ;;; -*- coding: utf-8; lexical-binding: t -*-
 ;;; Author: ywatanabe
-;;; Timestamp: <2025-02-26 21:22:14>
+;;; Timestamp: <2025-02-27 01:51:31>
 ;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/emacs-llm-process.el
 
 (require 'emacs-llm-dired)
@@ -15,6 +15,10 @@
 (defun --el-process-chunk
     (proc chunk parse-func)
   "Process CHUNK from PROC using PARSE-FUNC to extract content."
+  ;; (message "Raw chunk received: %s"
+  ;;          (substring chunk 0
+  ;;                     (min 300
+  ;;                          (length chunk))))
   (let*
       ((partial
         (or
@@ -30,14 +34,11 @@
             ""
           (car
            (last lines)))))
-
     (unless
         (string= incomplete "")
       (setq lines
             (butlast lines)))
-
     (process-put proc 'partial-data incomplete)
-
     ;; Process each complete line
     (dolist
         (line lines)
@@ -50,15 +51,18 @@
               (when
                   (not
                    (string= json-data "[DONE]"))
-                (funcall parse-func json-data))))
-
+                (progn
+                  (funcall parse-func json-data)))))
           (when text
+            ;; (message "Text extracted: %s"
+            ;;          (substring text 0
+            ;;                     (min 30
+            ;;                          (length text))))
             (with-current-buffer
                 (process-get proc 'target-buffer)
               (goto-char
                (point-max))
               (insert text))
-
             ;; Accumulate content
             (process-put proc 'content
                          (concat
@@ -70,9 +74,7 @@
 (defun --el-process-sentinel
     (proc event)
   "Process sentinel for PROC handling EVENT."
-  (message "Process %s received event: %s"
-           (process-name proc)
-           event)
+
   (when
       (string-match-p "\\(finished\\|exited\\|failed\\)" event)
     (--el-stop-spinner)
@@ -83,21 +85,21 @@
           (process-get proc 'provider))
          (engine
           (process-get proc 'engine))
-         ;; Template is intentionally not used in history
-         ;; (template
-         ;;  (process-get proc 'template))
+         (template
+          (process-get proc 'template))
          (response
           (process-get proc 'content)))
+
       (when
           (and prompt provider)
         ;; Only append to history after we have a complete response
-        ;; Don't pass template to history
-        (--el-append-to-history "user" prompt)
+        (--el-history-append "user" prompt template)
         (when
-            (not
-             (string-empty-p response))
-          ;; Don't pass template to history for assistant responses either
-          (--el-append-to-history engine response)))
+            (and response
+                 (not
+                  (string-empty-p response)))
+
+          (--el-history-append engine response template)))
       ;; Clean up temp buffer
       (when-let
           ((tb

@@ -67,7 +67,7 @@ All key bindings are under the `C-c l` prefix by default.
 Conversation history is automatically saved and managed:
 - History is stored in JSON format
 - Auto-backup when history file exceeds 10MB
-- View history with `el-show-history` command
+- View history with `el-history-show` command
 - Copy previous responses with `--el-copy-last-response`
 
 ## Templates

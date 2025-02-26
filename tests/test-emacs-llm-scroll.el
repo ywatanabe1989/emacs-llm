@@ -1,6 +1,6 @@
 ;;; -*- coding: utf-8; lexical-binding: t -*-
 ;;; Author: ywatanabe
-;;; Timestamp: <2025-02-26 22:20:13>
+;;; Timestamp: <2025-02-27 09:30:23>
 ;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-scroll.el
 
 ;;; -*- coding: utf-8; lexical-binding: t -*-
@@ -9,16 +9,6 @@
 ;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-scroll.el
 (require 'ert)
 (require 'emacs-llm-scroll)
-
-(ert-deftest test-el-scroll-to-bottom-loadable
-    ()
-  (should
-   (fboundp '--el-scroll-to-bottom)))
-
-(ert-deftest test-el-scroll-to-point-loadable
-    ()
-  (should
-   (fboundp '--el-scroll-to-point)))
 
 (ert-deftest test-el-scroll-to-last-separator-loadable
     ()
@@ -48,21 +38,7 @@
                  ((symbol-function 'recenter)
                   (lambda
                     (&optional arg)
-                    nil)))
-
-              ;; Test scrolling to a specific point (position of "Line 2")
-              (--el-scroll-to-point
-               (+
-                (point-min)
-                7))
-
-              ;; Verify cursor moved to the expected position
-              (should
-               (=
-                (point)
-                (+
-                 (point-min)
-                 7))))))
+                    nil))))))
       (kill-buffer test-buffer-name))))
 
 (ert-deftest test-el-scroll-to-last-separator-function

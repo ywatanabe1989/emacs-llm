@@ -1,7 +1,7 @@
 ;;; -*- coding: utf-8; lexical-binding: t -*-
 ;;; Author: ywatanabe
-;;; Timestamp: <2025-02-26 15:18:41>
-;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-call/test-emacs-llm-call-anthropic.el
+;;; Timestamp: <2025-02-27 08:50:48>
+;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-providers/test-emacs-llm-providers-anthropic.el
 
 (ert-deftest test-emacs-llm-construct-anthropic-payload
     ()
@@ -20,7 +20,7 @@
             (json-read-from-string payload)))
         (should
          (string=
-          (alist-get 'engine data)
+          (alist-get 'model data)
           "claude-3-5-sonnet-20241022"))
         (should
          (eq
@@ -57,10 +57,10 @@
       (--el-parse-anthropic-chunk chunk)
       "Hello"))))
 
-(provide 'test-emacs-llm-call-anthropic)
+(provide 'test-emacs-llm-providers-anthropic)
 
 (when
     (not load-file-name)
-  (message "test-emacs-llm-call-anthropic.el loaded."
+  (message "test-emacs-llm-providers-anthropic.el loaded."
            (file-name-nondirectory
             (or load-file-name buffer-file-name))))

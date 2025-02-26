@@ -1,55 +1,7 @@
 ;;; -*- coding: utf-8; lexical-binding: t -*-
 ;;; Author: ywatanabe
-;;; Timestamp: <2025-02-26 21:18:21>
+;;; Timestamp: <2025-02-27 01:53:33>
 ;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/emacs-llm-call/emacs-llm-call-openai.el
-
-;; (defun --el-openai-stream
-;;     (prompt &optional template-name)
-;;   "Send PROMPT to OpenAI API via streaming.
-;; Optional TEMPLATE-NAME is the name of the template used."
-;;   (let*
-;;       ((temp-buffer
-;;         (generate-new-buffer " *openai-temp-output*"))
-;;        (full-prompt
-;;         (--el-apply-template prompt template-name))
-;;        (payload
-;;         (--el-construct-openai-payload full-prompt))
-;;        ;; No need for string replacements when using shell-quote-argument
-;;        (curl-command
-;;         (format "curl -N 'https://api.openai.com/v1/chat/completions' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' -d %s"
-;;                 (or --el-api-key-openai --el-api-key)
-;;                 (shell-quote-argument payload)))
-;;        (engine-name
-;;         (or --el-openai-engine --el-default-engine-openai)))
-;;     (message "Using engine: %s" engine-name)
-;;     (message "Curl command length: %d"
-;;              (length curl-command))
-;;     (message "Payload first 100 chars: %s"
-;;              (substring payload 0
-;;                         (min 100
-;;                              (length payload))))
-;;     (let*
-;;         ((buffer-name
-;;           (--el-prepare-llm-buffer prompt "OPENAI" engine-name template-name))
-;;          (proc
-;;           (start-process-shell-command "--el-openai-stream" temp-buffer curl-command)))
-;;       (message "Process started with PID: %s"
-;;                (process-id proc))
-;;       (process-put proc 'target-buffer buffer-name)
-;;       (process-put proc 'temp-buffer temp-buffer)
-;;       (process-put proc 'content "")
-;;       (process-put proc 'prompt prompt)
-;;       (process-put proc 'provider "OPENAI")
-;;       (process-put proc 'engine engine-name)
-;;       (process-put proc 'template template-name)
-;;       (set-process-filter proc #'--el-openai-filter)
-;;       (message "Process filter set")
-;;       (set-process-sentinel proc #'--el-process-sentinel)
-;;       (message "Process sentinel set")
-;;       (--el-start-spinner)
-;;       ;; Don't append to history here - let the process-sentinel do it
-;;       ;; when the response is complete
-;;       proc)))
 
 (defun --el-openai-stream
     (prompt &optional template-name)
@@ -72,17 +24,17 @@ Optional TEMPLATE-NAME is the name of the template used."
                 (shell-quote-argument payload)))
        (engine-name
         (or --el-openai-engine --el-default-engine-openai)))
-    (message "Using engine: %s" engine-name)
-    (message "Curl command length: %d"
-             (length curl-command))
-    (message "Payload first 100 chars: %s"
-             (substring payload 0
-                        (min 100
-                             (length payload))))
+    ;; (message "Using engine: %s" engine-name)
+    ;; (message "Curl command length: %d"
+    ;;          (length curl-command))
+    ;; (message "Payload first 300 chars: %s"
+    ;;          (substring payload 0
+    ;;                     (min 300
+    ;;                          (length payload))))
     (let*
         (;; Pass original prompt for display purposes, not the template-augmented one
          (buffer-name
-          (--el-prepare-llm-buffer prompt "OPENAI" engine-name template-name))
+          (--el-prepare-llm-buffer prompt "openai" engine-name template-name))
          (proc
           (start-process-shell-command "--el-openai-stream" temp-buffer curl-command)))
       (message "Process started with PID: %s"
@@ -91,29 +43,20 @@ Optional TEMPLATE-NAME is the name of the template used."
       (process-put proc 'temp-buffer temp-buffer)
       (process-put proc 'content "")
       (process-put proc 'prompt prompt)
-      (process-put proc 'provider "OPENAI")
+      (process-put proc 'provider "openai")
       (process-put proc 'engine engine-name)
-      ;; Don't store template name in process properties
-      ;; (process-put proc 'template template-name)
+      (process-put proc 'template template-name)
       (set-process-filter proc #'--el-openai-filter)
       (message "Process filter set")
       (set-process-sentinel proc #'--el-process-sentinel)
       (message "Process sentinel set")
       (--el-start-spinner)
-      ;; Don't append to history here - let the process-sentinel do it
-      ;; when the response is complete
       proc)))
-
-;; Helper
-;; ----------------------------------------
 
 (defun --el-parse-openai-chunk
     (chunk)
   "Parse OpenAI JSON CHUNK and return content."
-  (message "DEBUG: Parsing OpenAI chunk: %s"
-           (substring chunk 0
-                      (min 30
-                           (length chunk))))
+
   (when
       (and chunk
            (not
@@ -133,6 +76,8 @@ Optional TEMPLATE-NAME is the name of the template used."
                                       (length chunk))))
              nil))))
       (when data
+        ;; (message "Parsed data: %S" data)
+        ;; Add this debug line
         (let*
             ((choices
               (alist-get 'choices data))
@@ -144,29 +89,27 @@ Optional TEMPLATE-NAME is the name of the template used."
                         0))
                 (alist-get 'delta
                            (aref choices 0)))))
-          (message "DEBUG: Delta: %S" delta)
+
           ;; Check for content or thinking (reasoning_efforts)
           (if
               (alist-get 'content delta)
-              (alist-get 'content delta)
+              (progn
+                (alist-get 'content delta))
             (if
                 (alist-get 'reasoning_efforts delta)
                 (progn
-                  (message "DEBUG: Found reasoning_efforts: %s"
-                           (alist-get 'reasoning_efforts delta))
                   (alist-get 'reasoning_efforts delta))
               nil)))))))
 
 (defun --el-openai-filter
     (proc chunk)
   "Filter for OpenAI stream PROC processing CHUNK."
-  (message "DEBUG: OpenAI filter received chunk of length %d"
-           (length chunk))
+
   (when
       (>
        (length chunk)
        0)
-    (message "DEBUG: Full chunk: %s" chunk))
+    )
   (--el-process-chunk proc chunk #'--el-parse-openai-chunk))
 
 (defun --el-construct-openai-payload
@@ -186,19 +129,22 @@ Optional TEMPLATE-NAME is the name of the template used."
         (car engine-parts))
        (effort
         (cdr engine-parts))
-       ;; Get recent history
-       (recent-history
-        (--el-get-recent-history))
-       ;; Create messages array - include history and current message
-       (messages
-        (append recent-history
-                (list
-                 `(("role" . "user")
-                   ("content" . ,prompt)))))
+       ;; Add recent history as string
+       (conversation
+        (--el-history-get-recent-as-string))
+       ;; Combine history with prompt
+       (full-conversation
+        (if
+            (string-empty-p conversation)
+            prompt
+          (concat conversation "\n\n" prompt)))
        ;; Base payload
        (payload
-        `(("engine" . ,actual-engine)
-          ("messages" . ,messages)
+        `(("model" . ,actual-engine)
+          ;; This is correct - OpenAI API uses "model"
+          ("messages" . ,(list
+                          `(("role" . "user")
+                            ("content" . ,full-conversation))))
           ;; ("max_tokens" . ,max-tokens)
           ;; ("temperature" . ,--el-temperature)
           ("stream" . t))))
@@ -210,10 +156,6 @@ Optional TEMPLATE-NAME is the name of the template used."
     (let
         ((json-result
           (json-encode payload)))
-      (message "DEBUG: Final JSON payload: %s"
-               (substring json-result 0
-                          (min 300
-                               (length json-result))))
       json-result)))
 
 (defun --el-parse-openai-engine
@@ -244,8 +186,6 @@ Returns (ACTUAL-ENGINE . EFFORT)."
      ;; fallback
      (t
       (setq base engine-string)))
-    (message "DEBUG: Parsed engine %s to %s with effort %s"
-             engine-string base effort)
     (cons base effort)))
 
 (provide 'emacs-llm-call-openai)

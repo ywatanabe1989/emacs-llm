@@ -17,7 +17,7 @@
        (--el-temperature 0.7))
     ;; Mock the history function to return empty list
     (cl-letf
-        (((symbol-function '--el-get-recent-history)
+        (((symbol-function '--el-history-get-recent)
           (lambda
             ()
             nil)))

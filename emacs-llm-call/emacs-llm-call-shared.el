@@ -1,7 +1,7 @@
 ;;; -*- coding: utf-8; lexical-binding: t -*-
 ;;; Author: ywatanabe
-;;; Timestamp: <2025-02-26 21:18:49>
-;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/emacs-llm-call/emacs-llm-call-shared.el
+;;; Timestamp: <2025-02-27 01:16:09>
+;;; File: /home/ywatanabe/.emacs.d/lisp/emacs-llm/emacs-llm-call/emacs-llm-call-shared.el
 
 (require 'emacs-llm-call-variables)
 (require 'emacs-llm-call-openai)
@@ -14,11 +14,11 @@
   "Stream LLM response for PROMPT using PROVIDER.
 Optional TEMPLATE-NAME is the name of the template used.
 
-If PROVIDER is nil, use value of --el-provider.
+If PROVIDER is nil, use value of --el-actual-provider.
 Returns the process object for the streaming request."
   (let*
       ((actual-provider
-        (or provider --el-provider))
+        (or provider --el-actual-provider))
        (provider-function
         (intern
          (format "--el-%s-stream" actual-provider))))
@@ -27,7 +27,7 @@ Returns the process object for the streaming request."
     (if
         (fboundp provider-function)
         (progn
-          (message "Using provider: %s" actual-provider)
+          (message "Actual provider: %s" actual-provider)
           (funcall provider-function prompt template-name))
 
       ;; If provider function doesn't exist, try to fallback
@@ -46,9 +46,9 @@ Returns the process object for the streaming request."
               (funcall fallback-function prompt template-name))
           (error "No working LLM provider found"))))))
 
-(defun sanitize-prompt
-    (prompt)
-  (replace-regexp-in-string "[;\\\"'`$()]" "\\\\\\&" prompt))
+;; (defun sanitize-prompt
+;;     (prompt)
+;;   (replace-regexp-in-string "[;\\\"'`$()]" "\\\\\\&" prompt))
 
 (provide 'emacs-llm-call-shared)
 

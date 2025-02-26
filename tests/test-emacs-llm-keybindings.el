@@ -80,7 +80,7 @@
 
 (ert-deftest test-emacs-llm-keybindings-after-setup-show-history
     ()
-  "Test that C-c l h is bound to el-show-history after setup."
+  "Test that C-c l h is bound to el-history-show after setup."
   (let*
       ((map
         (make-sparse-keymap))
@@ -91,12 +91,12 @@
                 prefix-map)
     (define-key prefix-map
                 (kbd "l h")
-                #'el-show-history)
+                #'el-history-show)
     (should
      (equal
       (lookup-key map
                   (kbd "C-c l h"))
-      #'el-show-history))))
+      #'el-history-show))))
 
 (provide 'test-emacs-llm-keybindings)
 

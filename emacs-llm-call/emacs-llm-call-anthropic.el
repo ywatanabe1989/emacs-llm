@@ -1,6 +1,6 @@
 ;;; -*- coding: utf-8; lexical-binding: t -*-
 ;;; Author: ywatanabe
-;;; Timestamp: <2025-02-26 21:18:19>
+;;; Timestamp: <2025-02-27 01:35:50>
 ;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/emacs-llm-call/emacs-llm-call-anthropic.el
 
 ;; Main
@@ -25,20 +25,23 @@ Optional TEMPLATE-NAME is the name of the template-name used."
         (format "curl -N 'https://api.anthropic.com/v1/messages' -H 'Content-Type: application/json' -H 'anthropic-version: 2023-06-01' -H 'anthropic-beta: output-128k-2025-02-19' -H 'x-api-key: %s' -d '%s'"
                 (or --el-api-key-anthropic --el-anthropic-api-key)
                 escaped-payload))
-       (engine-name
+       (actual-engine
         (or --el-anthropic-engine --el-default-engine-anthropic))
        (buffer-name
-        (--el-prepare-llm-buffer prompt "ANTHROPIC" engine-name template-name))
+        (--el-prepare-llm-buffer prompt "anthropic" actual-engine template-name))
        (proc
         (start-process-shell-command "--el-anthropic-stream" temp-buffer curl-command)))
-
     (process-put proc 'target-buffer buffer-name)
     (process-put proc 'temp-buffer temp-buffer)
     (process-put proc 'content "")
+    (process-put proc 'prompt prompt)
+    (process-put proc 'provider "anthropic")
+    (process-put proc 'template template-name)
+    (process-put proc 'engine actual-engine)
     (set-process-filter proc #'--el-anthropic-filter)
     (set-process-sentinel proc #'--el-process-sentinel)
     (--el-start-spinner)
-    (--el-append-to-history "user" prompt template-name)
+    (--el-history-append "user" prompt template-name)
     proc))
 
 ;; Helper
@@ -47,10 +50,7 @@ Optional TEMPLATE-NAME is the name of the template-name used."
 (defun --el-parse-anthropic-chunk
     (chunk)
   "Parse Anthropic JSON CHUNK and return text delta."
-  ;; (message "Parsing Anthropic chunk: %s"
-  ;;          (substring chunk 0
-  ;;                     (min 30
-  ;;                          (length chunk))))
+
   (when
       (and chunk
            (not
@@ -66,8 +66,6 @@ Optional TEMPLATE-NAME is the name of the template-name used."
                       (error-message-string err))
              nil))))
       (when data
-        ;; (message "Data type: %s"
-        ;;          (alist-get 'type data))
         (let
             ((type
               (alist-get 'type data)))
@@ -76,7 +74,6 @@ Optional TEMPLATE-NAME is the name of the template-name used."
             (let
                 ((delta
                   (alist-get 'delta data)))
-              ;; (message "Content delta: %s" delta)
               (or
                (alist-get 'text delta)
                (alist-get 'thinking delta))))
@@ -91,14 +88,24 @@ Optional TEMPLATE-NAME is the name of the template-name used."
     (prompt)
   "Construct the JSON payload for Anthropic API with PROMPT."
   (let*
-      ((engine-name
+      ((actual-engine
         (or --el-anthropic-engine --el-default-engine-anthropic))
        (max-tokens
         (or
-         (alist-get engine-name --el-anthropic-engine-max-tokens-alist nil nil 'string=)
-         128000)))
+         (alist-get actual-engine --el-anthropic-engine-max-tokens-alist nil nil 'string=)
+         128000))
+       ;; Add recent history as string
+       (conversation
+        (--el-history-get-recent-as-string))
+       ;; Combine history with prompt
+       (full-conversation
+        (if
+            (string-empty-p conversation)
+            prompt
+          (concat conversation "\n\n" prompt))))
     (json-encode
-     `(("engine" . ,engine-name)
+     `(("model" . ,actual-engine)
+       ;; This is correct - Anthropic API uses "model"
        ("max_tokens" . ,max-tokens)
        ("stream" . t)
        ;; ("temperature" . ,--el-temperature)
@@ -108,7 +115,7 @@ Optional TEMPLATE-NAME is the name of the template-name used."
        ("messages" .
         ,(list
           `(("role" . "user")
-            ("content" . ,prompt))))))))
+            ("content" . ,full-conversation))))))))
 
 (provide 'emacs-llm-call-anthropic)
 

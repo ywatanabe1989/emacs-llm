@@ -48,7 +48,7 @@
        (--el-google-engine-max-tokens-alist
         '(("gemini-pro" . 8192)))
        ;; Mock history function to return empty result
-       (--el-get-recent-history
+       (--el-history-get-recent
         (lambda
           ()
           '())))
@@ -141,7 +141,7 @@
           (lambda
             ()
             nil))
-         ((symbol-function '--el-append-to-history)
+         ((symbol-function '--el-history-append)
           (lambda
             (&rest args)
             nil)))

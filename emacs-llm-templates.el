@@ -1,7 +1,7 @@
 ;;; -*- coding: utf-8; lexical-binding: t -*-
 ;;; Author: ywatanabe
-;;; Timestamp: <2025-02-26 22:24:48>
-;;; File: /home/ywatanabe/.emacs.d/lisp/emacs-llm/emacs-llm-templates.el
+;;; Timestamp: <2025-02-26 23:31:14>
+;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/emacs-llm-templates.el
 
 (defcustom --el-templates-dir
   (expand-file-name "templates"
@@ -15,9 +15,9 @@
   "Mapping between shortcuts and their corresponding templates.
 Example: Template shortcuts can be customized as:
 \\=((\"p\" . \"Program\")              ; p -> Program.md
-  (\"e\" . \"Email\")                ; e -> Email.md
-  (\"c\" . \"Correct\")              ; c -> Correct.md
-  (\"my\" . \"MyAwesomeTemplate\"))  ; my -> MyAwesomeTemplate.md"
+ (\"e\" . \"Email\")                ; e -> Email.md
+ (\"c\" . \"Correct\")              ; c -> Correct.md
+ (\"my\" . \"MyAwesomeTemplate\"))  ; my -> MyAwesomeTemplate.md"
   :type
   '(alist :key-type string :value-type string)
   :group 'emacs-llm)
@@ -256,22 +256,24 @@ Example: (--el-find-first-capital \"parapHrase.md\") => (h . 5)"
     (prompt template-name)
   "Apply template TEMPLATE-NAME to PROMPT.
 Returns a new prompt with the template applied."
-  (when template-name
-    (let
-        ((template-path
-          (expand-file-name
-           (concat template-name ".md")
-           --el-templates-dir)))
-      (if
-          (file-exists-p template-path)
-          (with-temp-buffer
-            (insert-file-contents template-path)
-            (let
-                ((template-content
-                  (buffer-string)))
-              (replace-regexp-in-string "PLACEHOLDER" prompt template-content)))
-        ;; If template file doesn't exist, just return original prompt
-        prompt))))
+  (if template-name
+      (let
+          ((template-path
+            (expand-file-name
+             (concat template-name ".md")
+             --el-templates-dir)))
+        (if
+            (file-exists-p template-path)
+            (with-temp-buffer
+              (insert-file-contents template-path)
+              (let
+                  ((template-content
+                    (buffer-string)))
+                (replace-regexp-in-string "PLACEHOLDER" prompt template-content)))
+          ;; If template file doesn't exist, just return original prompt
+          prompt))
+    ;; When template-name is nil, just return the original prompt
+    prompt))
 
 (provide 'emacs-llm-templates)
 

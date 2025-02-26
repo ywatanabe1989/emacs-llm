@@ -1,20 +1,20 @@
 ;;; -*- coding: utf-8; lexical-binding: t -*-
 ;;; Author: ywatanabe
-;;; Timestamp: <2025-02-26 22:32:48>
+;;; Timestamp: <2025-02-27 01:36:43>
 ;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/emacs-llm-call/emacs-llm-call-variables.el
 
 ;; General
 ;; ----------------------------------------
 
-(defcustom --el-default-provider "google"
-  "Default provider"
-  :type 'string
-  :group 'el)
+;; (defcustom --el-default-provider "google"
+;;   "Default provider"
+;;   :type 'string
+;;   :group 'el)
 
-(defcustom --el-default-engine "gemini-2.0-flash-thinking-exp-01-21"
-  "Default engine"
-  :type 'string
-  :group 'el)
+;; (defcustom --el-default-engine "gemini-2.0-flash-thinking-exp-01-21"
+;;   "Default engine"
+;;   :type 'string
+;;   :group 'el)
 
 (defcustom --el-request-timeout 300
   "Timeout in seconds for LLM API requests"
@@ -31,7 +31,7 @@
   :type 'integer
   :group 'emacs-llm)
 
-(defcustom --el-provider "openai"
+(defcustom --el-actual-provider "google"
   "Default LLM provider to use."
   :type
   '(choice

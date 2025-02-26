@@ -195,7 +195,7 @@
                 (lambda
                   ()
                   t))
-               ((symbol-function '--el-append-to-history)
+               ((symbol-function '--el-history-append)
                 (lambda
                   (role content)
                   (with-current-buffer test-buffer
@@ -244,7 +244,7 @@
                 (lambda
                   ()
                   t))
-               ((symbol-function '--el-append-to-history)
+               ((symbol-function '--el-history-append)
                 (lambda
                   (&rest _)
                   t)))

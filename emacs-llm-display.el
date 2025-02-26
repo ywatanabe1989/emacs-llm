@@ -1,6 +1,6 @@
 ;;; -*- coding: utf-8; lexical-binding: t -*-
 ;;; Author: ywatanabe
-;;; Timestamp: <2025-02-26 22:02:08>
+;;; Timestamp: <2025-02-27 01:43:13>
 ;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/emacs-llm-display.el
 
 (defun --el-prepare-llm-buffer
@@ -29,6 +29,7 @@ Optional TEMPLATE-NAME is the name of the template used, if any."
        (format "\n\n > %s [Template: %s]" engine template-name))
       (insert
        (format "\n\n > %s\n\n" prompt))
+      (--el-scroll-to-last-separator)
       (display-buffer
        (current-buffer)))
     buffer-name))

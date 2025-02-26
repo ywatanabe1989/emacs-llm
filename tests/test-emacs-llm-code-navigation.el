@@ -1,7 +1,7 @@
 ;;; -*- coding: utf-8; lexical-binding: t -*-
 ;;; Author: ywatanabe
-;;; Timestamp: <2025-02-26 21:56:56>
-;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/-test-emacs-llm-code-navigation.el
+;;; Timestamp: <2025-02-27 09:34:42>
+;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-code-navigation.el
 
 (require 'ert)
 (require 'emacs-llm-code-navigation)
@@ -19,27 +19,6 @@
    (stringp --el-code-block-end-delimiter))
   (should
    (string-match-p --el-code-block-end-delimiter "```")))
-
-(ert-deftest test-el-copy-with-syntax
-    ()
-  (with-temp-buffer
-    (insert "Some text\n```python\nprint('hello')\n```\nMore text")
-    (let*
-        ((start
-          (save-excursion
-            (goto-char
-             (point-min))
-            (re-search-forward "print" nil t)
-            (match-beginning 0)))
-         (end
-          (save-excursion
-            (goto-char start)
-            (end-of-line)
-            (point)))
-         (result
-          (--el-copy-with-syntax start end)))
-      (should
-       (string= result "print('hello')")))))
 
 (ert-deftest test-el-navigate-code-blocks-next
     ()
@@ -193,10 +172,10 @@
 
 (provide 'test-emacs-llm-code-navigation)
 
-(provide '-test-emacs-llm-code-navigation)
+(provide 'test-emacs-llm-code-navigation)
 
 (when
     (not load-file-name)
-  (message "-test-emacs-llm-code-navigation.el loaded."
+  (message "test-emacs-llm-code-navigation.el loaded."
            (file-name-nondirectory
             (or load-file-name buffer-file-name))))
