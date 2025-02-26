@@ -1,6 +1,6 @@
 ;;; -*- coding: utf-8; lexical-binding: t -*-
 ;;; Author: ywatanabe
-;;; Timestamp: <2025-02-26 21:32:42>
+;;; Timestamp: <2025-02-27 09:34:32>
 ;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/emacs-llm-code-navigation.el
 
 (require 'emacs-llm-scroll)
@@ -100,103 +100,6 @@ Returns the region of the block found or nil."
   (interactive)
   (with-current-buffer --el-buffer-name
     (--el-navigate-code-blocks 'previous)))
-
-(defun --el-copy-with-syntax
-    (start end)
-  "Copy the region from START to END with syntax properties preserved."
-  (interactive "r")
-  (let
-      ((text
-        (buffer-substring start end))
-       (lang
-        (save-excursion
-          (goto-char start)
-          (when
-              (re-search-backward --el-code-block-start-delimiter nil t)
-            (match-string-no-properties 1)))))
-    (kill-new text)
-    (when lang
-      (message "Copied %s code block." lang))
-    text))
-
-;; (defun --el-copy-all-code-blocks
-;;     ()
-;;   "Copy all code blocks in the last LLM output with language info."
-;;   (interactive)
-;;   (with-current-buffer
-;;       (get-buffer --el-buffer-name)
-;;     (goto-char
-;;      (point-max))
-;;     (let
-;;         ((blocks nil)
-;;          (count 0))
-;;       (when
-;;           (search-backward --el-separator nil t)
-;;         (goto-char
-;;          (match-end 0))
-;;         (while
-;;             (re-search-forward --el-code-block-start-delimiter nil t)
-;;           (let
-;;               ((lang
-;;                 (match-string-no-properties 1)))
-;;             (forward-line 1)
-;;             (let
-;;                 ((start
-;;                   (point)))
-;;               (when
-;;                   (re-search-forward --el-code-block-end-delimiter nil t)
-;;                 (let
-;;                     ((end
-;;                       (match-beginning 0))
-;;                      (block-text
-;;                       (buffer-substring-no-properties
-;;                        (save-excursion
-;;                          (forward-line -1)
-;;                          (point))
-;;                        end)))
-;;                   (push
-;;                    (cons lang
-;;                          (buffer-substring-no-properties start end))
-;;                    blocks)
-;;                   (setq count
-;;                         (1+ count)))))))
-
-;;         (when blocks
-;;           (let
-;;               ((all-blocks
-;;                 (mapconcat
-;;                  (lambda
-;;                    (block)
-;;                    (format "```%s\n%s\n```"
-;;                            (car block)
-;;                            (cdr block)))
-;;                  (nreverse blocks)
-;;                  "\n\n")))
-;;             (kill-new all-blocks)
-;;             (message "Copied %d code blocks with language information." count)))))))
-
-;; (defun --el-quick-menu
-;;     ()
-;;   "Show a quick menu of available LLM actions."
-;;   (interactive)
-;;   (let*
-;;       ((actions
-;;         '(("Run on region/prompt" . el-run)
-;;           ("Switch LLM provider" . el-switch)
-;;           ("Show history" . el-show-history)
-;;           ("Copy last response" . --el-copy-last-response)
-;;           ("Copy all code blocks" . --el-copy-all-code-blocks)
-;;           ("Navigate to next code block" . --el-next-code-block)
-;;           ("Navigate to previous code block" . --el-previous-code-block)
-;;           ("Scroll to bottom" . --el-scroll-to-bottom)))
-;;        (choice
-;;         (completing-read "LLM action: "
-;;                          (mapcar #'car actions)
-;;                          nil t)))
-;;     (when choice
-;;       (funcall
-;;        (cdr
-;;         (assoc choice actions))))))
 
 (provide 'emacs-llm-code-navigation)
 
