@@ -1,6 +1,6 @@
 ;;; -*- coding: utf-8; lexical-binding: t -*-
 ;;; Author: ywatanabe
-;;; Timestamp: <2025-02-26 15:52:09>
+;;; Timestamp: <2025-02-26 16:42:09>
 ;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-switch.el
 
 ;;; test-emacs-llm-switch.el --- Tests for emacs-llm provider switching -*- lexical-binding: t -*-
@@ -56,7 +56,7 @@
 
       ;; Test with openai
       (setq completing-read-result "openai")
-      (call-interactively '--el-switch-provider)
+      (call-interactively 'el-switch)
       (should
        (string= --el-provider "openai"))
       (should
@@ -64,7 +64,7 @@
 
       ;; Test with anthropic
       (setq completing-read-result "anthropic")
-      (call-interactively '--el-switch-provider)
+      (call-interactively 'el-switch)
       (should
        (string= --el-provider "anthropic"))
       (should
@@ -72,7 +72,7 @@
 
       ;; Test with google
       (setq completing-read-result "google")
-      (call-interactively '--el-switch-provider)
+      (call-interactively 'el-switch)
       (should
        (string= --el-provider "google"))
       (should
@@ -80,7 +80,7 @@
 
       ;; Test with deepseek
       (setq completing-read-result "deepseek")
-      (call-interactively '--el-switch-provider)
+      (call-interactively 'el-switch)
       (should
        (string= --el-provider "deepseek"))
       (should

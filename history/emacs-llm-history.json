@@ -150,5 +150,29 @@
   {
     "role": "user",
     "content": "HI"
+  },
+  {
+    "role": "user",
+    "content": "hello"
+  },
+  {
+    "role": "assistant",
+    "content": "Hello! How can I help you today?"
+  },
+  {
+    "role": "user",
+    "content": "hi"
+  },
+  {
+    "role": "assistant",
+    "content": "Hello! What can I do for you today?"
+  },
+  {
+    "role": "user",
+    "content": "hi"
+  },
+  {
+    "role": "assistant",
+    "content": "Hello there! How can I help you today?"
   }
 ]

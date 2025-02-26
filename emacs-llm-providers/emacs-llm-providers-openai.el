@@ -1,65 +1,9 @@
 ;;; -*- coding: utf-8; lexical-binding: t -*-
 ;;; Author: ywatanabe
-;;; Timestamp: <2025-02-26 16:19:43>
+;;; Timestamp: <2025-02-26 17:53:05>
 ;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/emacs-llm-providers/emacs-llm-providers-openai.el
 
-;; (defun --el--send-openai-stream
-;;     (prompt)
-;;   "Send PROMPT to OpenAI API via streaming."
-;;   (let*
-;;       ((buffer-name
-;;         (get-buffer-create --el-buffer-name))
-;;        (temp-buffer
-;;         (generate-new-buffer " *openai-temp-output*"))
-;;        (payload
-;;         (--el--construct-openai-payload prompt))
-;;        (payload-oneline
-;;         (replace-regexp-in-string "\n" " " payload))
-;;        (escaped-payload
-;;         (replace-regexp-in-string "'" "\\\\'" payload-oneline))
-;;        (curl-command
-;;         (format "curl -N 'https://api.openai.com/v1/chat/completions' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' -d '%s'"
-;;                 (or --el-api-key-openai --el-api-key)
-;;                 escaped-payload))
-;;        (proc
-;;         (start-process-shell-command "--el-openai-stream" temp-buffer curl-command)))
-
-;;     ;; (message "DEBUG: Original payload: %s" payload)
-;;     ;; (message "DEBUG: Payload on one line: %s" payload-oneline)
-;;     ;; (message "DEBUG: Escaped payload: %s" escaped-payload)
-;;     ;; (message "DEBUG: Curl command: %s" curl-command)
-;;     (with-current-buffer buffer-name
-;;       (unless
-;;           (derived-mode-p 'markdown-mode)
-;;         (markdown-mode))
-;;       (goto-char
-;;        (point-max))
-;;       (unless
-;;           (=
-;;            (point-min)
-;;            (point-max))
-;;         (insert "\n\n"))
-;;       (insert --el-separator)
-;;       (insert "\n\n")
-;;       (insert
-;;        (format "Provider: %s | Model: %s\n\n" "OPENAI"
-;;                (or --el-default-engine-openai --el-openai-model)))
-;;       (insert
-;;        (format "Prompt: %s\n\n" prompt))
-;;       (insert "Response: ")
-;;       (display-buffer
-;;        (current-buffer)))
-
-;;     (process-put proc 'target-buffer buffer-name)
-;;     (process-put proc 'temp-buffer temp-buffer)
-;;     (process-put proc 'content "")
-;;     (set-process-filter proc #'--el--openai-filter)
-;;     (set-process-sentinel proc #'--el--process-sentinel)
-;;     (--el--start-spinner)
-;;     (--el--append-to-history "user" prompt)
-;;     proc))
-
-(defun --el--send-openai-stream
+(defun --el-openai-stream
     (prompt &optional template)
   "Send PROMPT to OpenAI API via streaming.
 Optional TEMPLATE is the name of the template used."
@@ -67,7 +11,7 @@ Optional TEMPLATE is the name of the template used."
       ((temp-buffer
         (generate-new-buffer " *openai-temp-output*"))
        (payload
-        (--el--construct-openai-payload prompt))
+        (--el-construct-openai-payload prompt))
        (payload-oneline
         (replace-regexp-in-string "\n" " " payload))
        (escaped-payload
@@ -77,27 +21,95 @@ Optional TEMPLATE is the name of the template used."
                 (or --el-api-key-openai --el-api-key)
                 escaped-payload))
        (model-name
-        (or --el-default-engine-openai --el-openai-model))
-       (buffer-name
-        (--el--prepare-llm-buffer prompt "OPENAI" model-name template))
-       (proc
-        (start-process-shell-command "--el-openai-stream" temp-buffer curl-command)))
+        (or --el-openai-model --el-default-engine-openai)))
+    (message "Using model: %s" model-name)
+    (message "Curl command length: %d"
+             (length curl-command))
+    (message "Payload first 100 chars: %s"
+             (substring payload 0
+                        (min 100
+                             (length payload))))
+    (let*
+        ((buffer-name
+          (--el-prepare-llm-buffer prompt "OPENAI" model-name template))
+         (proc
+          (start-process-shell-command "--el-openai-stream" temp-buffer curl-command)))
+      (message "Process started with PID: %s"
+               (process-id proc))
+      (process-put proc 'target-buffer buffer-name)
+      (process-put proc 'temp-buffer temp-buffer)
+      (process-put proc 'content "")
+      (process-put proc 'prompt prompt)
+      (process-put proc 'provider "OPENAI")
+      (process-put proc 'model model-name)
+      (process-put proc 'template template)
+      (set-process-filter proc #'--el-openai-filter)
+      (message "Process filter set")
+      (set-process-sentinel proc #'--el-process-sentinel)
+      (message "Process sentinel set")
+      (--el-start-spinner)
+      ;; Don't append to history here - let the process-sentinel do it
+      ;; when the response is complete
+      proc)))
 
-    (process-put proc 'target-buffer buffer-name)
-    (process-put proc 'temp-buffer temp-buffer)
-    (process-put proc 'content "")
-    (set-process-filter proc #'--el--openai-filter)
-    (set-process-sentinel proc #'--el--process-sentinel)
-    (--el--start-spinner)
-    (--el--append-to-history "user" prompt template)
-    proc))
+;; (defun --el-openai-stream
+;;     (prompt &optional template)
+;;   "Send PROMPT to OpenAI API via streaming.
+;; Optional TEMPLATE is the name of the template used."
+;;   (let*
+;;       ((temp-buffer
+;;         (generate-new-buffer " *openai-temp-output*"))
+;;        (payload
+;;         (--el-construct-openai-payload prompt))
+;;        (payload-oneline
+;;         (replace-regexp-in-string "\n" " " payload))
+;;        (escaped-payload
+;;         (replace-regexp-in-string "'" "\\\\'" payload-oneline))
+;;        (curl-command
+;;         (format "curl -N 'https://api.openai.com/v1/chat/completions' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' -d '%s'"
+;;                 (or --el-api-key-openai --el-api-key)
+;;                 escaped-payload))
+;;        (model-name
+;;         (or --el-openai-model --el-default-engine-openai)))
+;;     (message "Using model: %s" model-name)
+;;     (message "Curl command length: %d"
+;;              (length curl-command))
+;;     (message "Payload first 100 chars: %s"
+;;              (substring payload 0
+;;                         (min 100
+;;                              (length payload))))
+;;     (let*
+;;         ((buffer-name
+;;           (--el-prepare-llm-buffer prompt "OPENAI" model-name template))
+;;          (proc
+;;           (start-process-shell-command "--el-openai-stream" temp-buffer curl-command)))
+;;       (message "Process started with PID: %s"
+;;                (process-id proc))
+;;       (process-put proc 'target-buffer buffer-name)
+;;       (process-put proc 'temp-buffer temp-buffer)
+;;       (process-put proc 'content "")
+;;       (process-put proc 'prompt prompt)
+;;       (process-put proc 'provider "OPENAI")
+;;       (process-put proc 'model model-name)
+;;       (process-put proc 'template template)
+;;       (set-process-filter proc #'--el-openai-filter)
+;;       (message "Process filter set")
+;;       (set-process-sentinel proc #'--el-process-sentinel)
+;;       (message "Process sentinel set")
+;;       (--el-start-spinner)
+;;       (--el-append-to-history "user" prompt template)
+;;       proc)))
 
 ;; Helper
 ;; ----------------------------------------
-(defun --el--parse-openai-chunk
+
+(defun --el-parse-openai-chunk
     (chunk)
   "Parse OpenAI JSON CHUNK and return content."
-  ;; (message "DEBUG: Parsing OpenAI chunk: %s" (substring chunk 0 (min 30 (length chunk))))
+  (message "DEBUG: Parsing OpenAI chunk: %s"
+           (substring chunk 0
+                      (min 30
+                           (length chunk))))
   (when
       (and chunk
            (not
@@ -110,8 +122,11 @@ Optional TEMPLATE is the name of the template used."
           (condition-case err
               (json-read-from-string chunk)
             (error
-             (message "Error parsing JSON: %s"
-                      (error-message-string err))
+             (message "Error parsing JSON: %s | Chunk: %s"
+                      (error-message-string err)
+                      (substring chunk 0
+                                 (min 50
+                                      (length chunk))))
              nil))))
       (when data
         (let*
@@ -125,62 +140,109 @@ Optional TEMPLATE is the name of the template used."
                         0))
                 (alist-get 'delta
                            (aref choices 0)))))
-          ;; (message "DEBUG: Delta: %s" delta)
-          (alist-get 'content delta))))))
+          (message "DEBUG: Delta: %S" delta)
+          ;; Check for content or thinking (reasoning_efforts)
+          (if
+              (alist-get 'content delta)
+              (alist-get 'content delta)
+            (if
+                (alist-get 'reasoning_efforts delta)
+                (progn
+                  (message "DEBUG: Found reasoning_efforts: %s"
+                           (alist-get 'reasoning_efforts delta))
+                  (alist-get 'reasoning_efforts delta))
+              nil)))))))
 
-(defun --el--openai-filter
+(defun --el-openai-filter
     (proc chunk)
   "Filter for OpenAI stream PROC processing CHUNK."
-  ;; (message "DEBUG: OpenAI filter received chunk of length %d" (length chunk))
-  (--el--process-chunk proc chunk #'--el--parse-openai-chunk))
+  (message "DEBUG: OpenAI filter received chunk of length %d"
+           (length chunk))
+  (when
+      (>
+       (length chunk)
+       0)
+    (message "DEBUG: Full chunk: %s" chunk))
+  (--el-process-chunk proc chunk #'--el-parse-openai-chunk))
 
-;; (defun --el--construct-openai-payload
-;;     (prompt)
-;;   "Construct the JSON payload for OpenAI API with PROMPT."
-;;   (let*
-;;       ((mod--el-name
-;;         (or --el-default-engine-openai --el-openai-model))
-;;        (max-tokens
-;;         (or
-;;          (alist-get mod--el-name --el-openai-engine-max-tokens-alist nil nil 'string=)
-;;          8192))
-;;        (recent-history
-;;         (--el--get-recent-history))
-;;        (payload
-;;         (json-encode
-;;          `(("model" . ,mod--el-name)
-;;            ("messages" . ,(append recent-history
-;;                                   `((("role" . "user")
-;;                                      ("content" . ,prompt)))))
-;;            ("max_tokens" . ,max-tokens)
-;;            ("temperature" . ,--el-temperature)
-;;            ("stream" . t)))))
-;;     ;; (message "DEBUG: Constructed payload: %s" payload)
-;;     payload))
-
-(defun --el--construct-openai-payload
+(defun --el-construct-openai-payload
     (prompt)
   "Construct the JSON payload for OpenAI API with PROMPT."
   (let*
       ((mod--el-name
-        (or --el-default-engine-openai --el-openai-model))
+        (or --el-openai-model --el-default-engine-openai))
        (max-tokens
         (or
          (alist-get mod--el-name --el-openai-engine-max-tokens-alist nil nil 'string=)
          8192))
+       ;; Parse engine for reasoning effort
+       (engine-parts
+        (--el-parse-openai-engine mod--el-name))
+       (actual-engine
+        (car engine-parts))
+       (effort
+        (cdr engine-parts))
+       ;; Get recent history
        (recent-history
-        (--el--get-recent-history))
+        (--el-get-recent-history))
+       ;; Create messages array - include history and current message
+       (messages
+        (append recent-history
+                (list
+                 `(("role" . "user")
+                   ("content" . ,prompt)))))
+       ;; Base payload
        (payload
-        (json-encode
-         `(("model" . ,mod--el-name)
-           ("messages" . ,(append recent-history
-                                  (list
-                                   `(("role" . "user")
-                                     ("content" . ,prompt)))))
-           ("max_tokens" . ,max-tokens)
-           ("temperature" . ,--el-temperature)
-           ("stream" . t)))))
-    payload))
+        `(("model" . ,actual-engine)
+          ("messages" . ,messages)
+          ;; ("max_tokens" . ,max-tokens)
+          ;; ("temperature" . ,--el-temperature)
+          ("stream" . t))))
+    ;; Add reasoning_effort if specified
+    (when effort
+      (push
+       (cons "reasoning_effort" effort)
+       payload))
+    (let
+        ((json-result
+          (json-encode payload)))
+      (message "DEBUG: Final JSON payload: %s"
+               (substring json-result 0
+                          (min 300
+                               (length json-result))))
+      json-result)))
+
+(defun --el-parse-openai-engine
+    (engine-string)
+  "Parse OpenAI engine string to get base model and effort level.
+Returns (ACTUAL-ENGINE . EFFORT)."
+  (let
+      ((base nil)
+       (effort nil))
+    (cond
+     ;; o3-mini variants
+     ((string-prefix-p "o3-mini" engine-string)
+      (setq base "o3-mini")
+      (when
+          (string-match "-\\(low\\|medium\\|high\\)$" engine-string)
+        (setq effort
+              (match-string 1 engine-string))))
+     ;; o1 variants
+     ((string-prefix-p "o1" engine-string)
+      (setq base "o1")
+      (when
+          (string-match "-\\(low\\|medium\\|high\\)$" engine-string)
+        (setq effort
+              (match-string 1 engine-string))))
+     ;; gpt-4o
+     ((string= engine-string "gpt-4o")
+      (setq base "gpt-4o"))
+     ;; fallback
+     (t
+      (setq base engine-string)))
+    (message "DEBUG: Parsed engine %s to %s with effort %s"
+             engine-string base effort)
+    (cons base effort)))
 
 (provide 'emacs-llm-providers-openai)
 

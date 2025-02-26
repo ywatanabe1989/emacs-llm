@@ -4,7 +4,7 @@
 ;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/emacs-llm-switch.el
 
 ;;;###autoload
-(defun --el-switch-provider
+(defun el-switch
     (provider)
   "Switch the LLM provider and select a model."
   (interactive

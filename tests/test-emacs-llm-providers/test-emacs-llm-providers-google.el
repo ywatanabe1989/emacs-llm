@@ -1,6 +1,6 @@
 ;;; -*- coding: utf-8; lexical-binding: t -*-
 ;;; Author: ywatanabe
-;;; Timestamp: <2025-02-26 16:01:15>
+;;; Timestamp: <2025-02-26 16:49:11>
 ;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-providers/test-emacs-llm-providers-google.el
 
 (require 'emacs-llm-providers-google)
@@ -15,21 +15,21 @@
       ((valid-chunk "{\"candidates\":[{\"content\":{\"parts\":[{\"text\":\"Hello world\"}]}}]}"))
     (should
      (string=
-      (--el--parse-google-chunk valid-chunk)
+      (--el-parse-google-chunk valid-chunk)
       "Hello world"))))
 
 (ert-deftest test-el-parse-google-chunk-empty
     ()
   (should
    (eq
-    (--el--parse-google-chunk "[DONE]")
+    (--el-parse-google-chunk "[DONE]")
     nil)))
 
 (ert-deftest test-el-parse-google-chunk-invalid-json
     ()
   (should
    (eq
-    (--el--parse-google-chunk "{invalid json}")
+    (--el-parse-google-chunk "{invalid json}")
     nil)))
 
 (ert-deftest test-el-parse-google-chunk-missing-content
@@ -38,7 +38,7 @@
       ((chunk-no-content "{\"candidates\":[{}]}"))
     (should
      (eq
-      (--el--parse-google-chunk chunk-no-content)
+      (--el-parse-google-chunk chunk-no-content)
       nil))))
 
 (ert-deftest test-el-construct-google-payload
@@ -48,13 +48,13 @@
        (--el-google-engine-max-tokens-alist
         '(("gemini-pro" . 8192)))
        ;; Mock history function to return empty result
-       (--el--get-recent-history
+       (--el-get-recent-history
         (lambda
           ()
           '())))
     (let
         ((payload
-          (--el--construct-google-payload "Test prompt")))
+          (--el-construct-google-payload "Test prompt")))
       (should
        (string-match-p "\"role\"\\s-*:\\s-*\"user\"" payload))
       (should
@@ -69,7 +69,7 @@
       ((chunk "{\"candidates\":[{\"content\":{\"parts\":[{\"text\":\"Hello\"}]}}]}"))
     (should
      (string=
-      (--el--parse-google-chunk chunk)
+      (--el-parse-google-chunk chunk)
       "Hello"))))
 
 (ert-deftest test-el-google-filter
@@ -85,7 +85,7 @@
     (process-put proc 'content "")
 
     ;; Run filter
-    (--el--google-filter proc valid-chunk)
+    (--el-google-filter proc valid-chunk)
 
     ;; Check results
     (with-current-buffer target-buffer
@@ -101,7 +101,7 @@
     ;; Cleanup
     (kill-buffer target-buffer)))
 
-(ert-deftest test-el-send-google-stream
+(ert-deftest test-el-google-stream
     ()
   ;; Mocking required functions and variables
   (let
@@ -126,22 +126,22 @@
                                 '("sleep" "0.1")
                                 :noquery t))
             mock-proc))
-         ((symbol-function '--el--construct-google-payload)
+         ((symbol-function '--el-construct-google-payload)
           (lambda
             (prompt)
             (setq constructed-payload prompt)
             "{\"mock\":\"payload\"}"))
-         ((symbol-function '--el--prepare-llm-buffer)
+         ((symbol-function '--el-prepare-llm-buffer)
           (lambda
             (prompt engine model template)
             (setq prepared-buffer
                   (list prompt engine model template))
             "*mock-buffer*"))
-         ((symbol-function '--el--start-spinner)
+         ((symbol-function '--el-start-spinner)
           (lambda
             ()
             nil))
-         ((symbol-function '--el--append-to-history)
+         ((symbol-function '--el-append-to-history)
           (lambda
             (&rest args)
             nil)))
@@ -149,7 +149,7 @@
       ;; Call the function
       (let
           ((result
-            (--el--send-google-stream "Test prompt" "Test template")))
+            (--el-google-stream "Test prompt" "Test template")))
         ;; Check results
         (should
          (string= constructed-payload "Test prompt"))

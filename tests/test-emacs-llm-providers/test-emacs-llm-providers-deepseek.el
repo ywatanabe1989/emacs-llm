@@ -1,6 +1,6 @@
 ;;; -*- coding: utf-8; lexical-binding: t -*-
 ;;; Author: ywatanabe
-;;; Timestamp: <2025-02-26 16:06:43>
+;;; Timestamp: <2025-02-26 16:49:11>
 ;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-providers/test-emacs-llm-providers-deepseek.el
 
 ;; Test: test-emacs-llm-construct-deepseek-payload
@@ -17,13 +17,13 @@
        (--el-temperature 0.7))
     ;; Mock the history function to return empty list
     (cl-letf
-        (((symbol-function '--el--get-recent-history)
+        (((symbol-function '--el-get-recent-history)
           (lambda
             ()
             nil)))
       (let
           ((payload
-            (--el--construct-deepseek-payload "Test prompt")))
+            (--el-construct-deepseek-payload "Test prompt")))
         (should
          (stringp payload))
         (let*
@@ -70,7 +70,7 @@
       ((chunk "{\"choices\":[{\"delta\":{\"content\":\"Hello\"}}]}"))
     (should
      (string=
-      (--el--parse-deepseek-chunk chunk)
+      (--el-parse-deepseek-chunk chunk)
       "Hello"))))
 
 (provide 'test-emacs-llm-providers-deepseek)

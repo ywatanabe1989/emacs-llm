@@ -1,36 +1,7 @@
 ;;; -*- coding: utf-8; lexical-binding: t -*-
 ;;; Author: ywatanabe
-;;; Timestamp: <2025-02-26 15:14:16>
+;;; Timestamp: <2025-02-26 18:09:19>
 ;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/emacs-llm-run.el
-
-(defun --el--canc--el-timer
-    ()
-  "Cancel the LLM spinner timer if active."
-  (when --el-spinner-timer
-    (cancel-timer --el-spinner-timer)
-    (setq --el-spinner-timer nil)))
-
-(defun --el--process-sentinel
-    (proc event)
-  "Monitor PROC status and handle EVENT completion."
-  ;; (message "Process %s had event: %s" proc event)
-  (when
-      (string-match-p "\\(finished\\|exited\\|failed\\)" event)
-    (--el--canc--el-timer)
-    (when
-        (process-live-p proc)
-      (kill-process proc))
-    (let
-        ((temp-buffer
-          (process-get proc 'temp-buffer)))
-      (when
-          (buffer-live-p temp-buffer)
-        (kill-buffer temp-buffer)))
-    (--el--append-to-history "assistant"
-                             (or
-                              (process-get proc 'content)
-                              ""))
-    (run-hooks '--el-completion-hook)))
 
 ;;;###autoload
 (defun --el-on-region
@@ -40,7 +11,7 @@ If a region is selected, use that text as the prompt.
 Otherwise, prompt the user to enter text."
   (interactive)
   ;; (message "DEBUG: Starting --el-on-region")
-  (--el--load-history)
+  (--el-load-history)
   (let
       ((prompt
         (if
@@ -49,42 +20,31 @@ Otherwise, prompt the user to enter text."
                 (buffer-substring-no-properties
                  (region-beginning)
                  (region-end))
-              ;; (message "DEBUG: Region detected; using selected text as prompt")
+              (message "DEBUG: Region detected; using selected text as prompt")
               (deactivate-mark))
           (read-string "Enter prompt: "))))
-    ;; (message "DEBUG: Prompt is: %s" prompt)
-    ;; (message "DEBUG: --el-provider is: %s" --el-provider)
+    (message "DEBUG: Prompt is: %s" prompt)
+    (message "DEBUG: --el-provider is: %s" --el-provider)
     (pcase --el-provider
       ("openai"
-       (--el--send-openai-stream prompt))
+       (--el-openai-stream prompt))
       ("anthropic"
-       (--el--send-anthropic-stream prompt))
+       (--el-anthropic-stream prompt))
       ("google"
-       (--el--send-google-stream prompt))
+       (--el-google-stream prompt))
       ("deepseek"
-       (--el--send-deepseek-stream prompt))
+       (--el-deepseek-stream prompt))
       (_
        (message "DEBUG: Provider %s not fully supported yet" --el-provider)))))
 
-;; (defun --el--process-sentinel
-;;     (proc event)
-;;   "Sentinel function for LLM streaming processes.
-;; It stops the spinner when the process finishes."
-;;   ;; (message "DEBUG: Process %s received event: %s" proc event)
-;;   (when
-;;       (or
-;;        (string-match-p "finished" event)
-;;        (string-match-p "exited" event)
-;;        (string-match-p "signal" event))
-;;     (--el--stop-spinner)
-;;     (with-current-buffer
-;;         (process-get proc 'target-buffer)
-;;       (goto-char
-;;        (point-max))
-;;       ;; (insert "\n\nLLM process finished.\n")
-;;       )))
+(defun --el-canc--el-timer
+    ()
+  "Cancel the LLM spinner timer if active."
+  (when --el-spinner-timer
+    (cancel-timer --el-spinner-timer)
+    (setq --el-spinner-timer nil)))
 
-(defun --el--process-chunk
+(defun --el-process-chunk
     (proc chunk parse-func)
   "Process CHUNK from PROC using PARSE-FUNC to extract content."
   (let*
@@ -138,6 +98,44 @@ Otherwise, prompt the user to enter text."
                            (process-get proc 'content)
                            "")
                           text))))))))
+
+(defun --el-process-sentinel
+    (proc event)
+  "Process sentinel for PROC handling EVENT."
+  (message "Process %s received event: %s"
+           (process-name proc)
+           event)
+  (when
+      (string-match-p "\\(finished\\|exited\\|failed\\)" event)
+    (--el-stop-spinner)
+    (let
+        ((prompt
+          (process-get proc 'prompt))
+         (provider
+          (process-get proc 'provider))
+         (model
+          (process-get proc 'model))
+         (template
+          (process-get proc 'template))
+         (response
+          (process-get proc 'content)))
+
+      (when
+          (and prompt provider)
+        ;; Only append to history after we have a complete response
+        (--el-append-to-history "user" prompt template)
+        (when
+            (not
+             (string-empty-p response))
+          (--el-append-to-history "assistant" response template)))
+
+      ;; Clean up temp buffer
+      (when-let
+          ((tb
+            (process-get proc 'temp-buffer)))
+        (when
+            (buffer-live-p tb)
+          (kill-buffer tb))))))
 
 (provide 'emacs-llm-run)
 

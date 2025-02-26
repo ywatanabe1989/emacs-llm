@@ -1,12 +1,12 @@
 ;;; -*- coding: utf-8; lexical-binding: t -*-
 ;;; Author: ywatanabe
-;;; Timestamp: <2025-02-26 16:00:27>
+;;; Timestamp: <2025-02-26 17:33:06>
 ;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/emacs-llm-providers/emacs-llm-providers-google.el
 
 ;; Main
 ;; ----------------------------------------
 
-(defun --el--send-google-stream
+(defun --el-google-stream
     (prompt &optional template)
   "Send PROMPT to Google API via streaming.
 Optional TEMPLATE is the name of the template used."
@@ -14,20 +14,20 @@ Optional TEMPLATE is the name of the template used."
       ((temp-buffer
         (generate-new-buffer " *google-temp-output*"))
        (mod--el-name
-        (or --el-default-engine-google --el-google-model))
+        (or --el-google-model --el-default-engine-google))
        (url
         (format "https://generativelanguage.googleapis.com/v1beta/models/%s:streamGenerateContent?alt=sse&key=%s"
                 mod--el-name
                 (or --el-api-key-google --el-google-api-key)))
        (payload
-        (--el--construct-google-payload prompt))
+        (--el-construct-google-payload prompt))
        (args
         (list "--no-buffer"
               url
               "-H" "Content-Type: application/json"
               "-d" payload))
        (buffer-name
-        (--el--prepare-llm-buffer prompt "GOOGLE" mod--el-name template))
+        (--el-prepare-llm-buffer prompt "GOOGLE" mod--el-name template))
        (proc
         (apply #'start-process "--el-google-stream" temp-buffer "curl" args)))
 
@@ -35,15 +35,15 @@ Optional TEMPLATE is the name of the template used."
     (process-put proc 'temp-buffer temp-buffer)
     (process-put proc 'content "")
     (process-put proc 'partial-data "")
-    (set-process-filter proc #'--el--google-filter)
-    (set-process-sentinel proc #'--el--process-sentinel)
-    (--el--start-spinner)
-    (--el--append-to-history "user" prompt template)
+    (set-process-filter proc #'--el-google-filter)
+    (set-process-sentinel proc #'--el-process-sentinel)
+    (--el-start-spinner)
+    (--el-append-to-history "user" prompt template)
     proc))
 
 ;; Helper
 ;; ----------------------------------------
-;; (defun --el--parse-google-chunk
+;; (defun --el-parse-google-chunk
 ;;     (chunk)
 ;;   "Parse Google JSON CHUNK and return content."
 ;;   (when
@@ -85,7 +85,7 @@ Optional TEMPLATE is the name of the template used."
 ;;                (alist-get 'text part))
 ;;              parts
 ;;              "")))))))
-(defun --el--parse-google-chunk
+(defun --el-parse-google-chunk
     (chunk)
   "Parse Google JSON CHUNK and return content."
   (when
@@ -127,7 +127,7 @@ Optional TEMPLATE is the name of the template used."
                (alist-get 'text part))
              parts
              "")))))))
-;; (defun --el--google-filter
+;; (defun --el-google-filter
 ;;     (proc chunk)
 ;;   "Filter for Google stream PROC processing CHUNK."
 ;;   (let*
@@ -166,7 +166,7 @@ Optional TEMPLATE is the name of the template used."
 ;;               (string= jsonstr "[DONE]")
 ;;             (let
 ;;                 ((text
-;;                   (--el--parse-google-chunk jsonstr)))
+;;                   (--el-parse-google-chunk jsonstr)))
 ;;               (when text
 ;;                 (with-current-buffer
 ;;                     (process-get proc 'target-buffer)
@@ -180,7 +180,7 @@ Optional TEMPLATE is the name of the template used."
 ;;                                "")
 ;;                               text))))))))))
 
-(defun --el--google-filter
+(defun --el-google-filter
     (proc chunk)
   "Filter for Google stream PROC processing CHUNK."
   (let*
@@ -222,7 +222,7 @@ Optional TEMPLATE is the name of the template used."
               (string= jsonstr "[DONE]")
             (let
                 ((text
-                  (--el--parse-google-chunk jsonstr)))
+                  (--el-parse-google-chunk jsonstr)))
               (when text
                 (with-current-buffer
                     (process-get proc 'target-buffer)
@@ -236,18 +236,18 @@ Optional TEMPLATE is the name of the template used."
                                "")
                               text))))))))))
 
-(defun --el--construct-google-payload
+(defun --el-construct-google-payload
     (prompt)
   "Construct the JSON payload for Google Gemini API with PROMPT."
   (let*
       ((mod--el-name
-        (or --el-default-engine-google --el-google-model))
+        (or --el-google-model --el-default-engine-google))
        (max-tokens
         (or
          (alist-get mod--el-name --el-google-engine-max-tokens-alist nil nil 'string=)
          100000))
        (recent-history
-        (--el--get-recent-history))
+        (--el-get-recent-history))
        (content-parts
         (list)))
     ;; Convert history to Google format

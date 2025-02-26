@@ -16,7 +16,7 @@
    #'--el-on-region)
   (global-set-key
    (kbd "C-c l s")
-   #'--el-switch-provider)
+   #'el-switch)
   (global-set-key
    (kbd "C-c l h")
    #'--el-show-history)
