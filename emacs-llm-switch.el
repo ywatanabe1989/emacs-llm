@@ -1,0 +1,45 @@
+;;; -*- coding: utf-8; lexical-binding: t -*-
+;;; Author: ywatanabe
+;;; Timestamp: <2025-02-26 13:01:41>
+;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/emacs-llm-switch.el
+
+;;;###autoload
+(defun el-switch-provider
+    (provider)
+  "Switch the LLM provider and select a model."
+  (interactive
+   (list
+    (completing-read "Select LLM provider: "
+                     '("openai" "anthropic" "google" "deepseek")
+                     nil t)))
+  (setq el-provider provider)
+
+  (let*
+      ((provider-models
+        (cond
+         ((string= provider "openai")
+          el-openai-models)
+         ((string= provider "anthropic")
+          el-anthropic-models)
+         ((string= provider "google")
+          el-google-models)
+         ((string= provider "deepseek")
+          el-deepseek-models)))
+       (selected-model
+        (completing-read "Select model: " provider-models nil t)))
+
+    (cond
+     ((string= provider "openai")
+      (setq el-model selected-model))
+     ((string= provider "anthropic")
+      (setq el-anthropic-model selected-model)))
+
+    (message "Switched to %s using model: %s" provider selected-model)))
+
+(provide 'emacs-llm-switch)
+
+(when
+    (not load-file-name)
+  (message "emacs-llm-switch.el loaded."
+           (file-name-nondirectory
+            (or load-file-name buffer-file-name))))
