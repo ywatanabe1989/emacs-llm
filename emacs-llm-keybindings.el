@@ -24,7 +24,7 @@
 
   (global-set-key
    (kbd "C-c l h")
-   #'el-show-history)
+   #'el-history-show)
 
   ;; (global-set-key
   ;;  (kbd "C-c l q")
