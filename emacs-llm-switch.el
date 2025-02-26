@@ -1,6 +1,6 @@
 ;;; -*- coding: utf-8; lexical-binding: t -*-
 ;;; Author: ywatanabe
-;;; Timestamp: <2025-02-26 14:19:04>
+;;; Timestamp: <2025-02-27 01:11:29>
 ;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/emacs-llm-switch.el
 
 ;;;###autoload
@@ -12,7 +12,7 @@
     (completing-read "Select LLM provider: "
                      '("openai" "anthropic" "google" "deepseek")
                      nil t)))
-  (setq --el-provider provider)
+  (setq --el-actual-provider provider)
 
   (let*
       ((provider-engines
