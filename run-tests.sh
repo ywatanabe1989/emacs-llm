@@ -1,7 +1,7 @@
 #!/bin/bash
 # -*- coding: utf-8 -*-
-# Timestamp: "2025-02-25 01:33:48 (ywatanabe)"
-# File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-test/run-tests.sh
+# Timestamp: "2025-02-26 18:12:09 (ywatanabe)"
+# File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/run-tests.sh
 
 THIS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 LOG_PATH="$0.log"
@@ -34,10 +34,8 @@ main() {
             *) echo "Unknown option: $1"; usage ;;
         esac
     done
-
     local l_args=""
     local loaded_files=()
-
     for file in "${SOURCE_FILES[@]}"; do
         if [[ -f "$file" && ! "$file" =~ "test-" ]]; then
             if [ "$debug" = true ]; then
@@ -47,7 +45,6 @@ main() {
             loaded_files+=("$file")
         fi
     done
-
     for file in "${TEST_FILES[@]}"; do
         if [[ -f "$file" ]]; then
             if [ "$debug" = true ]; then
@@ -57,32 +54,31 @@ main() {
             loaded_files+=("$file")
         fi
     done
-
     load_paths=""
     for path in "${PATHS[@]}"; do
         if [[ -d "$path" ]]; then
             load_paths="$load_paths(add-to-list 'load-path \"$path\") "
         fi
     done
-
     if [ "${#loaded_files[@]}" -eq 0 ]; then
         echo "No test files found"
         exit 1
     fi
-
     local require_exprs=""
     for pkg in "${REQUIRE_PACKAGES[@]}"; do
         require_exprs="$require_exprs(require '$pkg)"
     done
-
     emacs -batch \
           -l ert \
           -l package \
           --eval "(progn \
-            (package-initialize) \
-            $load_paths \
-            $require_exprs \
-            (require 'ert))" \
+          (package-initialize) \
+          $load_paths \
+          $require_exprs \
+          (require 'ert) \
+          (setq yes-or-no-p-history t) \
+          (fset 'yes-or-no-p (lambda (&rest _) t)) \
+          (fset 'y-or-n-p (lambda (&rest _) t)))" \
           $l_args \
           -f ert-run-tests-batch-and-exit || true
 }

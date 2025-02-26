@@ -1,6 +1,6 @@
 ;;; -*- coding: utf-8; lexical-binding: t -*-
 ;;; Author: ywatanabe
-;;; Timestamp: <2025-02-26 16:49:15>
+;;; Timestamp: <2025-02-26 17:34:18>
 ;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/emacs-llm-providers/emacs-llm-providers-deepseek.el
 
 (defun --el-deepseek-stream
@@ -171,13 +171,15 @@ Optional TEMPLATE is the name of the template used."
          8192))
        (recent-history
         (--el-get-recent-history))
+       (full-prompt
+        (append recent-history
+                (list
+                 `(("role" . "user")
+                   ("content" . ,prompt)))))
        (payload
         (json-encode
          `(("model" . ,mod--el-name)
-           ("messages" . ,(append recent-history
-                                  (list
-                                   `(("role" . "user")
-                                     ("content" . ,prompt)))))
+           ("messages" . ,full-prompt)
            ("temperature" . ,--el-temperature)
            ("max_tokens" . ,max-tokens)
            ("stream" . t)))))

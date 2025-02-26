@@ -1,6 +1,6 @@
 ;;; -*- coding: utf-8; lexical-binding: t -*-
 ;;; Author: ywatanabe
-;;; Timestamp: <2025-02-26 17:15:17>
+;;; Timestamp: <2025-02-26 17:53:05>
 ;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/emacs-llm-providers/emacs-llm-providers-openai.el
 
 (defun --el-openai-stream
@@ -182,11 +182,15 @@ Optional TEMPLATE is the name of the template used."
         (car engine-parts))
        (effort
         (cdr engine-parts))
-       ;; Create messages array - simple implementation with just current message
+       ;; Get recent history
+       (recent-history
+        (--el-get-recent-history))
+       ;; Create messages array - include history and current message
        (messages
-        (list
-         `(("role" . "user")
-           ("content" . ,prompt))))
+        (append recent-history
+                (list
+                 `(("role" . "user")
+                   ("content" . ,prompt)))))
        ;; Base payload
        (payload
         `(("model" . ,actual-engine)
@@ -207,8 +211,6 @@ Optional TEMPLATE is the name of the template used."
                           (min 300
                                (length json-result))))
       json-result)))
-
-;; --el-construct-openai-payload: `let' bindings can have only one value-form: when, effort, (setq payload (cons (cons "reasoning_effort" effort) payload))
 
 (defun --el-parse-openai-engine
     (engine-string)

@@ -115,60 +115,60 @@
    (boundp '--el-groq-engine-max-tokens-alist)))
 
 ;; Test available engines lists existence
-(ert-deftest test-el-openai-available-engines-existence
+(ert-deftest test-el-openai-models-existence
     ()
   (should
-   (boundp '--el-openai-available-engines)))
+   (boundp '--el-openai-models)))
 
-(ert-deftest test-el-anthropic-available-engines-existence
+(ert-deftest test-el-anthropic-models-existence
     ()
   (should
-   (boundp '--el-anthropic-available-engines)))
+   (boundp '--el-anthropic-models)))
 
-(ert-deftest test-el-google-available-engines-existence
+(ert-deftest test-el-google-models-existence
     ()
   (should
-   (boundp '--el-google-available-engines)))
+   (boundp '--el-google-models)))
 
-(ert-deftest test-el-deepseek-available-engines-existence
+(ert-deftest test-el-deepseek-models-existence
     ()
   (should
-   (boundp '--el-deepseek-available-engines)))
+   (boundp '--el-deepseek-models)))
 
-(ert-deftest test-el-groq-available-engines-existence
+(ert-deftest test-el-groq-models-existence
     ()
   (should
-   (boundp '--el-groq-available-engines)))
+   (boundp '--el-groq-models)))
 
 ;; Test available engines content
-(ert-deftest test-el-openai-available-engines-content
+(ert-deftest test-el-openai-models-content
     ()
   (should
-   (equal --el-openai-available-engines
+   (equal --el-openai-models
           (mapcar #'car --el-openai-engine-max-tokens-alist))))
 
-(ert-deftest test-el-anthropic-available-engines-content
+(ert-deftest test-el-anthropic-models-content
     ()
   (should
-   (equal --el-anthropic-available-engines
+   (equal --el-anthropic-models
           (mapcar #'car --el-anthropic-engine-max-tokens-alist))))
 
-(ert-deftest test-el-google-available-engines-content
+(ert-deftest test-el-google-models-content
     ()
   (should
-   (equal --el-google-available-engines
+   (equal --el-google-models
           (mapcar #'car --el-google-engine-max-tokens-alist))))
 
-(ert-deftest test-el-deepseek-available-engines-content
+(ert-deftest test-el-deepseek-models-content
     ()
   (should
-   (equal --el-deepseek-available-engines
+   (equal --el-deepseek-models
           (mapcar #'car --el-deepseek-engine-max-tokens-alist))))
 
-(ert-deftest test-el-groq-available-engines-content
+(ert-deftest test-el-groq-models-content
     ()
   (should
-   (equal --el-groq-available-engines
+   (equal --el-groq-models
           (mapcar #'car --el-groq-engine-max-tokens-alist))))
 
 ;; Test specific engine max tokens values

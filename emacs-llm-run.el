@@ -1,6 +1,6 @@
 ;;; -*- coding: utf-8; lexical-binding: t -*-
 ;;; Author: ywatanabe
-;;; Timestamp: <2025-02-26 17:15:33>
+;;; Timestamp: <2025-02-26 18:09:19>
 ;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/emacs-llm-run.el
 
 ;;;###autoload
@@ -98,41 +98,6 @@ Otherwise, prompt the user to enter text."
                            (process-get proc 'content)
                            "")
                           text))))))))
-
-;; (defun --el-process-sentinel
-;;     (proc event)
-;;   "Monitor PROC status and handle EVENT completion."
-;;   ;; (message "Process %s had event: %s" proc event)
-;;   (when
-;;       (string-match-p "\\(finished\\|exited\\|failed\\)" event)
-;;     (--el-canc--el-timer)
-;;     (when
-;;         (process-live-p proc)
-;;       (kill-process proc))
-;;     (let
-;;         ((temp-buffer
-;;           (process-get proc 'temp-buffer))
-;;          (content
-;;           (or
-;;            (process-get proc 'content)
-;;            ""))
-;;          (prompt
-;;           (process-get proc 'prompt))
-;;          (provider
-;;           (process-get proc 'provider))
-;;          (model
-;;           (process-get proc 'model))
-;;          (template
-;;           (process-get proc 'template)))
-;;       (when
-;;           (buffer-live-p temp-buffer)
-;;         (kill-buffer temp-buffer))
-;;       ;; Display final response with context
-;;       (when
-;;           (and content prompt provider model)
-;;         (--el-display-with-context prompt template content provider model))
-;;       (--el-append-to-history "assistant" content)
-;;       (run-hooks '--el-completion-hook))))
 
 (defun --el-process-sentinel
     (proc event)

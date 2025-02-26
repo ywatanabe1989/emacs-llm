@@ -1,6 +1,6 @@
 ;;; -*- coding: utf-8; lexical-binding: t -*-
 ;;; Author: ywatanabe
-;;; Timestamp: <2025-02-26 17:28:10>
+;;; Timestamp: <2025-02-26 17:30:03>
 ;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/emacs-llm-history.el
 
 (defcustom --el-history-dir
@@ -12,7 +12,7 @@
   :group 'emacs-llm)
 
 (defcustom --el-history-file
-  (expand-file-name "emacs-history.json" --el-history-dir)
+  (expand-file-name "emacs-llm-history.json" --el-history-dir)
   "File path to save conversation history."
   :type 'string
   :group 'emacs-llm)

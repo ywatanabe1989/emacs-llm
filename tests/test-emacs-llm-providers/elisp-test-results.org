@@ -1,18 +1,23 @@
 * Test Results Summary
 
-- Passed: 93
-- Failed: 0
+- Passed: 50
+- Failed: 1
 - Skipped: 0
 - Timeout: 0
 - Duplicates: 0
-- Total: 93
-- Success Rate: 100.0%
+- Total: 51
+- Success Rate: 98.0%
 
 ** Passed Tests
 - [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-providers/test-emacs-llm-providers-anthropic.el::test-emacs-llm-parse-anthropic-chunk][test-emacs-llm-providers-anthropic.el]] :: test-emacs-llm-parse-anthropic-chunk
 - [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-providers/test-emacs-llm-providers-anthropic.el::test-emacs-llm-construct-anthropic-payload][test-emacs-llm-providers-anthropic.el]] :: test-emacs-llm-construct-anthropic-payload
 - [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-providers/test-emacs-llm-providers-deepseek.el::test-emacs-llm-parse-deepseek-chunk][test-emacs-llm-providers-deepseek.el]] :: test-emacs-llm-parse-deepseek-chunk
 - [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-providers/test-emacs-llm-providers-deepseek.el::test-emacs-llm-construct-deepseek-payload][test-emacs-llm-providers-deepseek.el]] :: test-emacs-llm-construct-deepseek-payload
+- [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-providers/test-emacs-llm-providers.el::test-emacs-llm-parse-invalid-chunk][test-emacs-llm-providers.el]] :: test-emacs-llm-parse-invalid-chunk
+- [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-providers/test-emacs-llm-providers.el::test-emacs-llm-providers-deepseek-loadable][test-emacs-llm-providers.el]] :: test-emacs-llm-providers-deepseek-loadable
+- [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-providers/test-emacs-llm-providers.el::test-emacs-llm-providers-google-loadable][test-emacs-llm-providers.el]] :: test-emacs-llm-providers-google-loadable
+- [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-providers/test-emacs-llm-providers.el::test-emacs-llm-providers-anthropic-loadable][test-emacs-llm-providers.el]] :: test-emacs-llm-providers-anthropic-loadable
+- [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-providers/test-emacs-llm-providers.el::test-emacs-llm-providers-openai-loadable][test-emacs-llm-providers.el]] :: test-emacs-llm-providers-openai-loadable
 - [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-providers/test-emacs-llm-providers-google.el::test-el-google-stream][test-emacs-llm-providers-google.el]] :: test-el-google-stream
 - [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-providers/test-emacs-llm-providers-google.el::test-el-google-filter][test-emacs-llm-providers-google.el]] :: test-el-google-filter
 - [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-providers/test-emacs-llm-providers-google.el::test-emacs-llm-parse-google-chunk][test-emacs-llm-providers-google.el]] :: test-emacs-llm-parse-google-chunk
@@ -22,7 +27,6 @@
 - [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-providers/test-emacs-llm-providers-google.el::test-el-parse-google-chunk-empty][test-emacs-llm-providers-google.el]] :: test-el-parse-google-chunk-empty
 - [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-providers/test-emacs-llm-providers-google.el::test-el-parse-google-chunk][test-emacs-llm-providers-google.el]] :: test-el-parse-google-chunk
 - [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-providers/test-emacs-llm-providers-openai.el::test-emacs-llm-parse-openai-chunk][test-emacs-llm-providers-openai.el]] :: test-emacs-llm-parse-openai-chunk
-- [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-providers/test-emacs-llm-providers-openai.el::test-emacs-llm-construct-openai-payload][test-emacs-llm-providers-openai.el]] :: test-emacs-llm-construct-openai-payload
 - [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-providers/test-emacs-llm-providers-variables.el::test-el-openai-engine-max-tokens-gpt4o][test-emacs-llm-providers-variables.el]] :: test-el-openai-engine-max-tokens-gpt4o
 - [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-providers/test-emacs-llm-providers-variables.el::test-el-google-engine-max-tokens-gemini-2-flash][test-emacs-llm-providers-variables.el]] :: test-el-google-engine-max-tokens-gemini-2-flash
 - [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-providers/test-emacs-llm-providers-variables.el::test-el-groq-models-content][test-emacs-llm-providers-variables.el]] :: test-el-groq-models-content
@@ -55,53 +59,9 @@
 - [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-providers/test-emacs-llm-providers-variables.el::test-el-default-engine-existence][test-emacs-llm-providers-variables.el]] :: test-el-default-engine-existence
 - [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-providers/test-emacs-llm-providers-variables.el::test-el-default-provider-existence][test-emacs-llm-providers-variables.el]] :: test-el-default-provider-existence
 - [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-providers/test-emacs-llm-providers-variables.el::test-emacs-llm-providers-variables-loadable][test-emacs-llm-providers-variables.el]] :: test-emacs-llm-providers-variables-loadable
-- [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-providers/test-emacs-llm-providers.el::test-emacs-llm-parse-invalid-chunk][test-emacs-llm-providers.el]] :: test-emacs-llm-parse-invalid-chunk
-- [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-providers/test-emacs-llm-providers.el::test-emacs-llm-providers-deepseek-loadable][test-emacs-llm-providers.el]] :: test-emacs-llm-providers-deepseek-loadable
-- [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-providers/test-emacs-llm-providers.el::test-emacs-llm-providers-google-loadable][test-emacs-llm-providers.el]] :: test-emacs-llm-providers-google-loadable
-- [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-providers/test-emacs-llm-providers.el::test-emacs-llm-providers-anthropic-loadable][test-emacs-llm-providers.el]] :: test-emacs-llm-providers-anthropic-loadable
-- [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-providers/test-emacs-llm-providers.el::test-emacs-llm-providers-openai-loadable][test-emacs-llm-providers.el]] :: test-emacs-llm-providers-openai-loadable
-- [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-bindings.el::test-emacs-llm-bindings-global-C-M-S-g][test-emacs-llm-bindings.el]] :: test-emacs-llm-bindings-global-C-M-S-g
-- [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-bindings.el::test-emacs-llm-bindings-after-setup-copy-last-response][test-emacs-llm-bindings.el]] :: test-emacs-llm-bindings-after-setup-copy-last-response
-- [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-bindings.el::test-emacs-llm-bindings-after-setup-show-history][test-emacs-llm-bindings.el]] :: test-emacs-llm-bindings-after-setup-show-history
-- [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-bindings.el::test-emacs-llm-bindings-after-setup-switch-provider][test-emacs-llm-bindings.el]] :: test-emacs-llm-bindings-after-setup-switch-provider
-- [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-bindings.el::test-emacs-llm-bindings-after-setup-on-region][test-emacs-llm-bindings.el]] :: test-emacs-llm-bindings-after-setup-on-region
-- [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-bindings.el::test-emacs-llm-bindings-after-setup-quick-menu][test-emacs-llm-bindings.el]] :: test-emacs-llm-bindings-after-setup-quick-menu
-- [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-bindings.el::test-emacs-llm-bindings-setup-is-interactive][test-emacs-llm-bindings.el]] :: test-emacs-llm-bindings-setup-is-interactive
-- [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-bindings.el::test-emacs-llm-bindings-setup-exists][test-emacs-llm-bindings.el]] :: test-emacs-llm-bindings-setup-exists
-- [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-display.el::test-emacs-llm-display-with-context-and-template][test-emacs-llm-display.el]] :: test-emacs-llm-display-with-context-and-template
-- [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-display.el::test-emacs-llm-display-with-context][test-emacs-llm-display.el]] :: test-emacs-llm-display-with-context
-- [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-display.el::test-emacs-llm-prepare-buffer-appends-to-existing][test-emacs-llm-display.el]] :: test-emacs-llm-prepare-buffer-appends-to-existing
-- [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-display.el::test-emacs-llm-prepare-buffer-with-template][test-emacs-llm-display.el]] :: test-emacs-llm-prepare-buffer-with-template
-- [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-display.el::test-emacs-llm-prepare-buffer-basic][test-emacs-llm-display.el]] :: test-emacs-llm-prepare-buffer-basic
-- [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-display.el::test-emacs-llm-prepare-buffer][test-emacs-llm-display.el]] :: test-emacs-llm-prepare-buffer
-- [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-history.el::test-emacs-llm-copy-last-response][test-emacs-llm-history.el]] :: test-emacs-llm-copy-last-response
-- [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-history.el::test-emacs-llm-get-recent-history][test-emacs-llm-history.el]] :: test-emacs-llm-get-recent-history
-- [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-history.el::test-emacs-llm-clear-history][test-emacs-llm-history.el]] :: test-emacs-llm-clear-history
-- [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-history.el::test-emacs-llm-history-backup][test-emacs-llm-history.el]] :: test-emacs-llm-history-backup
-- [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-history.el::test-emacs-llm-history-save-load][test-emacs-llm-history.el]] :: test-emacs-llm-history-save-load
-- [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-history.el::test-emacs-llm-history-dir-creation][test-emacs-llm-history.el]] :: test-emacs-llm-history-dir-creation
-- [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-history.el::test-emacs-llm-history-with-template][test-emacs-llm-history.el]] :: test-emacs-llm-history-with-template
-- [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-history.el::test-emacs-llm-history-append][test-emacs-llm-history.el]] :: test-emacs-llm-history-append
-- [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-run.el::test-emacs-llm-process-sentinel][test-emacs-llm-run.el]] :: test-emacs-llm-process-sentinel
-- [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-run.el::test-emacs-llm-process-chunk][test-emacs-llm-run.el]] :: test-emacs-llm-process-chunk
-- [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-spinner.el::test-emacs-llm-spinner-marker-position][test-emacs-llm-spinner.el]] :: test-emacs-llm-spinner-marker-position
-- [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-spinner.el::test-emacs-llm-spinner-cancellation][test-emacs-llm-spinner.el]] :: test-emacs-llm-spinner-cancellation
-- [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-spinner.el::test-emacs-llm-spinner-creation][test-emacs-llm-spinner.el]] :: test-emacs-llm-spinner-creation
-- [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-switch.el::test-emacs-llm-switch-provider-functionality][test-emacs-llm-switch.el]] :: test-emacs-llm-switch-provider-functionality
-- [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-variables.el::test-emacs-llm-variables-dependencies][test-emacs-llm-variables.el]] :: test-emacs-llm-variables-dependencies
-- [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-variables.el::test-emacs-llm-customization-group][test-emacs-llm-variables.el]] :: test-emacs-llm-customization-group
-- [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-variables.el::test-emacs-llm-separator-defined][test-emacs-llm-variables.el]] :: test-emacs-llm-separator-defined
-- [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-variables.el::test-emacs-llm-use-stream-defined][test-emacs-llm-variables.el]] :: test-emacs-llm-use-stream-defined
-- [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-variables.el::test-emacs-llm-buffer-name-defined][test-emacs-llm-variables.el]] :: test-emacs-llm-buffer-name-defined
-- [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm.el::test-emacs-llm-switch-loadable][test-emacs-llm.el]] :: test-emacs-llm-switch-loadable
-- [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm.el::test-emacs-llm-spinner-loadable][test-emacs-llm.el]] :: test-emacs-llm-spinner-loadable
-- [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm.el::test-emacs-llm-run-loadable][test-emacs-llm.el]] :: test-emacs-llm-run-loadable
-- [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm.el::test-emacs-llm-providers-loadable][test-emacs-llm.el]] :: test-emacs-llm-providers-loadable
-- [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm.el::test-emacs-llm-history-loadable][test-emacs-llm.el]] :: test-emacs-llm-history-loadable
-- [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm.el::test-emacs-llm-display-loadable][test-emacs-llm.el]] :: test-emacs-llm-display-loadable
-- [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm.el::test-emacs-llm-bindings-loadable][test-emacs-llm.el]] :: test-emacs-llm-bindings-loadable
-- [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm.el::test-emacs-llm-variables-loadable][test-emacs-llm.el]] :: test-emacs-llm-variables-loadable
-- [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm.el::test-emacs-llm-loadable][test-emacs-llm.el]] :: test-emacs-llm-loadable
 ** Failed Tests
+- [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-providers/test-emacs-llm-providers-openai.el::test-emacs-llm-construct-openai-payload][test-emacs-llm-providers-openai.el]] :: test-emacs-llm-construct-openai-payload
+  + Error details:
+    (wrong-type-argument number-or-marker-p nil)
 ** Timeout Tests
 ** Not Found Tests
