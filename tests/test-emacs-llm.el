@@ -30,11 +30,11 @@
   (should
    (featurep 'emacs-llm-variables)))
 
-(ert-deftest test-emacs-llm-bindings-loadable
+(ert-deftest test-emacs-llm-keybindings-loadable
     ()
-  "Test that emacs-llm-bindings module can be loaded."
+  "Test that emacs-llm-keybindings module can be loaded."
   (should
-   (featurep 'emacs-llm-bindings)))
+   (featurep 'emacs-llm-keybindings)))
 
 (ert-deftest test-emacs-llm-display-loadable
     ()
@@ -48,11 +48,11 @@
   (should
    (featurep 'emacs-llm-history)))
 
-(ert-deftest test-emacs-llm-providers-loadable
+(ert-deftest test-emacs-llm-call-loadable
     ()
-  "Test that emacs-llm-providers module can be loaded."
+  "Test that emacs-llm-call module can be loaded."
   (should
-   (featurep 'emacs-llm-providers)))
+   (featurep 'emacs-llm-call)))
 
 (ert-deftest test-emacs-llm-run-loadable
     ()

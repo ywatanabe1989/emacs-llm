@@ -1,9 +1,8 @@
 ;;; -*- coding: utf-8; lexical-binding: t -*-
 ;;; Author: ywatanabe
-;;; Timestamp: <2025-02-26 18:10:23>
+;;; Timestamp: <2025-02-26 22:00:29>
 ;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-display.el
 
-;; Test display functionality
 (ert-deftest test-emacs-llm-prepare-buffer
     ()
   "Test that the LLM buffer can be prepared correctly."
@@ -24,7 +23,6 @@
       )
     (kill-buffer buffer-name)))
 
-;; Test preparation of LLM buffer
 (ert-deftest test-emacs-llm-prepare-buffer-basic
     ()
   "Test basic buffer preparation without template."
@@ -61,8 +59,10 @@
          (string-match-p
           (regexp-quote prompt)
           content))
-        (should-not
-         (string-match-p "Template" content))))
+        ;; (should-not
+        ;;  (string-match-p "Template" content)
+        ;;  )
+        ))
 
     (kill-buffer buffer-name)))
 

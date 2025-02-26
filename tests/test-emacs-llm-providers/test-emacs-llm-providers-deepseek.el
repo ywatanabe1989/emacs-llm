@@ -1,13 +1,13 @@
 ;;; -*- coding: utf-8; lexical-binding: t -*-
 ;;; Author: ywatanabe
 ;;; Timestamp: <2025-02-26 16:49:11>
-;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-providers/test-emacs-llm-providers-deepseek.el
+;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-call/test-emacs-llm-call-deepseek.el
 
 ;; Test: test-emacs-llm-construct-deepseek-payload
 ;; Status: ABORTED
 ;; Error: (ert-test-failed ((should (= (length messages) 1)) :form (= 11 1) :value nil))
 
-;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-providers/test-emacs-llm-providers-deepseek.el
+;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-call/test-emacs-llm-call-deepseek.el
 
 (ert-deftest test-emacs-llm-construct-deepseek-payload
     ()
@@ -73,10 +73,10 @@
       (--el-parse-deepseek-chunk chunk)
       "Hello"))))
 
-(provide 'test-emacs-llm-providers-deepseek)
+(provide 'test-emacs-llm-call-deepseek)
 
 (when
     (not load-file-name)
-  (message "test-emacs-llm-providers-deepseek.el loaded."
+  (message "test-emacs-llm-call-deepseek.el loaded."
            (file-name-nondirectory
             (or load-file-name buffer-file-name))))

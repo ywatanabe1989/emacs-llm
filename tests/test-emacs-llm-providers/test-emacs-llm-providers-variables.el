@@ -1,16 +1,16 @@
 ;;; -*- coding: utf-8; lexical-binding: t -*-
 ;;; Author: ywatanabe
 ;;; Timestamp: <2025-02-26 16:02:37>
-;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-providers/test-emacs-llm-providers-variables.el
+;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-call/test-emacs-llm-call-variables.el
 
 (require 'ert)
-(require 'emacs-llm-providers-variables)
+(require 'emacs-llm-call-variables)
 
 ;; Test loading
-(ert-deftest test-emacs-llm-providers-variables-loadable
+(ert-deftest test-emacs-llm-call-variables-loadable
     ()
   (should
-   (featurep 'emacs-llm-providers-variables)))
+   (featurep 'emacs-llm-call-variables)))
 
 ;; Test default provider variable
 (ert-deftest test-el-default-provider-existence
@@ -186,12 +186,12 @@
     (alist-get "gpt-4o" --el-openai-engine-max-tokens-alist nil nil 'string=)
     8192)))
 
-(provide 'test-emacs-llm-providers-variables)
+(provide 'test-emacs-llm-call-variables)
 
-(provide 'test-emacs-llm-providers-variables)
+(provide 'test-emacs-llm-call-variables)
 
 (when
     (not load-file-name)
-  (message "test-emacs-llm-providers-variables.el loaded."
+  (message "test-emacs-llm-call-variables.el loaded."
            (file-name-nondirectory
             (or load-file-name buffer-file-name))))

@@ -1,17 +1,15 @@
 ;;; -*- coding: utf-8; lexical-binding: t -*-
 ;;; Author: ywatanabe
-;;; Timestamp: <2025-02-26 18:48:00>
-;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/emacs-llm-providers/emacs-llm-providers-google.el
-
-(require 'emacs-llm-providers-shared)
+;;; Timestamp: <2025-02-26 21:18:20>
+;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/emacs-llm-call/emacs-llm-call-google.el
 
 ;; Main
 ;; ----------------------------------------
 
 (defun --el-google-stream
-    (prompt &optional template)
+    (prompt &optional template-name)
   "Send PROMPT to Google API via streaming.
-Optional TEMPLATE is the name of the template used."
+Optional TEMPLATE-NAME is the name of the template used."
   (let*
       ((temp-buffer
         (generate-new-buffer " *google-temp-output*"))
@@ -21,15 +19,17 @@ Optional TEMPLATE is the name of the template used."
         (format "https://generativelanguage.googleapis.com/v1beta/models/%s:streamGenerateContent?alt=sse&key=%s"
                 model-name
                 (or --el-api-key-google --el-google-api-key)))
+       (full-prompt
+        (--el-apply-template prompt template-name))
        (payload
-        (--el-construct-google-payload prompt))
+        (--el-construct-google-payload full-prompt))
        (args
         (list "--no-buffer"
               url
               "-H" "Content-Type: application/json"
               "-d" payload))
        (buffer-name
-        (--el-prepare-llm-buffer prompt "GOOGLE" model-name template))
+        (--el-prepare-llm-buffer prompt "GOOGLE" model-name template-name))
        (proc
         (apply #'start-process "--el-google-stream" temp-buffer "curl" args)))
 
@@ -40,7 +40,7 @@ Optional TEMPLATE is the name of the template used."
     (set-process-filter proc #'--el-google-filter)
     (set-process-sentinel proc #'--el-process-sentinel)
     (--el-start-spinner)
-    (--el-append-to-history "user" prompt template)
+    (--el-append-to-history "user" prompt template-name)
     proc))
 
 ;; Helper
@@ -283,10 +283,10 @@ Optional TEMPLATE is the name of the template used."
        ("generationConfig" .
         (("maxOutputTokens" . ,max-tokens)))))))
 
-(provide 'emacs-llm-providers-google)
+(provide 'emacs-llm-call-google)
 
 (when
     (not load-file-name)
-  (message "emacs-llm-providers-google.el loaded."
+  (message "emacs-llm-call-google.el loaded."
            (file-name-nondirectory
             (or load-file-name buffer-file-name))))

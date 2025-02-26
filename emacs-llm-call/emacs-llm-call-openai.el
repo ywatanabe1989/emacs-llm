@@ -1,27 +1,24 @@
 ;;; -*- coding: utf-8; lexical-binding: t -*-
 ;;; Author: ywatanabe
-;;; Timestamp: <2025-02-26 18:53:01>
-;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/emacs-llm-providers/emacs-llm-providers-openai.el
-
-(require 'emacs-llm-providers-shared)
+;;; Timestamp: <2025-02-26 21:18:21>
+;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/emacs-llm-call/emacs-llm-call-openai.el
 
 ;; (defun --el-openai-stream
-;;     (prompt &optional template)
+;;     (prompt &optional template-name)
 ;;   "Send PROMPT to OpenAI API via streaming.
-;; Optional TEMPLATE is the name of the template used."
+;; Optional TEMPLATE-NAME is the name of the template used."
 ;;   (let*
 ;;       ((temp-buffer
 ;;         (generate-new-buffer " *openai-temp-output*"))
+;;        (full-prompt
+;;         (--el-apply-template prompt template-name))
 ;;        (payload
-;;         (--el-construct-openai-payload prompt))
-;;        (payload-oneline
-;;         (replace-regexp-in-string "\n" " " payload))
-;;        (escaped-payload
-;;         (replace-regexp-in-string "'" "\\\\'" payload-oneline))
+;;         (--el-construct-openai-payload full-prompt))
+;;        ;; No need for string replacements when using shell-quote-argument
 ;;        (curl-command
-;;         (format "curl -N 'https://api.openai.com/v1/chat/completions' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' -d '%s'"
+;;         (format "curl -N 'https://api.openai.com/v1/chat/completions' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' -d %s"
 ;;                 (or --el-api-key-openai --el-api-key)
-;;                 escaped-payload))
+;;                 (shell-quote-argument payload)))
 ;;        (model-name
 ;;         (or --el-openai-model --el-default-engine-openai)))
 ;;     (message "Using model: %s" model-name)
@@ -33,7 +30,7 @@
 ;;                              (length payload))))
 ;;     (let*
 ;;         ((buffer-name
-;;           (--el-prepare-llm-buffer prompt "OPENAI" model-name template))
+;;           (--el-prepare-llm-buffer prompt "OPENAI" model-name template-name))
 ;;          (proc
 ;;           (start-process-shell-command "--el-openai-stream" temp-buffer curl-command)))
 ;;       (message "Process started with PID: %s"
@@ -44,7 +41,7 @@
 ;;       (process-put proc 'prompt prompt)
 ;;       (process-put proc 'provider "OPENAI")
 ;;       (process-put proc 'model model-name)
-;;       (process-put proc 'template template)
+;;       (process-put proc 'template template-name)
 ;;       (set-process-filter proc #'--el-openai-filter)
 ;;       (message "Process filter set")
 ;;       (set-process-sentinel proc #'--el-process-sentinel)
@@ -55,14 +52,19 @@
 ;;       proc)))
 
 (defun --el-openai-stream
-    (prompt &optional template)
+    (prompt &optional template-name)
   "Send PROMPT to OpenAI API via streaming.
-Optional TEMPLATE is the name of the template used."
+Optional TEMPLATE-NAME is the name of the template used."
   (let*
       ((temp-buffer
         (generate-new-buffer " *openai-temp-output*"))
+       ;; Apply template internally to get full prompt
+       (full-prompt
+        (if template-name
+            (--el-apply-template prompt template-name)
+          prompt))
        (payload
-        (--el-construct-openai-payload prompt))
+        (--el-construct-openai-payload full-prompt))
        ;; No need for string replacements when using shell-quote-argument
        (curl-command
         (format "curl -N 'https://api.openai.com/v1/chat/completions' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' -d %s"
@@ -78,8 +80,9 @@ Optional TEMPLATE is the name of the template used."
                         (min 100
                              (length payload))))
     (let*
-        ((buffer-name
-          (--el-prepare-llm-buffer prompt "OPENAI" model-name template))
+        (;; Pass original prompt for display purposes, not the template-augmented one
+         (buffer-name
+          (--el-prepare-llm-buffer prompt "OPENAI" model-name template-name))
          (proc
           (start-process-shell-command "--el-openai-stream" temp-buffer curl-command)))
       (message "Process started with PID: %s"
@@ -90,7 +93,8 @@ Optional TEMPLATE is the name of the template used."
       (process-put proc 'prompt prompt)
       (process-put proc 'provider "OPENAI")
       (process-put proc 'model model-name)
-      (process-put proc 'template template)
+      ;; Don't store template name in process properties
+      ;; (process-put proc 'template template-name)
       (set-process-filter proc #'--el-openai-filter)
       (message "Process filter set")
       (set-process-sentinel proc #'--el-process-sentinel)
@@ -244,10 +248,10 @@ Returns (ACTUAL-ENGINE . EFFORT)."
              engine-string base effort)
     (cons base effort)))
 
-(provide 'emacs-llm-providers-openai)
+(provide 'emacs-llm-call-openai)
 
 (when
     (not load-file-name)
-  (message "emacs-llm-providers-openai.el loaded."
+  (message "emacs-llm-call-openai.el loaded."
            (file-name-nondirectory
             (or load-file-name buffer-file-name))))

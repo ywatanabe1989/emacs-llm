@@ -1,54 +1,15 @@
 ;;; -*- coding: utf-8; lexical-binding: t -*-
 ;;; Author: ywatanabe
-;;; Timestamp: <2025-02-26 17:22:56>
+;;; Timestamp: <2025-02-26 22:02:08>
 ;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/emacs-llm-display.el
 
-;; (defun --el-display-with-context
-;;     (prompt template response provider model)
-;;   "Display PROMPT, TEMPLATE, RESPONSE with PROVIDER and MODEL info in the LLM buffer."
-;;   (with-current-buffer
-;;       (get-buffer-create --el-buffer-name)
-;;     (goto-char
-;;      (point-max))
-;;     (unless
-;;         (=
-;;          (point-min)
-;;          (point-max))
-;;       (insert "\n\n"))
-;;     (insert --el-separator)
-;;     (insert "\n\n")
-;;     (insert
-;;      (format "Provider: %s | Model: %s\n\n" provider model))
-
-;;     ;; Display the prompt with template info if available
-;;     ;; (insert
-;;     ;;  (propertize "User:" 'face 'bold))
-;;     (when template
-;;       (insert
-;;        (format " [Template: %s]" template)))
-;;     (insert "\n\n")
-;;     (insert prompt)
-;;     (insert "\n\n")
-
-;;     ;; Display the response
-;;     ;; (insert
-;;     ;;  (propertize "AI:" 'face 'bold))
-;;     (insert "\n\n")
-;;     (insert response)
-
-;;     (markdown-mode)
-;;     (goto-char
-;;      (point-max))
-;;     (display-buffer
-;;      (current-buffer))))
-
 (defun --el-prepare-llm-buffer
-    (prompt provider model &optional template)
+    (prompt provider model &optional template-name)
   "Prepare the LLM buffer for displaying a response.
 PROMPT is the user input.
 PROVIDER is the name of the LLM provider.
 MODEL is the model name.
-Optional TEMPLATE is the name of the template used, if any."
+Optional TEMPLATE-NAME is the name of the template used, if any."
   (let
       ((buffer-name
         (get-buffer-create --el-buffer-name)))
@@ -64,23 +25,10 @@ Optional TEMPLATE is the name of the template used, if any."
            (point-max))
         (insert "\n\n"))
       (insert --el-separator)
-      (insert "\n\n")
       (insert
-       (format "> %s\n\n" model))
-
-      ;; Display user prompt with template info
-      ;; (insert
-      ;;  (propertize "User:" 'face 'bold))
-      (when template
-        (insert
-         (format " [Template: %s]" template)))
+       (format "\n\n > %s [Template: %s]" model template-name))
       (insert
-       (format "> %s\n\n" prompt))
-      ;; Display response heading
-      ;; (insert
-      ;;  (propertize "AI:" 'face 'bold))
-      ;; (insert "\n\n")
-
+       (format "\n\n > %s\n\n" prompt))
       (display-buffer
        (current-buffer)))
     buffer-name))

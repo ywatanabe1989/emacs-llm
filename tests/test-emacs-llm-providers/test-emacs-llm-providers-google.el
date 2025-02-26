@@ -1,9 +1,9 @@
 ;;; -*- coding: utf-8; lexical-binding: t -*-
 ;;; Author: ywatanabe
 ;;; Timestamp: <2025-02-26 16:49:11>
-;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-providers/test-emacs-llm-providers-google.el
+;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-call/test-emacs-llm-call-google.el
 
-(require 'emacs-llm-providers-google)
+(require 'emacs-llm-call-google)
 ;; Test: test-emacs-llm-construct-google-payload
 ;; Status: ABORTED
 ;; Error: (wrong-type-argument listp [((role . "user") (content . "hi")) ((role . "assistant") (content . "")) ((role . "user") (content . "hi")) ((role . "assistant") (content . "")) ((role . "user") (content . "hi")) ((role . "assistant") (content . "")) ((role . "user") (content . "hi")) ((role . "assistant") (content . "")) ((role . "user") (content . "g")) ((role . "assistant") (content . ""))])
@@ -178,10 +178,10 @@
                (process-live-p mock-proc))
         (delete-process mock-proc)))))
 
-(provide 'test-emacs-llm-providers-google)
+(provide 'test-emacs-llm-call-google)
 
 (when
     (not load-file-name)
-  (message "test-emacs-llm-providers-google.el loaded."
+  (message "test-emacs-llm-call-google.el loaded."
            (file-name-nondirectory
             (or load-file-name buffer-file-name))))

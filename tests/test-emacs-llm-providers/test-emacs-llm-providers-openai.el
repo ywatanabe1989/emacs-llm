@@ -1,7 +1,7 @@
 ;;; -*- coding: utf-8; lexical-binding: t -*-
 ;;; Author: ywatanabe
 ;;; Timestamp: <2025-02-26 17:54:40>
-;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-providers/test-emacs-llm-providers-openai.el
+;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-call/test-emacs-llm-call-openai.el
 
 (ert-deftest test-emacs-llm-construct-openai-payload
     ()
@@ -87,10 +87,10 @@
       (--el-parse-openai-chunk chunk)
       "Hello"))))
 
-(provide 'test-emacs-llm-providers-openai)
+(provide 'test-emacs-llm-call-openai)
 
 (when
     (not load-file-name)
-  (message "test-emacs-llm-providers-openai.el loaded."
+  (message "test-emacs-llm-call-openai.el loaded."
            (file-name-nondirectory
             (or load-file-name buffer-file-name))))

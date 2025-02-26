@@ -1,9 +1,9 @@
 ;;; -*- coding: utf-8; lexical-binding: t -*-
 ;;; Author: ywatanabe
 ;;; Timestamp: <2025-02-26 16:49:12>
-;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-providers/test-emacs-llm-providers.el
+;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-call/test-emacs-llm-call.el
 
-;;; test-emacs-llm-providers.el --- Tests for emacs-llm providers -*- lexical-binding: t -*-
+;;; test-emacs-llm-call.el --- Tests for emacs-llm providers -*- lexical-binding: t -*-
 
 ;;; Commentary:
 ;; Test suite for the emacs-llm provider modules.
@@ -14,32 +14,32 @@
 
 ;; Load the package to test
 (when
-    (require 'emacs-llm-providers nil t)
-  (message "emacs-llm-providers loaded successfully for testing"))
+    (require 'emacs-llm-call nil t)
+  (message "emacs-llm-call loaded successfully for testing"))
 
-(ert-deftest test-emacs-llm-providers-openai-loadable
+(ert-deftest test-emacs-llm-call-openai-loadable
     ()
-  "Test that emacs-llm-providers-openai module can be loaded."
+  "Test that emacs-llm-call-openai module can be loaded."
   (should
-   (featurep 'emacs-llm-providers-openai)))
+   (featurep 'emacs-llm-call-openai)))
 
-(ert-deftest test-emacs-llm-providers-anthropic-loadable
+(ert-deftest test-emacs-llm-call-anthropic-loadable
     ()
-  "Test that emacs-llm-providers-anthropic module can be loaded."
+  "Test that emacs-llm-call-anthropic module can be loaded."
   (should
-   (featurep 'emacs-llm-providers-anthropic)))
+   (featurep 'emacs-llm-call-anthropic)))
 
-(ert-deftest test-emacs-llm-providers-google-loadable
+(ert-deftest test-emacs-llm-call-google-loadable
     ()
-  "Test that emacs-llm-providers-google module can be loaded."
+  "Test that emacs-llm-call-google module can be loaded."
   (should
-   (featurep 'emacs-llm-providers-google)))
+   (featurep 'emacs-llm-call-google)))
 
-(ert-deftest test-emacs-llm-providers-deepseek-loadable
+(ert-deftest test-emacs-llm-call-deepseek-loadable
     ()
-  "Test that emacs-llm-providers-deepseek module can be loaded."
+  "Test that emacs-llm-call-deepseek module can be loaded."
   (should
-   (featurep 'emacs-llm-providers-deepseek)))
+   (featurep 'emacs-llm-call-deepseek)))
 
 (ert-deftest test-emacs-llm-parse-invalid-chunk
     ()
@@ -55,10 +55,10 @@
     (should-not
      (--el-parse-deepseek-chunk invalid-chunk))))
 
-(provide 'test-emacs-llm-providers)
+(provide 'test-emacs-llm-call)
 
 (when
     (not load-file-name)
-  (message "test-emacs-llm-providers.el loaded."
+  (message "test-emacs-llm-call.el loaded."
            (file-name-nondirectory
             (or load-file-name buffer-file-name))))

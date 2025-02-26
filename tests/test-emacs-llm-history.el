@@ -1,6 +1,6 @@
 ;;; -*- coding: utf-8; lexical-binding: t -*-
 ;;; Author: ywatanabe
-;;; Timestamp: <2025-02-26 16:49:10>
+;;; Timestamp: <2025-02-26 22:21:26>
 ;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-history.el
 
 (ert-deftest test-emacs-llm-history-append
@@ -310,39 +310,6 @@
         (setq --el-history
               (json-read-from-string
                (buffer-string)))))))
-
-(ert-deftest test-emacs-llm-copy-last-response
-    ()
-  "Test copying the last AI response to kill ring."
-  (let*
-      ((env
-        (setup-test-history-env))
-       (--el-history-dir
-        (plist-get env :dir))
-       (--el-history-file
-        (plist-get env :file))
-       (--el-history
-        '())
-       (last-kill nil))
-    ;; Mock kill-new function
-    (cl-letf
-        (((symbol-function 'kill-new)
-          (lambda
-            (text)
-            (setq last-kill text))))
-      ;; Test with empty history
-      (--el-copy-last-response)
-      (should-not last-kill)
-      ;; Add some entries
-      (--el-append-to-history "user" "Test question")
-      (--el-append-to-history "assistant" "Test answer 1")
-      (--el-append-to-history "user" "Another question")
-      (--el-append-to-history "assistant" "Test answer 2")
-      ;; Copy last response
-      (--el-copy-last-response)
-      (should
-       (string= last-kill "Test answer 2")))
-    (cleanup-test-history-env env)))
 
 (provide 'test-emacs-llm-history)
 

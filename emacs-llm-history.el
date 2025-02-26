@@ -1,6 +1,6 @@
 ;;; -*- coding: utf-8; lexical-binding: t -*-
 ;;; Author: ywatanabe
-;;; Timestamp: <2025-02-26 17:30:03>
+;;; Timestamp: <2025-02-26 21:30:20>
 ;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/emacs-llm-history.el
 
 (defcustom --el-history-dir
@@ -108,13 +108,13 @@ If TEMPLATE is provided, include it as part of the metadata."
   (message "Emacs-LLM conversation history cleared."))
 
 ;;;###autoload
-(defun --el-show-history
+(defun el-show-history
     (&optional num-interactions)
   "Display the conversation history in a buffer.
 Show NUM-INTERACTIONS most recent interactions (default: 20)."
   (interactive
    (list
-    (read-number "Number of interactions to show (default: 20): " 20)))
+    (read-number "Number of interactions to show: " 20)))
   (--el-load-history)
   (let*
       ((num
@@ -177,31 +177,31 @@ Show NUM-INTERACTIONS most recent interactions (default: 20)."
           (with-selected-window window
             (recenter)))))))
 
-(defun --el-copy-last-response
-    ()
-  "Copy the last AI response from history to kill ring."
-  (interactive)
-  (--el-load-history)
-  (if --el-history
-      (let*
-          ((last-entries
-            (reverse --el-history))
-           (last-response
-            (cl-find-if
-             (lambda
-               (entry)
-               (string=
-                (alist-get 'role entry)
-                "assistant"))
-             last-entries)))
-        (if last-response
-            (let
-                ((content
-                  (alist-get 'content last-response)))
-              (kill-new content)
-              (message "Last AI response copied to kill ring"))
-          (message "No AI response found in history")))
-    (message "No history found")))
+;; (defun --el-copy-last-response
+;;     ()
+;;   "Copy the last AI response from history to kill ring."
+;;   (interactive)
+;;   (--el-load-history)
+;;   (if --el-history
+;;       (let*
+;;           ((last-entries
+;;             (reverse --el-history))
+;;            (last-response
+;;             (cl-find-if
+;;              (lambda
+;;                (entry)
+;;                (string=
+;;                 (alist-get 'role entry)
+;;                 "assistant"))
+;;              last-entries)))
+;;         (if last-response
+;;             (let
+;;                 ((content
+;;                   (alist-get 'content last-response)))
+;;               (kill-new content)
+;;               (message "Last AI response copied to kill ring"))
+;;           (message "No AI response found in history")))
+;;     (message "No history found")))
 
 (defun --el-get-recent-history
     ()
@@ -218,56 +218,56 @@ Show NUM-INTERACTIONS most recent interactions (default: 20)."
         (cl-subseq --el-history start-index)
       nil)))
 
-(defun --el-scroll-history-forward
-    ()
-  "Scroll forward in history buffer."
-  (interactive)
-  (when-let
-      ((history-buffer
-        (get-buffer "*Emacs-LLM History*")))
-    (with-selected-window
-        (get-buffer-window history-buffer)
-      (scroll-up-command))))
+;; (defun --el-scroll-history-forward
+;;     ()
+;;   "Scroll forward in history buffer."
+;;   (interactive)
+;;   (when-let
+;;       ((history-buffer
+;;         (get-buffer "*Emacs-LLM History*")))
+;;     (with-selected-window
+;;         (get-buffer-window history-buffer)
+;;       (scroll-up-command))))
 
-(defun --el-scroll-history-backward
-    ()
-  "Scroll backward in history buffer."
-  (interactive)
-  (when-let
-      ((history-buffer
-        (get-buffer "*Emacs-LLM History*")))
-    (with-selected-window
-        (get-buffer-window history-buffer)
-      (scroll-down-command))))
+;; (defun --el-scroll-history-backward
+;;     ()
+;;   "Scroll backward in history buffer."
+;;   (interactive)
+;;   (when-let
+;;       ((history-buffer
+;;         (get-buffer "*Emacs-LLM History*")))
+;;     (with-selected-window
+;;         (get-buffer-window history-buffer)
+;;       (scroll-down-command))))
 
-(defun --el-history-mode
-    ()
-  "Major mode for viewing LLM conversation history."
-  (interactive)
-  (kill-all-local-variables)
-  (use-local-map
-   (let
-       ((map
-         (make-sparse-keymap)))
-     (define-key map
-                 (kbd "n")
-                 #'--el-scroll-history-forward)
-     (define-key map
-                 (kbd "p")
-                 #'--el-scroll-history-backward)
-     (define-key map
-                 (kbd "SPC")
-                 #'--el-scroll-history-forward)
-     (define-key map
-                 (kbd "S-SPC")
-                 #'--el-scroll-history-backward)
-     (define-key map
-                 (kbd "q")
-                 #'quit-window)
-     map))
-  (setq major-mode '--el-history-mode
-        mode-name "LLM-History")
-  (read-only-mode 1))
+;; (defun --el-history-mode
+;;     ()
+;;   "Major mode for viewing LLM conversation history."
+;;   (interactive)
+;;   (kill-all-local-variables)
+;;   (use-local-map
+;;    (let
+;;        ((map
+;;          (make-sparse-keymap)))
+;;      (define-key map
+;;                  (kbd "n")
+;;                  #'--el-scroll-history-forward)
+;;      (define-key map
+;;                  (kbd "p")
+;;                  #'--el-scroll-history-backward)
+;;      (define-key map
+;;                  (kbd "SPC")
+;;                  #'--el-scroll-history-forward)
+;;      (define-key map
+;;                  (kbd "S-SPC")
+;;                  #'--el-scroll-history-backward)
+;;      (define-key map
+;;                  (kbd "q")
+;;                  #'quit-window)
+;;      map))
+;;   (setq major-mode '--el-history-mode
+;;         mode-name "LLM-History")
+;;   (read-only-mode 1))
 
 (provide 'emacs-llm-history)
 

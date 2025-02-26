@@ -1,7 +1,7 @@
 ;;; -*- coding: utf-8; lexical-binding: t -*-
 ;;; Author: ywatanabe
-;;; Timestamp: <2025-02-26 18:58:20>
-;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/emacs-llm-providers/emacs-llm-providers-variables.el
+;;; Timestamp: <2025-02-26 21:18:21>
+;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/emacs-llm-call/emacs-llm-call-variables.el
 
 ;; Used
 ;; ----------------------------------------
@@ -226,10 +226,10 @@
 (defvar --el-deepseek-model nil
   "Selected DeepSeek model.")
 
-(provide 'emacs-llm-providers-variables)
+(provide 'emacs-llm-call-variables)
 
 (when
     (not load-file-name)
-  (message "emacs-llm-providers-variables.el loaded."
+  (message "emacs-llm-call-variables.el loaded."
            (file-name-nondirectory
             (or load-file-name buffer-file-name))))

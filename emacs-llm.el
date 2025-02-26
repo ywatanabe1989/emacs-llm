@@ -1,9 +1,12 @@
 ;;; -*- coding: utf-8; lexical-binding: t -*-
 ;;; Author: ywatanabe
-;;; Timestamp: <2025-02-26 16:58:46>
+;;; Timestamp: <2025-02-26 22:07:50>
 ;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/emacs-llm.el
 
-(defun --lle-load-file-silent
+;; Path and Loading
+;; ----------------------------------------
+
+(defun --el-load-file-silent
     (file-path)
   "Load Emacs Lisp file at FILE-PATH silently.
 Suppresses all messages, warnings and outputs during loading.
@@ -23,10 +26,10 @@ Arguments:
              (warning-minimum-level :error))
           (load-file file-path))))))
 
-(defun --lle-add-subdirs-to-loadpath
+(defun --el-add-subdirs-to-loadpath
     (parent)
   "Add all visible (non-hidden) subdirectories of PARENT to `load-path`.
-Ignores any directories in `--lle-excluded-dirs`."
+Ignores any directories in `--el-excluded-dirs`."
   (let
       ((candidates
         (directory-files parent t "\\`[^.]")))
@@ -47,19 +50,33 @@ Ignores any directories in `--lle-excluded-dirs`."
       (file-name-directory
        (or load-file-name buffer-file-name))))
   ;; 2) Add immediate subdirectories to load-path
-  (--lle-add-subdirs-to-loadpath root))
+  (--el-add-subdirs-to-loadpath root))
 
-(add-to-list 'load-path "/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/")
+;; (add-to-list 'load-path "/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/")
 
+;; Emacs LLM package
+;; ----------------------------------------
+
+;; LLM
 (require 'emacs-llm-variables)
-(require 'emacs-llm-providers)
-(require 'emacs-llm-bindings)
 (require 'emacs-llm-display)
+(require 'emacs-llm-templates)
+(require 'emacs-llm-call)
+(require 'emacs-llm-switch)
+
+;; Utils
+(require 'emacs-llm-spinner)
+(require 'emacs-llm-scroll)
+(require 'emacs-llm-code-navigation)
 (require 'emacs-llm-history)
 
+;; Dired
+(require 'emacs-llm-filter)
+(require 'emacs-llm-dired)
+
+;; Main
 (require 'emacs-llm-run)
-(require 'emacs-llm-spinner)
-(require 'emacs-llm-switch)
+(require 'emacs-llm-keybindings)
 
 (provide 'emacs-llm)
 

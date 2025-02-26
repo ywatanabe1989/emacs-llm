@@ -1,22 +1,22 @@
 ;;; -*- coding: utf-8; lexical-binding: t -*-
 ;;; Author: ywatanabe
-;;; Timestamp: <2025-02-26 18:47:51>
-;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/emacs-llm-providers/emacs-llm-providers-anthropic.el
-
-(require 'emacs-llm-providers-shared)
+;;; Timestamp: <2025-02-26 21:18:19>
+;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/emacs-llm-call/emacs-llm-call-anthropic.el
 
 ;; Main
 ;; ----------------------------------------
 
 (defun --el-anthropic-stream
-    (prompt &optional template)
+    (prompt &optional template-name)
   "Send PROMPT to Anthropic API via streaming.
-Optional TEMPLATE is the name of the template used."
+Optional TEMPLATE-NAME is the name of the template-name used."
   (let*
       ((temp-buffer
         (generate-new-buffer " *anthropic-temp-output*"))
+       (full-prompt
+        (--el-apply-template prompt template-name))
        (payload
-        (--el-construct-anthropic-payload prompt))
+        (--el-construct-anthropic-payload full-prompt))
        (payload-oneline
         (replace-regexp-in-string "\n" " " payload))
        (escaped-payload
@@ -28,7 +28,7 @@ Optional TEMPLATE is the name of the template used."
        (model-name
         (or --el-anthropic-model --el-default-engine-anthropic))
        (buffer-name
-        (--el-prepare-llm-buffer prompt "ANTHROPIC" model-name template))
+        (--el-prepare-llm-buffer prompt "ANTHROPIC" model-name template-name))
        (proc
         (start-process-shell-command "--el-anthropic-stream" temp-buffer curl-command)))
 
@@ -38,7 +38,7 @@ Optional TEMPLATE is the name of the template used."
     (set-process-filter proc #'--el-anthropic-filter)
     (set-process-sentinel proc #'--el-process-sentinel)
     (--el-start-spinner)
-    (--el-append-to-history "user" prompt template)
+    (--el-append-to-history "user" prompt template-name)
     proc))
 
 ;; Helper
@@ -110,10 +110,10 @@ Optional TEMPLATE is the name of the template used."
           `(("role" . "user")
             ("content" . ,prompt))))))))
 
-(provide 'emacs-llm-providers-anthropic)
+(provide 'emacs-llm-call-anthropic)
 
 (when
     (not load-file-name)
-  (message "emacs-llm-providers-anthropic.el loaded."
+  (message "emacs-llm-call-anthropic.el loaded."
            (file-name-nondirectory
             (or load-file-name buffer-file-name))))
