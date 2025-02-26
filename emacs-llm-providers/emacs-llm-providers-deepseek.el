@@ -1,15 +1,14 @@
 ;;; -*- coding: utf-8; lexical-binding: t -*-
 ;;; Author: ywatanabe
-;;; Timestamp: <2025-02-26 14:19:24>
+;;; Timestamp: <2025-02-26 16:19:26>
 ;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/emacs-llm-providers/emacs-llm-providers-deepseek.el
 
 (defun --el--send-deepseek-stream
-    (prompt)
-  "Send PROMPT to DeepSeek API via streaming."
+    (prompt &optional template)
+  "Send PROMPT to DeepSeek API via streaming.
+Optional TEMPLATE is the name of the template used."
   (let*
-      ((buffer-name
-        (get-buffer-create --el-buffer-name))
-       (temp-buffer
+      ((temp-buffer
         (generate-new-buffer " *deepseek-temp-output*"))
        (payload
         (--el--construct-deepseek-payload prompt))
@@ -21,30 +20,12 @@
         (format "curl -N 'https://api.deepseek.com/v1/chat/completions' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' -d '%s'"
                 --el-deepseek-api-key
                 escaped-payload))
+       (model-name
+        (or --el-default-engine-deepseek --el-deepseek-model))
+       (buffer-name
+        (--el--prepare-llm-buffer prompt "DEEPSEEK" model-name template))
        (proc
         (start-process-shell-command "--el-deepseek-stream" temp-buffer curl-command)))
-
-    ;; (message "DEBUG: DeepSeek curl command: %s" curl-command)
-    (with-current-buffer buffer-name
-      (unless
-          (derived-mode-p 'markdown-mode)
-        (markdown-mode))
-      (goto-char
-       (point-max))
-      (unless
-          (=
-           (point-min)
-           (point-max))
-        (insert "\n\n"))
-      (insert --el-separator)
-      (insert "\n\n")
-      (insert
-       (format "Provider: %s | Model: %s\n\n" "DEEPSEEK" --el-deepseek-model))
-      (insert
-       (format "Prompt: %s\n\n" prompt))
-      (insert "Response: ")
-      (display-buffer
-       (current-buffer)))
 
     (process-put proc 'target-buffer buffer-name)
     (process-put proc 'temp-buffer temp-buffer)
@@ -53,7 +34,7 @@
     (set-process-filter proc #'--el--deepseek-filter)
     (set-process-sentinel proc #'--el--process-sentinel)
     (--el--start-spinner)
-    (--el--append-to-history "user" prompt)
+    (--el--append-to-history "user" prompt template)
     proc))
 
 ;; Helper
@@ -153,6 +134,31 @@
                                "")
                               text))))))))))
 
+;; (defun --el--construct-deepseek-payload
+;;     (prompt)
+;;   "Construct the JSON payload for DeepSeek API with PROMPT."
+;;   (let*
+;;       ((mod--el-name
+;;         (or --el-default-engine-deepseek --el-deepseek-model))
+;;        (max-tokens
+;;         (or
+;;          (alist-get mod--el-name --el-deepseek-engine-max-tokens-alist nil nil 'string=)
+;;          8192))
+;;        (recent-history
+;;         (--el--get-recent-history))
+;;        (payload
+;;         (json-encode
+;;          `(("model" . ,mod--el-name)
+;;            ("messages" . ,(append recent-history
+;;                                   (vector
+;;                                    `(("role" . "user")
+;;                                      ("content" . ,prompt)))))
+;;            ("temperature" . ,--el-temperature)
+;;            ("max_tokens" . ,max-tokens)
+;;            ("stream" . t)))))
+;;     ;; (message "DEBUG: Constructed DeepSeek payload: %s" payload)
+;;     payload))
+
 (defun --el--construct-deepseek-payload
     (prompt)
   "Construct the JSON payload for DeepSeek API with PROMPT."
@@ -163,24 +169,19 @@
         (or
          (alist-get mod--el-name --el-deepseek-engine-max-tokens-alist nil nil 'string=)
          8192))
+       (recent-history
+        (--el--get-recent-history))
        (payload
         (json-encode
          `(("model" . ,mod--el-name)
-           ("messages" . ,(vector
-                           `(("role" . "user")
-                             ("content" . ,prompt))))
+           ("messages" . ,(append recent-history
+                                  (list
+                                   `(("role" . "user")
+                                     ("content" . ,prompt)))))
            ("temperature" . ,--el-temperature)
            ("max_tokens" . ,max-tokens)
            ("stream" . t)))))
-    ;; (message "DEBUG: Constructed DeepSeek payload: %s" payload)
     payload))
-
-(provide 'emacs-llm-providers-deepseek)
-(when
-    (not load-file-name)
-  (message "emacs-llm-providers-deepseek.el loaded."
-           (file-name-nondirectory
-            (or load-file-name buffer-file-name))))
 
 (provide 'emacs-llm-providers-deepseek)
 

@@ -1,0 +1,124 @@
+# Timestamp: "2025-02-14 06:21:59 (ywatanabe)"
+# File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-tab-manager/.github/workflows/test.yml
+
+name: tests
+on:
+  push:
+    paths-ignore:
+      - '**.md'
+  pull_request:
+    paths-ignore:
+      - '**.md'
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    continue-on-error: ${{ matrix.emacs_version == 'snapshot' }}
+    strategy:
+      matrix:
+        emacs_version:
+          - 27.1
+          - 27.2
+          - 28.1
+          - 28.2
+          - 29.1
+          - 29.2
+          - 29.3
+          - 29.4
+          - snapshot
+    steps:
+      - uses: actions/checkout@v3
+      - uses: purcell/setup-emacs@master
+        with:
+          version: ${{ matrix.emacs_version }}
+      - name: run-tests
+        run: |
+          sh run-tests.sh
+
+# name: CI
+# on:
+#   push:
+#     paths-ignore:
+#       - '**.md'
+#   pull_request:
+#     paths-ignore:
+#       - '**.md'
+
+# jobs:
+#   test:
+#     runs-on: ubuntu-latest
+#     continue-on-error: ${{ matrix.emacs_version == 'snapshot' }}
+#     strategy:
+#       matrix:
+#         emacs_version:
+#           - 27.1
+#           - 27.2
+#           - 28.1
+#           - 28.2
+#           - 29.1
+#           - 29.2
+#           - 29.3
+#           - 29.4
+#           - snapshot
+
+#     steps:
+#       - uses: actions/checkout@v3
+#       - uses: purcell/setup-emacs@master
+#         with:
+#           version: ${{ matrix.emacs_version }}
+
+#       - name: Run tests
+#         run: |
+#             emacs -batch -l ert \
+#                   -l package \
+#                   --eval "(progn \
+#                             (add-to-list 'load-path .") \
+#                             (add-to-list 'load-path ./etm-buffer\") \
+#                             (add-to-list 'load-path ./etm-close\") \
+#                             (add-to-list 'load-path ./etm-keys\") \
+#                             (add-to-list 'load-path ./etm-layout\") \
+#                             (add-to-list 'load-path ./tests\") \
+#                             (package-initialize) \
+#                             (require 'tab-bar))" \
+#                   -l etm-variables.el \
+#                   -l etm-buffer-checkers.el \
+#                   -l etm-buffer-getters.el \
+#                   -l etm-buffer-jumpers.el \
+#                   -l etm-buffer-kill-or-bury.el \
+#                   -l etm-buffer-setters.el \
+#                   -l etm-buffer.el \
+#                   -l etm-close-core.el \
+#                   -l etm-close-utils.el \
+#                   -l etm-close.el \
+#                   -l etm-init.el \
+#                   -l etm-keys-buffer.el \
+#                   -l etm-keys-command-map.el \
+#                   -l etm-keys-layout.el \
+#                   -l etm-keys-navigation.el \
+#                   -l etm-layout-create.el \
+#                   -l etm-layout-load.el \
+#                   -l etm-layout-save.el \
+#                   -l etm-layout-window.el \
+#                   -l etm-layout.el \
+#                   -l etm-navigation.el \
+#                   -l etm-new-and-rename.el \
+#                   -l test-etm-buffer-checkers.el \
+#                   -l test-etm-buffer-getters.el \
+#                   -l test-etm-buffer-jumpers.el \
+#                   -l test-etm-buffer-kill-or-bury.el \
+#                   -l test-etm-buffer-setters.el \
+#                   -l test-etm-close-core.el \
+#                   -l test-etm-close-utils.el \
+#                   -l test-etm-init.el \
+#                   -l test-etm-keys-command-map.el \
+#                   -l test-etm-keys-layout.el \
+#                   -l test-etm-keys-navigation.el \
+#                   -l test-etm-layout-create.el \
+#                   -l test-etm-layout-load.el \
+#                   -l test-etm-layout-save.el \
+#                   -l test-etm-layout-window.el \
+#                   -l test-etm-navigation.el \
+#                   -l test-etm-new-and-rename.el \
+#                   -l test-etm-variables.el \
+#                   -f ert-run-tests-batch-and-exit
+
+# EOF

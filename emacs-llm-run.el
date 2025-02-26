@@ -1,7 +1,36 @@
 ;;; -*- coding: utf-8; lexical-binding: t -*-
 ;;; Author: ywatanabe
-;;; Timestamp: <2025-02-26 14:19:07>
+;;; Timestamp: <2025-02-26 15:14:16>
 ;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/emacs-llm-run.el
+
+(defun --el--canc--el-timer
+    ()
+  "Cancel the LLM spinner timer if active."
+  (when --el-spinner-timer
+    (cancel-timer --el-spinner-timer)
+    (setq --el-spinner-timer nil)))
+
+(defun --el--process-sentinel
+    (proc event)
+  "Monitor PROC status and handle EVENT completion."
+  ;; (message "Process %s had event: %s" proc event)
+  (when
+      (string-match-p "\\(finished\\|exited\\|failed\\)" event)
+    (--el--canc--el-timer)
+    (when
+        (process-live-p proc)
+      (kill-process proc))
+    (let
+        ((temp-buffer
+          (process-get proc 'temp-buffer)))
+      (when
+          (buffer-live-p temp-buffer)
+        (kill-buffer temp-buffer)))
+    (--el--append-to-history "assistant"
+                             (or
+                              (process-get proc 'content)
+                              ""))
+    (run-hooks '--el-completion-hook)))
 
 ;;;###autoload
 (defun --el-on-region
@@ -37,33 +66,27 @@ Otherwise, prompt the user to enter text."
       (_
        (message "DEBUG: Provider %s not fully supported yet" --el-provider)))))
 
-(defun --el--process-sentinel
-    (proc event)
-  "Sentinel function for LLM streaming processes.
-It stops the spinner when the process finishes."
-  ;; (message "DEBUG: Process %s received event: %s" proc event)
-  (when
-      (or
-       (string-match-p "finished" event)
-       (string-match-p "exited" event)
-       (string-match-p "signal" event))
-    (--el--stop-spinner)
-    (with-current-buffer
-        (process-get proc 'target-buffer)
-      (goto-char
-       (point-max))
-      ;; (insert "\n\nLLM process finished.\n")
-      )))
+;; (defun --el--process-sentinel
+;;     (proc event)
+;;   "Sentinel function for LLM streaming processes.
+;; It stops the spinner when the process finishes."
+;;   ;; (message "DEBUG: Process %s received event: %s" proc event)
+;;   (when
+;;       (or
+;;        (string-match-p "finished" event)
+;;        (string-match-p "exited" event)
+;;        (string-match-p "signal" event))
+;;     (--el--stop-spinner)
+;;     (with-current-buffer
+;;         (process-get proc 'target-buffer)
+;;       (goto-char
+;;        (point-max))
+;;       ;; (insert "\n\nLLM process finished.\n")
+;;       )))
 
 (defun --el--process-chunk
     (proc chunk parse-func)
   "Process CHUNK from PROC using PARSE-FUNC to extract content."
-  ;; (message "Raw chunk: %s"
-  ;;          (substring chunk 0
-  ;;                     (min 100
-  ;;                          (length chunk))))
-
-  ;; Handle partial data from previous chunks
   (let*
       ((partial
         (or
@@ -84,6 +107,7 @@ It stops the spinner when the process finishes."
         (string= incomplete "")
       (setq lines
             (butlast lines)))
+
     (process-put proc 'partial-data incomplete)
 
     ;; Process each complete line
@@ -101,20 +125,13 @@ It stops the spinner when the process finishes."
                 (funcall parse-func json-data))))
 
           (when text
-            ;; (message "Got text: %s"
-            ;;          (substring text 0
-            ;;                     (min 30
-            ;;                          (length text))
-            ;;                     ))
             (with-current-buffer
                 (process-get proc 'target-buffer)
-              (save-excursion
-                (goto-char
-                 (point-max))
-                (insert text))))
+              (goto-char
+               (point-max))
+              (insert text))
 
-          ;; Accumulate content regardless of display
-          (when text
+            ;; Accumulate content
             (process-put proc 'content
                          (concat
                           (or

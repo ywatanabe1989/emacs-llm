@@ -1,6 +1,6 @@
 ;;; -*- coding: utf-8; lexical-binding: t -*-
 ;;; Author: ywatanabe
-;;; Timestamp: <2025-02-26 14:19:06>
+;;; Timestamp: <2025-02-26 15:11:54>
 ;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/emacs-llm-spinner.el
 
 ;;;; Stream processing
@@ -53,11 +53,26 @@
                                            (1+ --el-spinner-index)
                                            (length --el-spinner-frames))))))))))))
 
+;; (defun --el--stop-spinner
+;;     ()
+;;   "Stop the spinner animation."
+;;   (when --el-spinner-timer
+;;     (canc--el-timer --el-spinner-timer)
+;;     (setq --el-spinner-timer nil)
+;;     (when
+;;         (and --el-spinner-marker
+;;              (marker-buffer --el-spinner-marker))
+;;       (with-current-buffer
+;;           (marker-buffer --el-spinner-marker)
+;;         (save-excursion
+;;           (goto-char --el-spinner-marker)
+;;           (delete-char 1))))))
+
 (defun --el--stop-spinner
     ()
   "Stop the spinner animation."
   (when --el-spinner-timer
-    (canc--el-timer --el-spinner-timer)
+    (cancel-timer --el-spinner-timer)
     (setq --el-spinner-timer nil)
     (when
         (and --el-spinner-marker

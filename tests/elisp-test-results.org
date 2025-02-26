@@ -1,0 +1,26 @@
+* Test Results Summary
+
+- Passed: 6
+- Failed: 2
+- Skipped: 0
+- Timeout: 0
+- Duplicates: 0
+- Total: 8
+- Success Rate: 75.0%
+
+** Passed Tests
+- [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-history.el::test-emacs-llm-copy-last-response][test-emacs-llm-history.el]] :: test-emacs-llm-copy-last-response
+- [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-history.el::test-emacs-llm-clear-history][test-emacs-llm-history.el]] :: test-emacs-llm-clear-history
+- [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-history.el::test-emacs-llm-history-backup][test-emacs-llm-history.el]] :: test-emacs-llm-history-backup
+- [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-history.el::test-emacs-llm-history-dir-creation][test-emacs-llm-history.el]] :: test-emacs-llm-history-dir-creation
+- [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-history.el::test-emacs-llm-history-with-template][test-emacs-llm-history.el]] :: test-emacs-llm-history-with-template
+- [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-history.el::test-emacs-llm-history-append][test-emacs-llm-history.el]] :: test-emacs-llm-history-append
+** Failed Tests
+- [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-history.el::test-emacs-llm-get-recent-history][test-emacs-llm-history.el]] :: test-emacs-llm-get-recent-history
+  + Error details:
+    (wrong-type-argument listp [((role . "user") (content . "Message 3")) ((role . "assistant") (content . "Response 3"))])
+- [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-history.el::test-emacs-llm-history-save-load][test-emacs-llm-history.el]] :: test-emacs-llm-history-save-load
+  + Error details:
+    (wrong-type-argument listp [((role . "user") (content . "Test user message 1")) ((role . "assistant") (content . "Test assistant response 1")) ((role . "user") (content . "Test user message 2")) ((role . "assistant") (content . "Test assistant response 2"))])
+** Timeout Tests
+** Not Found Tests
