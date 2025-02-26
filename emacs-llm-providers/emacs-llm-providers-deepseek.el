@@ -1,7 +1,9 @@
 ;;; -*- coding: utf-8; lexical-binding: t -*-
 ;;; Author: ywatanabe
-;;; Timestamp: <2025-02-26 17:34:18>
+;;; Timestamp: <2025-02-26 18:47:56>
 ;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/emacs-llm-providers/emacs-llm-providers-deepseek.el
+
+(require 'emacs-llm-providers-shared)
 
 (defun --el-deepseek-stream
     (prompt &optional template)
@@ -138,17 +140,17 @@ Optional TEMPLATE is the name of the template used."
 ;;     (prompt)
 ;;   "Construct the JSON payload for DeepSeek API with PROMPT."
 ;;   (let*
-;;       ((mod--el-name
+;;       ((model-name
 ;;         (or --el-deepseek-model --el-default-engine-deepseek))
 ;;        (max-tokens
 ;;         (or
-;;          (alist-get mod--el-name --el-deepseek-engine-max-tokens-alist nil nil 'string=)
+;;          (alist-get model-name --el-deepseek-engine-max-tokens-alist nil nil 'string=)
 ;;          8192))
 ;;        (recent-history
 ;;         (--el-get-recent-history))
 ;;        (payload
 ;;         (json-encode
-;;          `(("model" . ,mod--el-name)
+;;          `(("model" . ,model-name)
 ;;            ("messages" . ,(append recent-history
 ;;                                   (vector
 ;;                                    `(("role" . "user")
@@ -163,11 +165,11 @@ Optional TEMPLATE is the name of the template used."
     (prompt)
   "Construct the JSON payload for DeepSeek API with PROMPT."
   (let*
-      ((mod--el-name
+      ((model-name
         (or --el-deepseek-model --el-default-engine-deepseek))
        (max-tokens
         (or
-         (alist-get mod--el-name --el-deepseek-engine-max-tokens-alist nil nil 'string=)
+         (alist-get model-name --el-deepseek-engine-max-tokens-alist nil nil 'string=)
          8192))
        (recent-history
         (--el-get-recent-history))
@@ -178,7 +180,7 @@ Optional TEMPLATE is the name of the template used."
                    ("content" . ,prompt)))))
        (payload
         (json-encode
-         `(("model" . ,mod--el-name)
+         `(("model" . ,model-name)
            ("messages" . ,full-prompt)
            ("temperature" . ,--el-temperature)
            ("max_tokens" . ,max-tokens)

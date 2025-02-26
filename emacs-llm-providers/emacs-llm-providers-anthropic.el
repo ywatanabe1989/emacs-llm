@@ -1,7 +1,9 @@
 ;;; -*- coding: utf-8; lexical-binding: t -*-
 ;;; Author: ywatanabe
-;;; Timestamp: <2025-02-26 16:50:46>
+;;; Timestamp: <2025-02-26 18:47:51>
 ;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/emacs-llm-providers/emacs-llm-providers-anthropic.el
+
+(require 'emacs-llm-providers-shared)
 
 ;; Main
 ;; ----------------------------------------
@@ -89,14 +91,14 @@ Optional TEMPLATE is the name of the template used."
     (prompt)
   "Construct the JSON payload for Anthropic API with PROMPT."
   (let*
-      ((mod--el-name
+      ((model-name
         (or --el-anthropic-model --el-default-engine-anthropic))
        (max-tokens
         (or
-         (alist-get mod--el-name --el-anthropic-engine-max-tokens-alist nil nil 'string=)
+         (alist-get model-name --el-anthropic-engine-max-tokens-alist nil nil 'string=)
          128000)))
     (json-encode
-     `(("model" . ,mod--el-name)
+     `(("model" . ,model-name)
        ("max_tokens" . ,max-tokens)
        ("stream" . t)
        ;; ("temperature" . ,--el-temperature)

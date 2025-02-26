@@ -40,7 +40,7 @@
 
 (ert-deftest test-emacs-llm-bindings-after-setup-on-region
     ()
-  "Test that C-c l o is bound to --el-on-region after setup."
+  "Test that C-c l o is bound to el-run after setup."
   (let*
       ((map
         (make-sparse-keymap))
@@ -51,12 +51,12 @@
                 prefix-map)
     (define-key prefix-map
                 (kbd "l o")
-                #'--el-on-region)
+                #'el-run)
     (should
      (equal
       (lookup-key map
                   (kbd "C-c l o"))
-      #'--el-on-region))))
+      #'el-run))))
 
 (ert-deftest test-emacs-llm-bindings-after-setup-switch-provider
     ()
@@ -120,12 +120,12 @@
 
 (ert-deftest test-emacs-llm-bindings-global-C-M-S-g
     ()
-  "Test that C-M-S-g is bound to --el-on-region."
+  "Test that C-M-S-g is bound to el-run."
   (should
    (eq
     (global-key-binding
      (kbd "C-M-S-g"))
-    '--el-on-region)))
+    'el-run)))
 
 (provide 'test-emacs-llm-bindings)
 

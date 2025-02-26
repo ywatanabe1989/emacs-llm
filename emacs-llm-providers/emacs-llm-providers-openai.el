@@ -1,56 +1,9 @@
 ;;; -*- coding: utf-8; lexical-binding: t -*-
 ;;; Author: ywatanabe
-;;; Timestamp: <2025-02-26 17:53:05>
+;;; Timestamp: <2025-02-26 18:53:01>
 ;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/emacs-llm-providers/emacs-llm-providers-openai.el
 
-(defun --el-openai-stream
-    (prompt &optional template)
-  "Send PROMPT to OpenAI API via streaming.
-Optional TEMPLATE is the name of the template used."
-  (let*
-      ((temp-buffer
-        (generate-new-buffer " *openai-temp-output*"))
-       (payload
-        (--el-construct-openai-payload prompt))
-       (payload-oneline
-        (replace-regexp-in-string "\n" " " payload))
-       (escaped-payload
-        (replace-regexp-in-string "'" "\\\\'" payload-oneline))
-       (curl-command
-        (format "curl -N 'https://api.openai.com/v1/chat/completions' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' -d '%s'"
-                (or --el-api-key-openai --el-api-key)
-                escaped-payload))
-       (model-name
-        (or --el-openai-model --el-default-engine-openai)))
-    (message "Using model: %s" model-name)
-    (message "Curl command length: %d"
-             (length curl-command))
-    (message "Payload first 100 chars: %s"
-             (substring payload 0
-                        (min 100
-                             (length payload))))
-    (let*
-        ((buffer-name
-          (--el-prepare-llm-buffer prompt "OPENAI" model-name template))
-         (proc
-          (start-process-shell-command "--el-openai-stream" temp-buffer curl-command)))
-      (message "Process started with PID: %s"
-               (process-id proc))
-      (process-put proc 'target-buffer buffer-name)
-      (process-put proc 'temp-buffer temp-buffer)
-      (process-put proc 'content "")
-      (process-put proc 'prompt prompt)
-      (process-put proc 'provider "OPENAI")
-      (process-put proc 'model model-name)
-      (process-put proc 'template template)
-      (set-process-filter proc #'--el-openai-filter)
-      (message "Process filter set")
-      (set-process-sentinel proc #'--el-process-sentinel)
-      (message "Process sentinel set")
-      (--el-start-spinner)
-      ;; Don't append to history here - let the process-sentinel do it
-      ;; when the response is complete
-      proc)))
+(require 'emacs-llm-providers-shared)
 
 ;; (defun --el-openai-stream
 ;;     (prompt &optional template)
@@ -97,8 +50,55 @@ Optional TEMPLATE is the name of the template used."
 ;;       (set-process-sentinel proc #'--el-process-sentinel)
 ;;       (message "Process sentinel set")
 ;;       (--el-start-spinner)
-;;       (--el-append-to-history "user" prompt template)
+;;       ;; Don't append to history here - let the process-sentinel do it
+;;       ;; when the response is complete
 ;;       proc)))
+
+(defun --el-openai-stream
+    (prompt &optional template)
+  "Send PROMPT to OpenAI API via streaming.
+Optional TEMPLATE is the name of the template used."
+  (let*
+      ((temp-buffer
+        (generate-new-buffer " *openai-temp-output*"))
+       (payload
+        (--el-construct-openai-payload prompt))
+       ;; No need for string replacements when using shell-quote-argument
+       (curl-command
+        (format "curl -N 'https://api.openai.com/v1/chat/completions' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' -d %s"
+                (or --el-api-key-openai --el-api-key)
+                (shell-quote-argument payload)))
+       (model-name
+        (or --el-openai-model --el-default-engine-openai)))
+    (message "Using model: %s" model-name)
+    (message "Curl command length: %d"
+             (length curl-command))
+    (message "Payload first 100 chars: %s"
+             (substring payload 0
+                        (min 100
+                             (length payload))))
+    (let*
+        ((buffer-name
+          (--el-prepare-llm-buffer prompt "OPENAI" model-name template))
+         (proc
+          (start-process-shell-command "--el-openai-stream" temp-buffer curl-command)))
+      (message "Process started with PID: %s"
+               (process-id proc))
+      (process-put proc 'target-buffer buffer-name)
+      (process-put proc 'temp-buffer temp-buffer)
+      (process-put proc 'content "")
+      (process-put proc 'prompt prompt)
+      (process-put proc 'provider "OPENAI")
+      (process-put proc 'model model-name)
+      (process-put proc 'template template)
+      (set-process-filter proc #'--el-openai-filter)
+      (message "Process filter set")
+      (set-process-sentinel proc #'--el-process-sentinel)
+      (message "Process sentinel set")
+      (--el-start-spinner)
+      ;; Don't append to history here - let the process-sentinel do it
+      ;; when the response is complete
+      proc)))
 
 ;; Helper
 ;; ----------------------------------------
@@ -169,15 +169,15 @@ Optional TEMPLATE is the name of the template used."
     (prompt)
   "Construct the JSON payload for OpenAI API with PROMPT."
   (let*
-      ((mod--el-name
+      ((model-name
         (or --el-openai-model --el-default-engine-openai))
        (max-tokens
         (or
-         (alist-get mod--el-name --el-openai-engine-max-tokens-alist nil nil 'string=)
+         (alist-get model-name --el-openai-engine-max-tokens-alist nil nil 'string=)
          8192))
        ;; Parse engine for reasoning effort
        (engine-parts
-        (--el-parse-openai-engine mod--el-name))
+        (--el-parse-openai-engine model-name))
        (actual-engine
         (car engine-parts))
        (effort

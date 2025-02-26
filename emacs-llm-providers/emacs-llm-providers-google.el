@@ -1,7 +1,9 @@
 ;;; -*- coding: utf-8; lexical-binding: t -*-
 ;;; Author: ywatanabe
-;;; Timestamp: <2025-02-26 17:33:06>
+;;; Timestamp: <2025-02-26 18:48:00>
 ;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/emacs-llm-providers/emacs-llm-providers-google.el
+
+(require 'emacs-llm-providers-shared)
 
 ;; Main
 ;; ----------------------------------------
@@ -13,11 +15,11 @@ Optional TEMPLATE is the name of the template used."
   (let*
       ((temp-buffer
         (generate-new-buffer " *google-temp-output*"))
-       (mod--el-name
+       (model-name
         (or --el-google-model --el-default-engine-google))
        (url
         (format "https://generativelanguage.googleapis.com/v1beta/models/%s:streamGenerateContent?alt=sse&key=%s"
-                mod--el-name
+                model-name
                 (or --el-api-key-google --el-google-api-key)))
        (payload
         (--el-construct-google-payload prompt))
@@ -27,7 +29,7 @@ Optional TEMPLATE is the name of the template used."
               "-H" "Content-Type: application/json"
               "-d" payload))
        (buffer-name
-        (--el-prepare-llm-buffer prompt "GOOGLE" mod--el-name template))
+        (--el-prepare-llm-buffer prompt "GOOGLE" model-name template))
        (proc
         (apply #'start-process "--el-google-stream" temp-buffer "curl" args)))
 
@@ -240,11 +242,11 @@ Optional TEMPLATE is the name of the template used."
     (prompt)
   "Construct the JSON payload for Google Gemini API with PROMPT."
   (let*
-      ((mod--el-name
+      ((model-name
         (or --el-google-model --el-default-engine-google))
        (max-tokens
         (or
-         (alist-get mod--el-name --el-google-engine-max-tokens-alist nil nil 'string=)
+         (alist-get model-name --el-google-engine-max-tokens-alist nil nil 'string=)
          100000))
        (recent-history
         (--el-get-recent-history))

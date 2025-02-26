@@ -1,11 +1,11 @@
 * Test Results Summary
 
-- Passed: 93
+- Passed: 91
 - Failed: 0
 - Skipped: 0
 - Timeout: 0
 - Duplicates: 0
-- Total: 93
+- Total: 91
 - Success Rate: 100.0%
 
 ** Passed Tests
@@ -68,8 +68,6 @@
 - [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-bindings.el::test-emacs-llm-bindings-after-setup-quick-menu][test-emacs-llm-bindings.el]] :: test-emacs-llm-bindings-after-setup-quick-menu
 - [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-bindings.el::test-emacs-llm-bindings-setup-is-interactive][test-emacs-llm-bindings.el]] :: test-emacs-llm-bindings-setup-is-interactive
 - [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-bindings.el::test-emacs-llm-bindings-setup-exists][test-emacs-llm-bindings.el]] :: test-emacs-llm-bindings-setup-exists
-- [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-display.el::test-emacs-llm-display-with-context-and-template][test-emacs-llm-display.el]] :: test-emacs-llm-display-with-context-and-template
-- [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-display.el::test-emacs-llm-display-with-context][test-emacs-llm-display.el]] :: test-emacs-llm-display-with-context
 - [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-display.el::test-emacs-llm-prepare-buffer-appends-to-existing][test-emacs-llm-display.el]] :: test-emacs-llm-prepare-buffer-appends-to-existing
 - [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-display.el::test-emacs-llm-prepare-buffer-with-template][test-emacs-llm-display.el]] :: test-emacs-llm-prepare-buffer-with-template
 - [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-display.el::test-emacs-llm-prepare-buffer-basic][test-emacs-llm-display.el]] :: test-emacs-llm-prepare-buffer-basic

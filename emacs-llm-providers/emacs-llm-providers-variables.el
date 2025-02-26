@@ -1,6 +1,6 @@
 ;;; -*- coding: utf-8; lexical-binding: t -*-
 ;;; Author: ywatanabe
-;;; Timestamp: <2025-02-26 16:20:04>
+;;; Timestamp: <2025-02-26 18:58:20>
 ;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/emacs-llm-providers/emacs-llm-providers-variables.el
 
 ;; Used
@@ -95,13 +95,6 @@
   :risky t
   :group 'el)
 
-(defcustom --el-api-key-anthropic
-  (getenv "ANTHROPIC_API_KEY")
-  "API key for Anthropic Claude."
-  :type 'string
-  :risky t
-  :group 'el)
-
 (defcustom --el-api-key-google
   (getenv "GOOGLE_API_KEY")
   "API key for Google Claude."
@@ -109,11 +102,16 @@
   :risky t
   :group 'el)
 
+(defcustom --el-api-key-anthropic
+  (getenv "ANTHROPIC_API_KEY")
+  "API key for Anthropic services."
+  :type 'string
+  :group 'el)
+
 (defcustom --el-api-key-deepseek
   (getenv "DEEPSEEK_API_KEY")
-  "API key for DeepSeek."
+  "API key for Deepseek services."
   :type 'string
-  :risky t
   :group 'el)
 
 (defcustom --el-api-key-groq
@@ -215,12 +213,6 @@
 (defvar --el-groq-models
   (mapcar #'car --el-groq-engine-max-tokens-alist)
   "List of available models for the groq provider.")
-
-(defcustom --el-anthropic-api-key
-  (getenv "ANTHROPIC_API_KEY")
-  "API key for Anthropic services."
-  :type 'string
-  :group 'el)
 
 (defvar --el-openai-model nil
   "Selected OpenAI model.")

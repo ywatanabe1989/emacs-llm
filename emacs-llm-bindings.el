@@ -13,7 +13,7 @@
    #'--el-quick-menu)
   (global-set-key
    (kbd "C-c l o")
-   #'--el-on-region)
+   #'el-run)
   (global-set-key
    (kbd "C-c l s")
    #'el-switch)
@@ -27,7 +27,7 @@
 
 (global-set-key
  (kbd "C-M-S-g")
- #'--el-on-region)
+ #'el-run)
 
 (provide 'emacs-llm-bindings)
 

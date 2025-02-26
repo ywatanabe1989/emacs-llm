@@ -1,28 +1,32 @@
 ;;; -*- coding: utf-8; lexical-binding: t -*-
 ;;; Author: ywatanabe
-;;; Timestamp: <2025-02-26 18:09:19>
-;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/emacs-llm-run.el
+;;; Timestamp: <2025-02-26 19:00:24>
+;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/_emacs-llm-run-with-dired.el
 
 ;;;###autoload
-(defun --el-on-region
-    ()
-  "Run LLM on selected region or prompt for input.
+(defun el-run
+    (&optional prompt)
+  "Run El command on selected region, dired files or prompt.
 If a region is selected, use that text as the prompt.
-Otherwise, prompt the user to enter text."
+If in dired-mode with marked files, concatenate their contents.
+Otherwise, prompt the user to enter a prompt.
+The response will be displayed in the *El* buffer."
   (interactive)
-  ;; (message "DEBUG: Starting --el-on-region")
   (--el-load-history)
-  (let
+  (let*
       ((prompt
-        (if
-            (use-region-p)
-            (prog1
-                (buffer-substring-no-properties
-                 (region-beginning)
-                 (region-end))
-              (message "DEBUG: Region detected; using selected text as prompt")
-              (deactivate-mark))
-          (read-string "Enter prompt: "))))
+        (or prompt
+            (cond
+             ((use-region-p)
+              (buffer-substring-no-properties
+               (region-beginning)
+               (region-end)))
+             ((eq major-mode 'dired-mode)
+              (--el-dired-get-contents))
+             (t
+              (read-string "Enter prompt: " ""))))))
+    ;; Sanitization isn't needed here - it should be done in the provider functions
+    ;; where the prompt is actually passed to shell commands
     (message "DEBUG: Prompt is: %s" prompt)
     (message "DEBUG: --el-provider is: %s" --el-provider)
     (pcase --el-provider
@@ -37,7 +41,128 @@ Otherwise, prompt the user to enter text."
       (_
        (message "DEBUG: Provider %s not fully supported yet" --el-provider)))))
 
-(defun --el-canc--el-timer
+;; (defun el-run
+;;     ()
+;;   "Run El command on selected region, dired files or prompt.
+;; If a region is selected, use that text as the prompt.
+;; If in dired-mode with marked files, concatenate their contents.
+;; Otherwise, prompt the user to enter a prompt.
+;; The response will be displayed in the *El* buffer."
+;;   (interactive)
+;;   (--el-load-history)
+;;   (let*
+;;       ((prompt
+;;         (cond
+;;          ((use-region-p)
+;;           (buffer-substring-no-properties
+;;            (region-beginning)
+;;            (region-end)))
+;;          ((eq major-mode 'dired-mode)
+;;           (--el-dired-get-contents))
+;;          (t
+;;           (read-string "Enter prompt: " ""))))
+;;        (prompt
+;;         (prog1 prompt))
+;;        )
+;;     (message "DEBUG: Prompt is: %s" prompt)
+;;     (message "DEBUG: --el-provider is: %s" --el-provider)
+;;     (pcase --el-provider
+;;       ("openai"
+;;        (--el-openai-stream prompt))
+;;       ("anthropic"
+;;        (--el-anthropic-stream prompt))
+;;       ("google"
+;;        (--el-google-stream prompt))
+;;       ("deepseek"
+;;        (--el-deepseek-stream prompt))
+;;       (_
+;;        (message "DEBUG: Provider %s not fully supported yet" --el-provider)))))
+
+;; DEBUG: OpenAI filter received chunk of length 4095
+;; DEBUG: Full chunk: /bin/bash: -c: line 1: syntax error near unexpected token `;;'
+
+(defun --el-dired-get-contents
+    ()
+  "Get contents of marked files recursively, handling only safe files. If no files specified, just call ordinal el-on-region"
+  (interactive)
+  (let*
+      ((marked-files
+        (dired-get-marked-files nil nil
+                                (lambda
+                                  (f)
+                                  (dired-file-marker f))))
+       (safe-extensions
+        '(".el" ".py" ".sh" ".src" ".txt" ".md" ".org" ".yml" ".yaml" ".json"))
+       (size-limit
+        (* 1024 1024))
+       (contents ""))
+    (if
+        (null marked-files)
+        (read-string "Enter prompt: " "")
+      (cl-labels
+          ((process-file
+             (file)
+             (cond
+              ((file-directory-p file)
+               (dolist
+                   (f
+                    (directory-files file t "^[^.]"))
+                 (process-file f)))
+              ((and
+                (file-regular-p file)
+                (member
+                 (file-name-extension file t)
+                 safe-extensions)
+                (<
+                 (file-attribute-size
+                  (file-attributes file))
+                 size-limit))
+               (setq contents
+                     (concat contents
+                             (format "\n\n;;; ----- %s -----\n\n" file)
+                             (with-temp-buffer
+                               (insert-file-contents file)
+                               (buffer-string))))))))
+        (dolist
+            (file marked-files)
+          (process-file file)))
+      contents)))
+
+;; ;;;###autoload
+;; (defun el-run
+;;     ()
+;;   "Run LLM on selected region or prompt for input.
+;; If a region is selected, use that text as the prompt.
+;; Otherwise, prompt the user to enter text."
+;;   (interactive)
+;;   ;; (message "DEBUG: Starting el-run")
+;;   (--el-load-history)
+;;   (let
+;;       ((prompt
+;;         (if
+;;             (use-region-p)
+;;             (prog1
+;;                 (buffer-substring-no-properties
+;;                  (region-beginning)
+;;                  (region-end))
+;;               (message "DEBUG: Region detected; using selected text as prompt")
+;;               (deactivate-mark))
+;;           (read-string "Enter prompt: "))))
+;;     (message "DEBUG: Prompt is: %s" prompt)
+;;     (message "DEBUG: --el-provider is: %s" --el-provider)
+;;     (pcase --el-provider
+;;       ("openai"
+;;        (--el-openai-stream prompt))
+;;       ("anthropic"
+;;        (--el-anthropic-stream prompt))
+;;       ("google"
+;;        (--el-google-stream prompt))
+;;       ("deepseek"
+;;        (--el-deepseek-stream prompt))
+;;       (_
+;;        (message "DEBUG: Provider %s not fully supported yet" --el-provider)))))
+
+(defun --el-cancel-timer
     ()
   "Cancel the LLM spinner timer if active."
   (when --el-spinner-timer
@@ -141,6 +266,6 @@ Otherwise, prompt the user to enter text."
 
 (when
     (not load-file-name)
-  (message "emacs-llm-run.el loaded."
+  (message "_emacs-llm-run-with-dired.el loaded."
            (file-name-nondirectory
             (or load-file-name buffer-file-name))))
