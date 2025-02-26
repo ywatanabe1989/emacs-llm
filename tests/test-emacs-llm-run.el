@@ -25,7 +25,7 @@
     (process-put proc 'partial-data "")
 
     ;; Test with complete data chunk
-    (--el--process-chunk proc "data: test-data\n" test-parse-func)
+    (--el-process-chunk proc "data: test-data\n" test-parse-func)
     (with-current-buffer target-buffer
       (should
        (string=
@@ -39,7 +39,7 @@
     ;; Test with partial/incomplete data
     (process-put proc 'content "")
     (process-put proc 'partial-data "")
-    (--el--process-chunk proc "da" test-parse-func)
+    (--el-process-chunk proc "da" test-parse-func)
     (should
      (string=
       (process-get proc 'partial-data)
@@ -49,7 +49,7 @@
       (process-get proc 'content)
       ""))
 
-    (--el--process-chunk proc "ta: test-data\n" test-parse-func)
+    (--el-process-chunk proc "ta: test-data\n" test-parse-func)
     (with-current-buffer target-buffer
       (should
        (string=
@@ -88,7 +88,7 @@
     (process-put proc 'content "Test content")
 
     ;; Run the sentinel function
-    (--el--process-sentinel proc "finished\n")
+    (--el-process-sentinel proc "finished\n")
 
     ;; Verify the spinner was cancelled
     (should-not --el-spinner-timer)

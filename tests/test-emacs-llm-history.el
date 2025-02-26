@@ -1,6 +1,6 @@
 ;;; -*- coding: utf-8; lexical-binding: t -*-
 ;;; Author: ywatanabe
-;;; Timestamp: <2025-02-26 16:27:35>
+;;; Timestamp: <2025-02-26 16:49:10>
 ;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-history.el
 
 (ert-deftest test-emacs-llm-history-append
@@ -10,7 +10,7 @@
       ((--el-history nil)
        (--el-history-file
         (make-temp-file "emacs-llm-test-history" nil ".json")))
-    (--el--append-to-history "user" "Test user message")
+    (--el-append-to-history "user" "Test user message")
     (should
      (=
       (length --el-history)
@@ -26,7 +26,7 @@
                  (car --el-history))
       "Test user message"))
 
-    (--el--append-to-history "assistant" "Test assistant response")
+    (--el-append-to-history "assistant" "Test assistant response")
     (should
      (=
       (length --el-history)
@@ -51,7 +51,7 @@
       ((--el-history nil)
        (--el-history-file
         (make-temp-file "emacs-llm-test-history" nil ".json")))
-    (--el--append-to-history "user" "Test with template" "test-template")
+    (--el-append-to-history "user" "Test with template" "test-template")
     (should
      (=
       (length --el-history)
@@ -117,7 +117,7 @@
     (delete-directory --el-history-dir t)
     (should-not
      (file-exists-p --el-history-dir))
-    (--el--ensure-history-dir)
+    (--el-ensure-history-dir)
     (should
      (file-exists-p --el-history-dir))
     (cleanup-test-history-env env)))
@@ -136,10 +136,10 @@
         '()))
 
     ;; Add some entries
-    (--el--append-to-history "user" "Test user message 1")
-    (--el--append-to-history "assistant" "Test assistant response 1")
-    (--el--append-to-history "user" "Test user message 2")
-    (--el--append-to-history "assistant" "Test assistant response 2")
+    (--el-append-to-history "user" "Test user message 1")
+    (--el-append-to-history "assistant" "Test assistant response 1")
+    (--el-append-to-history "user" "Test user message 2")
+    (--el-append-to-history "assistant" "Test assistant response 2")
 
     ;; Verify they were saved
     (should
@@ -152,7 +152,7 @@
      (=
       (length --el-history)
       0))
-    (--el--load-history)
+    (--el-load-history)
 
     ;; Verify history was loaded correctly
     (should
@@ -198,16 +198,16 @@
         '()))
 
     ;; Create a large history entry that will exceed the max size
-    (--el--append-to-history "user"
-                             (make-string 100 ?x))
+    (--el-append-to-history "user"
+                            (make-string 100 ?x))
 
     ;; Save to ensure the file exists
-    (--el--save-history)
+    (--el-save-history)
     (should
      (file-exists-p --el-history-file))
 
     ;; Check if backup was created when loading
-    (--el--load-history)
+    (--el-load-history)
 
     ;; Should find at least one backup file
     (let
@@ -234,21 +234,21 @@
         '()))
 
     ;; Add some entries
-    (--el--append-to-history "user" "Test message")
+    (--el-append-to-history "user" "Test message")
     (should
      (=
       (length --el-history)
       1))
 
     ;; Clear history
-    (--el--clear-history)
+    (--el-clear-history)
     (should
      (=
       (length --el-history)
       0))
 
     ;; Load from file to verify it was saved as empty
-    (--el--load-history)
+    (--el-load-history)
     (should
      (=
       (length --el-history)
@@ -270,16 +270,16 @@
        (--el-history
         '()))
     ;; Add several entries
-    (--el--append-to-history "user" "Message 1")
-    (--el--append-to-history "assistant" "Response 1")
-    (--el--append-to-history "user" "Message 2")
-    (--el--append-to-history "assistant" "Response 2")
-    (--el--append-to-history "user" "Message 3")
-    (--el--append-to-history "assistant" "Response 3")
+    (--el-append-to-history "user" "Message 1")
+    (--el-append-to-history "assistant" "Response 1")
+    (--el-append-to-history "user" "Message 2")
+    (--el-append-to-history "assistant" "Response 2")
+    (--el-append-to-history "user" "Message 3")
+    (--el-append-to-history "assistant" "Response 3")
     ;; Get recent history
     (let
         ((recent
-          (--el--get-recent-history)))
+          (--el-get-recent-history)))
       (should
        (=
         (length recent)
@@ -297,10 +297,10 @@
         "Response 3")))
     (cleanup-test-history-env env)))
 
-(defun --el--load-history
+(defun --el-load-history
     ()
   "Load conversation history from `--el-history-file`."
-  (--el--backup-history-file)
+  (--el-backup-history-file)
   (when
       (file-exists-p --el-history-file)
     (with-temp-buffer
@@ -334,10 +334,10 @@
       (--el-copy-last-response)
       (should-not last-kill)
       ;; Add some entries
-      (--el--append-to-history "user" "Test question")
-      (--el--append-to-history "assistant" "Test answer 1")
-      (--el--append-to-history "user" "Another question")
-      (--el--append-to-history "assistant" "Test answer 2")
+      (--el-append-to-history "user" "Test question")
+      (--el-append-to-history "assistant" "Test answer 1")
+      (--el-append-to-history "user" "Another question")
+      (--el-append-to-history "assistant" "Test answer 2")
       ;; Copy last response
       (--el-copy-last-response)
       (should

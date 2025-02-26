@@ -1,6 +1,6 @@
 ;;; -*- coding: utf-8; lexical-binding: t -*-
 ;;; Author: ywatanabe
-;;; Timestamp: <2025-02-26 16:21:58>
+;;; Timestamp: <2025-02-26 16:42:10>
 ;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-bindings.el
 
 (require 'ert)
@@ -60,7 +60,7 @@
 
 (ert-deftest test-emacs-llm-bindings-after-setup-switch-provider
     ()
-  "Test that C-c l s is bound to --el-switch-provider after setup."
+  "Test that C-c l s is bound to el-switch after setup."
   (let*
       ((map
         (make-sparse-keymap))
@@ -71,12 +71,12 @@
                 prefix-map)
     (define-key prefix-map
                 (kbd "l s")
-                #'--el-switch-provider)
+                #'el-switch)
     (should
      (equal
       (lookup-key map
                   (kbd "C-c l s"))
-      #'--el-switch-provider))))
+      #'el-switch))))
 
 (ert-deftest test-emacs-llm-bindings-after-setup-show-history
     ()

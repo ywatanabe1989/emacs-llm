@@ -9,7 +9,7 @@
   "Test that the LLM buffer can be prepared correctly."
   (let
       ((buffer-name
-        (--el--prepare-llm-buffer "Test prompt" "TEST" "test-model")))
+        (--el-prepare-llm-buffer "Test prompt" "TEST" "test-model")))
     (should
      (get-buffer buffer-name))
     (with-current-buffer buffer-name
@@ -33,7 +33,7 @@
        (provider "TEST-PROVIDER")
        (model "test-model")
        (buffer-name
-        (--el--prepare-llm-buffer prompt provider model)))
+        (--el-prepare-llm-buffer prompt provider model)))
 
     (should
      (get-buffer buffer-name))
@@ -82,7 +82,7 @@
        (model "test-model")
        (template "test-template")
        (buffer-name
-        (--el--prepare-llm-buffer prompt provider model template)))
+        (--el-prepare-llm-buffer prompt provider model template)))
 
     (should
      (get-buffer buffer-name))
@@ -112,7 +112,7 @@
       (insert "Initial content\n"))
 
     ;; Prepare buffer
-    (--el--prepare-llm-buffer "Test prompt" "TEST" "test-model")
+    (--el-prepare-llm-buffer "Test prompt" "TEST" "test-model")
 
     (with-current-buffer buffer
       (should
@@ -135,7 +135,7 @@
        (model "test-model"))
 
     ;; Display with context
-    (--el--display-with-context prompt nil response provider model)
+    (--el-display-with-context prompt nil response provider model)
 
     (with-current-buffer --el-buffer-name
       ;; Verify content
@@ -165,7 +165,7 @@
        (model "test-model"))
 
     ;; Display with context including template
-    (--el--display-with-context prompt template response provider model)
+    (--el-display-with-context prompt template response provider model)
 
     (with-current-buffer --el-buffer-name
       ;; Verify content with template

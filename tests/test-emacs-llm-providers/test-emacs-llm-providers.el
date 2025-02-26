@@ -1,6 +1,6 @@
 ;;; -*- coding: utf-8; lexical-binding: t -*-
 ;;; Author: ywatanabe
-;;; Timestamp: <2025-02-26 16:20:30>
+;;; Timestamp: <2025-02-26 16:49:12>
 ;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-providers/test-emacs-llm-providers.el
 
 ;;; test-emacs-llm-providers.el --- Tests for emacs-llm providers -*- lexical-binding: t -*-
@@ -47,13 +47,13 @@
   (let
       ((invalid-chunk "{invalid-json}"))
     (should-not
-     (--el--parse-openai-chunk invalid-chunk))
+     (--el-parse-openai-chunk invalid-chunk))
     (should-not
-     (--el--parse-anthropic-chunk invalid-chunk))
+     (--el-parse-anthropic-chunk invalid-chunk))
     (should-not
-     (--el--parse-google-chunk invalid-chunk))
+     (--el-parse-google-chunk invalid-chunk))
     (should-not
-     (--el--parse-deepseek-chunk invalid-chunk))))
+     (--el-parse-deepseek-chunk invalid-chunk))))
 
 (provide 'test-emacs-llm-providers)
 

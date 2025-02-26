@@ -11,7 +11,7 @@
        (--el-temperature 0.7))
     (let
         ((payload
-          (--el--construct-anthropic-payload "Test prompt")))
+          (--el-construct-anthropic-payload "Test prompt")))
       (should
        (stringp payload))
       (let*
@@ -54,7 +54,7 @@
       ((chunk "{\"type\":\"content_block_delta\",\"index\":0,\"delta\":{\"text\":\"Hello\"}}"))
     (should
      (string=
-      (--el--parse-anthropic-chunk chunk)
+      (--el-parse-anthropic-chunk chunk)
       "Hello"))))
 
 (provide 'test-emacs-llm-providers-anthropic)
