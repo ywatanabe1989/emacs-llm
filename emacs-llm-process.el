@@ -1,6 +1,6 @@
 ;;; -*- coding: utf-8; lexical-binding: t -*-
 ;;; Author: ywatanabe
-;;; Timestamp: <2025-02-27 01:51:31>
+;;; Timestamp: <2025-02-28 09:29:23>
 ;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/emacs-llm-process.el
 
 (require 'emacs-llm-dired)
@@ -74,7 +74,6 @@
 (defun --el-process-sentinel
     (proc event)
   "Process sentinel for PROC handling EVENT."
-
   (when
       (string-match-p "\\(finished\\|exited\\|failed\\)" event)
     (--el-stop-spinner)
@@ -87,19 +86,38 @@
           (process-get proc 'engine))
          (template
           (process-get proc 'template))
-         (response
-          (process-get proc 'content)))
-
+         (content
+          (process-get proc 'content))
+         (error-output
+          (with-current-buffer
+              (process-get proc 'temp-buffer)
+            (buffer-string))))
+      ;; Debug logging to help identify issues
+      (message "Process for %s %s with content length: %s"
+               provider event
+               (if content
+                   (length content)
+                 0))
+      ;; Show error output if process failed and no content was generated
+      (when
+          (and
+           (string-match-p "\\(exited abnormally\\|failed\\)" event)
+           (or
+            (null content)
+            (string-empty-p content)))
+        (message "Error from %s: %s" provider
+                 (substring error-output 0
+                            (min 500
+                                 (length error-output)))))
       (when
           (and prompt provider)
         ;; Only append to history after we have a complete response
         (--el-history-append "user" prompt template)
         (when
-            (and response
+            (and content
                  (not
-                  (string-empty-p response)))
-
-          (--el-history-append engine response template)))
+                  (string-empty-p content)))
+          (--el-history-append "assistant" content template)))
       ;; Clean up temp buffer
       (when-let
           ((tb

@@ -1,51 +1,34 @@
 ;;; -*- coding: utf-8; lexical-binding: t -*-
 ;;; Author: ywatanabe
-;;; Timestamp: <2025-02-27 01:18:09>
-;;; File: /home/ywatanabe/.emacs.d/lisp/emacs-llm/emacs-llm-call/emacs-llm-call-google.el
+;;; Timestamp: <2025-02-28 10:06:58>
+;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/emacs-llm-call/emacs-llm-call-google.el
 
-;; Main
-;; ----------------------------------------
-
-(defun --el-google-stream
-    (prompt &optional template-name)
-  "Send PROMPT to Google API via streaming.
-Optional TEMPLATE-NAME is the name of the template used."
+(defun --el-construct-google-curl-command
+    (prompt)
+  "Construct curl command for Google API with PROMPT."
   (let*
-      ((temp-buffer
-        (generate-new-buffer " *google-temp-output*"))
-       (actual-engine
+      ((actual-engine
         (or --el-google-engine --el-default-engine-google))
+       (api-key
+        (or --el-api-key-google --el-google-api-key))
        (url
         (format "https://generativelanguage.googleapis.com/v1beta/models/%s:streamGenerateContent?alt=sse&key=%s"
-                actual-engine
-                (or --el-api-key-google --el-google-api-key)))
-       (full-prompt
-        (--el-template-apply prompt template-name))
+                actual-engine api-key))
+       ;; Create simple Google payload format matching the example
        (payload
-        (--el-construct-google-payload full-prompt))
-       (args
-        (list "--no-buffer"
-              url
-              "-H" "Content-Type: application/json"
-              "-d" payload))
-       (buffer-name
-        (--el-prepare-llm-buffer prompt "google" actual-engine template-name))
-       (proc
-        (apply #'start-process "--el-google-stream" temp-buffer "curl" args)))
-    (process-put proc 'target-buffer buffer-name)
-    (process-put proc 'temp-buffer temp-buffer)
-    (process-put proc 'content "")
-    (process-put proc 'partial-data "")
-    (process-put proc 'provider "GOOGLE")
-    (process-put proc 'engine actual-engine)
-    (set-process-filter proc #'--el-google-filter)
-    (set-process-sentinel proc #'--el-process-sentinel)
-    (--el-start-spinner)
-    (--el-history-append "user" prompt template-name)
-    proc))
+        (json-encode
+         `((contents .
+                     [((parts .
+                              [((text . ,prompt))]))]))
+         ))
+       (escaped-payload
+        (shell-quote-argument payload))
+       (command
+        (format "curl \"%s\" -H \"Content-Type: application/json\" --no-buffer -d %s 2>&1"
+                url escaped-payload)))
+    ;; (message "DEBUG Google curl command: %s" command)
+    command))
 
-;; Helper
-;; ----------------------------------------
 (defun --el-parse-google-chunk
     (chunk)
   "Parse Google JSON CHUNK and return content."
@@ -92,6 +75,11 @@ Optional TEMPLATE-NAME is the name of the template used."
 (defun --el-google-filter
     (proc chunk)
   "Filter for Google stream PROC processing CHUNK."
+  ;; Debug logging for Google chunks
+  ;; (message "Google chunk received: %s"
+  ;;          (substring chunk 0
+  ;;                     (min 100
+  ;;                          (length chunk))))
   (let*
       ((partial
         (or
@@ -141,6 +129,7 @@ Optional TEMPLATE-NAME is the name of the template used."
                                (process-get proc 'content)
                                "")
                               text))))))))))
+
 (defun --el-construct-google-payload
     (prompt)
   "Construct the JSON payload for Google Gemini API with PROMPT."
@@ -151,21 +140,27 @@ Optional TEMPLATE-NAME is the name of the template used."
         (or
          (alist-get actual-engine --el-google-engine-max-tokens-alist nil nil 'string=)
          100000))
-       ;; Add recent history as string
-       (conversation
-        (--el-history-get-recent-as-string))
-       ;; Combine history with prompt
-       (full-conversation
-        (if
-            (string-empty-p conversation)
-            prompt
-          (concat conversation "\n\n" prompt))))
-    (json-encode
-     `(("contents" .
-        ,(list
-          `(("role" . "user")
+       ;; Get history in correct format
+       (history
+        (--el-history-load-recent))
+       ;; Build contents with proper format for Google
+       (contents
+        (append
+         (when history
+           (mapcar
+            (lambda
+              (msg)
+              `(;; ("role" . ,(cdr
+                ;;             (assoc "role" msg)))
+                ("parts" .
+                 ((("text" . ,(cdr
+                               (assoc "content" msg))))))))
+            history))
+         `((;; ("role" . "user")
             ("parts" .
-             ((("text" . ,full-conversation)))))))
+             ((("text" . ,prompt)))))))))
+    (json-encode
+     `(("contents" . ,contents)
        ("generationConfig" .
         (("maxOutputTokens" . ,max-tokens)))))))
 

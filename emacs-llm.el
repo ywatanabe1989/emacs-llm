@@ -9,7 +9,7 @@
 ;; ----------------------------------------
 
 ;; Preparation
-(require 'emacs-path-and-load)
+(require 'emacs-llm-path-and-load)
 
 ;; LLM
 (require 'emacs-llm-variables)

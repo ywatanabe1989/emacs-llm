@@ -1,6 +1,6 @@
 ;;; -*- coding: utf-8; lexical-binding: t -*-
 ;;; Author: ywatanabe
-;;; Timestamp: <2025-02-27 09:42:50>
+;;; Timestamp: <2025-02-28 07:39:43>
 ;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/emacs-llm-run.el
 
 (require 'emacs-llm-dired)
@@ -15,6 +15,7 @@ If in dired-mode with marked files, concatenate their contents.
 Otherwise, prompt the user to enter a prompt.
 The response will be displayed in the *El* buffer."
   (interactive)
+  (message "Starting el-run with prompt: %s, template-name: %s" prompt template-name)
   (--el-history-load)
   ;; (--el-scroll-to-last-separator)
   (let*
@@ -22,17 +23,23 @@ The response will be displayed in the *El* buffer."
         (or prompt
             (cond
              ((use-region-p)
+              (message "Using region text as prompt")
               (buffer-substring-no-properties
                (region-beginning)
                (region-end)))
              ((eq major-mode 'dired-mode)
+              (message "Using dired contents as prompt")
               (--el-dired-get-contents))
              (t
+              (message "Prompting user for input")
               (read-string "Enter prompt: " "")))))
        (template-name
-        (or template
-            (--el-template-select))))
-
+        (or template-name
+            (progn
+              (message "Selecting template")
+              (--el-template-select)))))
+    (message "Final prompt: %s" prompt)
+    (message "Selected template: %s" template-name)
     ;; Use the abstraction
     (el-llm-call prompt --el-actual-provider template-name)))
 

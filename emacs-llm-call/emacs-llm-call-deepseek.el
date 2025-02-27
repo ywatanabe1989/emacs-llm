@@ -1,49 +1,24 @@
 ;;; -*- coding: utf-8; lexical-binding: t -*-
 ;;; Author: ywatanabe
-;;; Timestamp: <2025-02-27 01:20:53>
-;;; File: /home/ywatanabe/.emacs.d/lisp/emacs-llm/emacs-llm-call/emacs-llm-call-deepseek.el
-
-(defun --el-deepseek-stream
-    (prompt &optional template-name)
-  "Send PROMPT to DeepSeek API via streaming.
-Optional TEMPLATE-NAME is the name of the template used."
-  (let*
-      ((temp-buffer
-        (generate-new-buffer " *deepseek-temp-output*"))
-       (full-prompt
-        (--el-template-apply prompt template-name))
-       (payload
-        (--el-construct-deepseek-payload full-prompt))
-       (payload-oneline
-        (replace-regexp-in-string "\n" " " payload))
-       (escaped-payload
-        (replace-regexp-in-string "'" "\\\\'" payload-oneline))
-       (curl-command
-        (format "curl -N 'https://api.deepseek.com/v1/chat/completions' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' -d '%s'"
-                --el-deepseek-api-key
-                escaped-payload))
-       (actual-engine
-        (or --el-deepseek-engine --el-default-engine-deepseek))
-       (buffer-name
-        (--el-prepare-llm-buffer prompt "deepseek" actual-engine template-name))
-       (proc
-        (start-process-shell-command "--el-deepseek-stream" temp-buffer curl-command)))
-    (process-put proc 'target-buffer buffer-name)
-    (process-put proc 'temp-buffer temp-buffer)
-    (process-put proc 'content "")
-    (process-put proc 'partial-data "")
-    (process-put proc 'prompt prompt)
-    (process-put proc 'provider "deepseek")
-    (process-put proc 'engine actual-engine)
-    (process-put proc 'template template-name)
-    (set-process-filter proc #'--el-deepseek-filter)
-    (set-process-sentinel proc #'--el-process-sentinel)
-    (--el-start-spinner)
-    (--el-history-append "user" prompt template-name)
-    proc))
+;;; Timestamp: <2025-02-28 10:08:28>
+;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/emacs-llm-call/emacs-llm-call-deepseek.el
 
 ;; Helper
 ;; ----------------------------------------
+
+(defun --el-construct-deepseek-curl-command
+    (prompt)
+  "Construct curl command for DeepSeek API with PAYLOAD."
+  (let*
+      ((payload
+        (--el-construct-deepseek-payload prompt))
+       (url "https://api.deepseek.com/v1/chat/completions")
+       (auth-header
+        (format "Bearer %s" --el-api-key-deepseek))
+       (escaped-payload
+        (shell-quote-argument payload)))
+    (format "curl -v -N %s -H \"Content-Type: application/json\" -H \"Authorization: %s\" -d %s 2>&1"
+            url auth-header escaped-payload)))
 
 (defun --el-parse-deepseek-chunk
     (chunk)
@@ -143,25 +118,29 @@ Optional TEMPLATE-NAME is the name of the template used."
         (or
          (alist-get actual-engine --el-deepseek-engine-max-tokens-alist nil nil 'string=)
          8192))
-       ;; Add recent history as string
-       (conversation
-        (--el-history-get-recent-as-string))
-       ;; Combine history with prompt
-       (full-conversation
-        (if
-            (string-empty-p conversation)
-            prompt
-          (concat conversation "\n\n" prompt)))
-       (payload
-        (json-encode
-         `(("model" . ,actual-engine)
-           ("messages" . ,(list
-                           `(("role" . "user")
-                             ("content" . ,full-conversation))))
-           ("temperature" . ,--el-temperature)
-           ("max_tokens" . ,max-tokens)
-           ("stream" . t)))))
-    payload))
+       ;; Get history in correct format
+       (history
+        (--el-history-load-recent))
+       ;; Format messages properly for DeepSeek
+       (messages
+        (append
+         (when history
+           (mapcar
+            (lambda
+              (msg)
+              `(("role" . ,(cdr
+                            (assoc "role" msg)))
+                ("content" . ,(cdr
+                               (assoc "content" msg)))))
+            history))
+         `((("role" . "user")
+            ("content" . ,prompt))))))
+    (json-encode
+     `(("model" . ,actual-engine)
+       ("messages" . ,messages)
+       ("temperature" . ,--el-temperature)
+       ("max_tokens" . ,max-tokens)
+       ("stream" . t)))))
 
 (provide 'emacs-llm-call-deepseek)
 

@@ -1,4 +1,4 @@
-# Timestamp: "2025-02-27 09:23:55 (ywatanabe)"
+# Timestamp: "2025-02-27 09:51:37 (ywatanabe)"
 # File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/elisp-test-results.org
 
 * Test Results Summary
@@ -167,7 +167,7 @@
     (ert-test-failed ((should (boundp '--el-default-provider)) :form (boundp --el-default-provider) :value nil))
 - [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-history.el::test-emacs-llm-get-recent-history][test-emacs-llm-history.el]] :: test-emacs-llm-get-recent-history
   + Error details:
-    (void-function --el-history-get-recent)
+    (void-function --el-history-load-recent)
 - [[file:/home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-history.el::test-emacs-llm-clear-history][test-emacs-llm-history.el]] :: test-emacs-llm-clear-history
   + Error details:
     (ert-test-failed ((should (= (length --el-history) 1)) :form (= 168 1) :value nil))

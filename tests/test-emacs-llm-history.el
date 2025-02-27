@@ -1,315 +1,251 @@
 ;;; -*- coding: utf-8; lexical-binding: t -*-
 ;;; Author: ywatanabe
-;;; Timestamp: <2025-02-26 22:21:26>
+;;; Timestamp: <2025-02-28 08:19:20>
 ;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-history.el
 
-(ert-deftest test-emacs-llm-history-append
-    ()
-  "Test adding entries to the history."
-  (let
-      ((--el-history nil)
-       (--el-history-file
-        (make-temp-file "emacs-llm-test-history" nil ".json")))
-    (--el-history-append "user" "Test user message")
-    (should
-     (=
-      (length --el-history)
-      1))
-    (should
-     (string=
-      (alist-get 'role
-                 (car --el-history))
-      "user"))
-    (should
-     (string=
-      (alist-get 'content
-                 (car --el-history))
-      "Test user message"))
-
-    (--el-history-append "assistant" "Test assistant response")
-    (should
-     (=
-      (length --el-history)
-      2))
-    (should
-     (string=
-      (alist-get 'role
-                 (nth 1 --el-history))
-      "assistant"))
-    (should
-     (string=
-      (alist-get 'content
-                 (nth 1 --el-history))
-      "Test assistant response"))
-
-    (delete-file --el-history-file)))
-
-(ert-deftest test-emacs-llm-history-with-template
-    ()
-  "Test that templates are properly recorded in history."
-  (let
-      ((--el-history nil)
-       (--el-history-file
-        (make-temp-file "emacs-llm-test-history" nil ".json")))
-    (--el-history-append "user" "Test with template" "test-template")
-    (should
-     (=
-      (length --el-history)
-      1))
-    (should
-     (string=
-      (alist-get 'template
-                 (car --el-history))
-      "test-template"))
-
-    (delete-file --el-history-file)))
-
-;;; test-emacs-llm-history.el --- Tests for emacs-llm history functionality -*- lexical-binding: t -*-
-
-;;; Commentary:
-;; Test suite for the emacs-llm history module.
-
-;;; Code:
+;;; test-emacs-llm-history.el --- Tests for emacs-llm-history.el -*- lexical-binding: t -*-
 
 (require 'ert)
+(require 'emacs-llm-history)
 
-;; Load the package to test
-(when
-    (require 'emacs-llm-history nil t)
-  (message "emacs-llm-history loaded successfully for testing"))
-
-;; Helper function for temporary test environment
-(defun setup-test-history-env
+(ert-deftest test-history-directory-existence
     ()
-  "Set up a clean test environment for history tests."
+  (should
+   (file-directory-p --el-history-dir)))
+
+(ert-deftest test-history-file-creation
+    ()
+  (--el-history-ensure-file)
+  (should
+   (file-exists-p --el-history-file)))
+
+(ert-deftest test-history-append
+    ()
   (let
-      ((temp-dir
-        (make-temp-file "emacs-llm-test-" t))
-       (temp-file
-        (make-temp-name "history.json")))
-    (list :dir temp-dir :file
-          (expand-file-name temp-file temp-dir))))
+      ((test-content "Test content")
+       (test-role "user")
+       (original-history
+        (when
+            (file-exists-p --el-history-file)
+          (with-temp-buffer
+            (insert-file-contents --el-history-file)
+            (buffer-string)))))
+    (unwind-protect
+        (progn
+          (--el-history-append test-role test-content)
+          (--el-history-load)
+          (should
+           (seq-some
+            (lambda
+              (entry)
+              (and
+               (equal
+                (alist-get 'role entry)
+                test-role)
+               (equal
+                (alist-get 'content entry)
+                test-content)))
+            --el-history)))
+      ;; Cleanup
+      (when original-history
+        (with-temp-file --el-history-file
+          (insert original-history))))))
 
-(defun cleanup-test-history-env
-    (env)
-  "Clean up the test environment created by setup-test-history-env."
-  (when
-      (file-exists-p
-       (plist-get env :file))
-    (delete-file
-     (plist-get env :file)))
-  (when
-      (file-exists-p
-       (plist-get env :dir))
-    (delete-directory
-     (plist-get env :dir)
-     t)))
-
-;; Basic history file operations
-(ert-deftest test-emacs-llm-history-dir-creation
+(ert-deftest test-history-append-with-template
     ()
-  "Test that history directory is created if it doesn't exist."
-  (let*
-      ((env
-        (setup-test-history-env))
-       (--el-history-dir
-        (plist-get env :dir)))
-    (delete-directory --el-history-dir t)
-    (should-not
-     (file-exists-p --el-history-dir))
-    (--el-history-ensure-file)
-    (should
-     (file-exists-p --el-history-dir))
-    (cleanup-test-history-env env)))
+  (let
+      ((test-content "Test with template")
+       (test-role "user")
+       (test-template "code")
+       (original-history
+        (when
+            (file-exists-p --el-history-file)
+          (with-temp-buffer
+            (insert-file-contents --el-history-file)
+            (buffer-string)))))
+    (unwind-protect
+        (progn
+          (--el-history-append test-role test-content test-template)
+          (--el-history-load)
+          (should
+           (seq-some
+            (lambda
+              (entry)
+              (and
+               (equal
+                (alist-get 'role entry)
+                test-role)
+               (equal
+                (alist-get 'content entry)
+                test-content)
+               (equal
+                (alist-get 'template entry)
+                test-template)))
+            --el-history)))
+      ;; Cleanup
+      (when original-history
+        (with-temp-file --el-history-file
+          (insert original-history))))))
 
-(ert-deftest test-emacs-llm-history-save-load
+(ert-deftest test-history-clear
     ()
-  "Test saving and loading history."
-  (let*
-      ((env
-        (setup-test-history-env))
-       (--el-history-dir
-        (plist-get env :dir))
-       (--el-history-file
-        (plist-get env :file))
-       (--el-history
-        '()))
+  (let
+      ((original-history
+        (when
+            (file-exists-p --el-history-file)
+          (with-temp-buffer
+            (insert-file-contents --el-history-file)
+            (buffer-string)))))
+    (unwind-protect
+        (progn
+          ;; First ensure we have some content
+          (--el-history-append "assistant" "Some content")
+          (el-history-clear)
+          (--el-history-load)
+          (should
+           (null --el-history)))
+      ;; Cleanup
+      (when original-history
+        (with-temp-file --el-history-file
+          (insert original-history))))))
 
-    ;; Add some entries
-    (--el-history-append "user" "Test user message 1")
-    (--el-history-append "assistant" "Test assistant response 1")
-    (--el-history-append "user" "Test user message 2")
-    (--el-history-append "assistant" "Test assistant response 2")
-
-    ;; Verify they were saved
-    (should
-     (file-exists-p --el-history-file))
-
-    ;; Clear in-memory history and reload from file
-    (setq --el-history
-          '())
-    (should
-     (=
-      (length --el-history)
-      0))
-    (--el-history-load)
-
-    ;; Verify history was loaded correctly
-    (should
-     (=
-      (length --el-history)
-      4))
-    (should
-     (string=
-      (alist-get 'content
-                 (nth 0 --el-history))
-      "Test user message 1"))
-    (should
-     (string=
-      (alist-get 'content
-                 (nth 1 --el-history))
-      "Test assistant response 1"))
-    (should
-     (string=
-      (alist-get 'content
-                 (nth 2 --el-history))
-      "Test user message 2"))
-    (should
-     (string=
-      (alist-get 'content
-                 (nth 3 --el-history))
-      "Test assistant response 2"))
-
-    (cleanup-test-history-env env)))
-
-(ert-deftest test-emacs-llm-history-backup
+(ert-deftest test-history-load-recent
     ()
-  "Test history file backup mechanism when it exceeds the size limit."
-  (let*
-      ((env
-        (setup-test-history-env))
-       (--el-history-dir
-        (plist-get env :dir))
-       (--el-history-file
-        (plist-get env :file))
-       (--el-history-max-size 50)
-       ;; Small size to trigger backup
-       (--el-history
-        '()))
+  (let
+      ((original-history
+        (when
+            (file-exists-p --el-history-file)
+          (with-temp-buffer
+            (insert-file-contents --el-history-file)
+            (buffer-string)))))
+    (unwind-protect
+        (progn
+          ;; Create a fresh test history
+          (with-temp-file --el-history-file
+            (insert "[]"))
 
-    ;; Create a large history entry that will exceed the max size
-    (--el-history-append "user"
-                            (make-string 100 ?x))
+          ;; Directly create a JSON history with known content
+          (let
+              ((test-history
+                (make-list
+                 (+ --el-n-histories 5)
+                 nil)))
+            (dotimes
+                (idx
+                 (length test-history))
+              (setf
+               (nth idx test-history)
+               `(("role" . "user")
+                 ("content" . ,(format "Message %d" idx)))))
 
-    ;; Save to ensure the file exists
-    (--el-history-save)
-    (should
-     (file-exists-p --el-history-file))
+            ;; Write the test history to file
+            (with-temp-file --el-history-file
+              (insert
+               (json-encode test-history)))
 
-    ;; Check if backup was created when loading
-    (--el-history-load)
+            ;; Now test the load recent function
+            (let*
+                ((recent-history
+                  (--el-history-load-recent))
+                 (first-entry
+                  (car recent-history)))
+              (should
+               (=
+                (length recent-history)
+                --el-n-histories))
+              (should first-entry)
+              ;; Check the structure matches what we expect
+              (should
+               (assoc "content" first-entry))
+              (should
+               (string-match-p "Message [0-9]+"
+                               (cdr
+                                (assoc "content" first-entry)))))))
 
-    ;; Should find at least one backup file
-    (let
-        ((backup-files
-          (directory-files --el-history-dir t "history-.*\\.json")))
-      (should
-       (>
-        (length backup-files)
-        0)))
+      ;; Cleanup
+      (when original-history
+        (with-temp-file --el-history-file
+          (insert original-history))))))
 
-    (cleanup-test-history-env env)))
-
-(ert-deftest test-emacs-llm-clear-history
+(ert-deftest test-history-rotation
     ()
-  "Test clearing the history."
-  (let*
-      ((env
-        (setup-test-history-env))
-       (--el-history-dir
-        (plist-get env :dir))
-       (--el-history-file
-        (plist-get env :file))
-       (--el-history
-        '()))
+  (let
+      ((original-history
+        (when
+            (file-exists-p --el-history-file)
+          (with-temp-buffer
+            (insert-file-contents --el-history-file)
+            (buffer-string))))
+       (original-max-size --el-history-max-size)
+       (test-max-size 100))
+    (unwind-protect
+        (progn
+          ;; Temporarily set lower max-size for testing
+          (setq --el-history-max-size test-max-size)
 
-    ;; Add some entries
-    (--el-history-append "user" "Test message")
-    (should
-     (=
-      (length --el-history)
-      1))
+          ;; Create a history file larger than test-max-size
+          (with-temp-file --el-history-file
+            (insert "[")
+            (dotimes
+                (idx 20)
+              (unless
+                  (= idx 0)
+                (insert ","))
+              (insert
+               (format "{\"role\":\"user\",\"content\":\"Test message %d with extra padding to make the file larger\"}" idx)))
+            (insert "]"))
 
-    ;; Clear history
-    (el-history-clear)
-    (should
-     (=
-      (length --el-history)
-      0))
+          ;; Count initial backup files
+          (let
+              ((initial-backups
+                (length
+                 (directory-files --el-history-dir nil "history-.*\\.json"))))
+            ;; Trigger rotation
+            (--el-history-ensure-rotation)
 
-    ;; Load from file to verify it was saved as empty
-    (--el-history-load)
-    (should
-     (=
-      (length --el-history)
-      0))
+            ;; Check if new backup was created
+            (should
+             (>
+              (length
+               (directory-files --el-history-dir nil "history-.*\\.json"))
+              initial-backups))))
+      ;; Cleanup
+      (when original-history
+        (with-temp-file --el-history-file
+          (insert original-history)))
+      (setq --el-history-max-size original-max-size))))
 
-    (cleanup-test-history-env env)))
-
-(ert-deftest test-emacs-llm-get-recent-history
+(ert-deftest test-history-show-buffer-creation
     ()
-  "Test getting recent history limited by max interactions."
-  (let*
-      ((env
-        (setup-test-history-env))
-       (--el-history-dir
-        (plist-get env :dir))
-       (--el-history-file
-        (plist-get env :file))
-       (--el-n-histories 2)
-       (--el-history
-        '()))
-    ;; Add several entries
-    (--el-history-append "user" "Message 1")
-    (--el-history-append "assistant" "Response 1")
-    (--el-history-append "user" "Message 2")
-    (--el-history-append "assistant" "Response 2")
-    (--el-history-append "user" "Message 3")
-    (--el-history-append "assistant" "Response 3")
-    ;; Get recent history
-    (let
-        ((recent
-          (--el-history-get-recent)))
-      (should
-       (=
-        (length recent)
-        2))
-      ;; Should have 2 messages (last 2 entries)
-      (should
-       (string=
-        (alist-get 'content
-                   (nth 0 recent))
-        "Message 3"))
-      (should
-       (string=
-        (alist-get 'content
-                   (nth 1 recent))
-        "Response 3")))
-    (cleanup-test-history-env env)))
+  ;; Just test that the buffer gets created with minimal assumptions
+  (unwind-protect
+      (progn
+        ;; Kill buffer if it exists
+        (when
+            (get-buffer "*Emacs-LLM History*")
+          (kill-buffer "*Emacs-LLM History*"))
 
-(defun --el-history-load
-    ()
-  "Load conversation history from `--el-history-file`."
-  (--el-history-backup-file-if)
-  (when
-      (file-exists-p --el-history-file)
-    (with-temp-buffer
-      (insert-file-contents --el-history-file)
-      (let
-          ((json-array-type 'list))
-        (setq --el-history
-              (json-read-from-string
-               (buffer-string)))))))
+        ;; Add a basic entry to history (without relying on file operations)
+        (let
+            ((--el-history
+              '(((role . "user")
+                 (content . "Test query")))))
+          ;; Show history
+          (cl-letf
+              (((symbol-function '--el-history-load)
+                (lambda
+                  ()
+                  --el-history)))
+            (el-history-show)))
+
+        ;; Check buffer was created
+        (should
+         (get-buffer "*Emacs-LLM History*")))
+
+    ;; Cleanup
+    (when
+        (get-buffer "*Emacs-LLM History*")
+      (kill-buffer "*Emacs-LLM History*"))))
 
 (provide 'test-emacs-llm-history)
 

@@ -1,51 +1,27 @@
 ;;; -*- coding: utf-8; lexical-binding: t -*-
 ;;; Author: ywatanabe
-;;; Timestamp: <2025-02-27 01:35:50>
+;;; Timestamp: <2025-02-28 10:07:43>
 ;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/emacs-llm-call/emacs-llm-call-anthropic.el
 
 ;; Main
 ;; ----------------------------------------
 
-(defun --el-anthropic-stream
-    (prompt &optional template-name)
-  "Send PROMPT to Anthropic API via streaming.
-Optional TEMPLATE-NAME is the name of the template-name used."
-  (let*
-      ((temp-buffer
-        (generate-new-buffer " *anthropic-temp-output*"))
-       (full-prompt
-        (--el-template-apply prompt template-name))
-       (payload
-        (--el-construct-anthropic-payload full-prompt))
-       (payload-oneline
-        (replace-regexp-in-string "\n" " " payload))
-       (escaped-payload
-        (replace-regexp-in-string "'" "\\\\'" payload-oneline))
-       (curl-command
-        (format "curl -N 'https://api.anthropic.com/v1/messages' -H 'Content-Type: application/json' -H 'anthropic-version: 2023-06-01' -H 'anthropic-beta: output-128k-2025-02-19' -H 'x-api-key: %s' -d '%s'"
-                (or --el-api-key-anthropic --el-anthropic-api-key)
-                escaped-payload))
-       (actual-engine
-        (or --el-anthropic-engine --el-default-engine-anthropic))
-       (buffer-name
-        (--el-prepare-llm-buffer prompt "anthropic" actual-engine template-name))
-       (proc
-        (start-process-shell-command "--el-anthropic-stream" temp-buffer curl-command)))
-    (process-put proc 'target-buffer buffer-name)
-    (process-put proc 'temp-buffer temp-buffer)
-    (process-put proc 'content "")
-    (process-put proc 'prompt prompt)
-    (process-put proc 'provider "anthropic")
-    (process-put proc 'template template-name)
-    (process-put proc 'engine actual-engine)
-    (set-process-filter proc #'--el-anthropic-filter)
-    (set-process-sentinel proc #'--el-process-sentinel)
-    (--el-start-spinner)
-    (--el-history-append "user" prompt template-name)
-    proc))
-
 ;; Helper
 ;; ----------------------------------------
+
+(defun --el-construct-anthropic-curl-command
+    (prompt)
+  "Construct curl command for Anthropic API with PAYLOAD."
+  (let*
+      ((payload
+        (--el-construct-anthropic-payload prompt))
+       (url "https://api.anthropic.com/v1/messages")
+       (api-key
+        (or --el-api-key-anthropic --el-anthropic-api-key))
+       (escaped-payload
+        (shell-quote-argument payload)))
+    (format "curl -v -N %s -H \"Content-Type: application/json\" -H \"anthropic-version: 2023-06-01\" -H \"anthropic-beta: output-128k-2025-02-19\" -H \"x-api-key: %s\" -d %s 2>&1"
+            url api-key escaped-payload)))
 
 (defun --el-parse-anthropic-chunk
     (chunk)
@@ -82,7 +58,55 @@ Optional TEMPLATE-NAME is the name of the template-name used."
 (defun --el-anthropic-filter
     (proc chunk)
   "Filter for Anthropic stream PROC processing CHUNK."
-  (--el-process-chunk proc chunk #'--el-parse-anthropic-chunk))
+  (let*
+      ((partial
+        (or
+         (process-get proc 'partial-data)
+         ""))
+       (combined
+        (concat partial chunk))
+       (lines
+        (split-string combined "\n"))
+       (incomplete
+        (if
+            (string-suffix-p "\n" combined)
+            ""
+          (car
+           (last lines)))))
+    (unless
+        (string= incomplete "")
+      (setq lines
+            (butlast lines)))
+    (process-put proc 'partial-data incomplete)
+    (dolist
+        (line lines)
+      (when
+          (string-prefix-p "data:" line)
+        (let
+            ((jsonstr
+              (string-trim
+               (substring line
+                          (if
+                              (string-prefix-p "data: " line)
+                              6
+                            5)))))
+          (unless
+              (string= jsonstr "[DONE]")
+            (let
+                ((text
+                  (--el-parse-anthropic-chunk jsonstr)))
+              (when text
+                (with-current-buffer
+                    (process-get proc 'target-buffer)
+                  (goto-char
+                   (point-max))
+                  (insert text))
+                (process-put proc 'content
+                             (concat
+                              (or
+                               (process-get proc 'content)
+                               "")
+                              text))))))))))
 
 (defun --el-construct-anthropic-payload
     (prompt)
@@ -94,28 +118,31 @@ Optional TEMPLATE-NAME is the name of the template-name used."
         (or
          (alist-get actual-engine --el-anthropic-engine-max-tokens-alist nil nil 'string=)
          128000))
-       ;; Add recent history as string
-       (conversation
-        (--el-history-get-recent-as-string))
-       ;; Combine history with prompt
-       (full-conversation
-        (if
-            (string-empty-p conversation)
-            prompt
-          (concat conversation "\n\n" prompt))))
+       ;; Get history in correct format
+       (history
+        (--el-history-load-recent))
+       ;; Prepare properly formatted messages for Anthropic
+       (messages
+        (append
+         (when history
+           (mapcar
+            (lambda
+              (msg)
+              `(("role" . ,(cdr
+                            (assoc "role" msg)))
+                ("content" . ,(cdr
+                               (assoc "content" msg)))))
+            history))
+         `((("role" . "user")
+            ("content" . ,prompt))))))
     (json-encode
      `(("model" . ,actual-engine)
-       ;; This is correct - Anthropic API uses "model"
        ("max_tokens" . ,max-tokens)
        ("stream" . t)
-       ;; ("temperature" . ,--el-temperature)
        ("thinking" .
         (("type" . "enabled")
          ("budget_tokens" . 32000)))
-       ("messages" .
-        ,(list
-          `(("role" . "user")
-            ("content" . ,full-conversation))))))))
+       ("messages" . ,messages)))))
 
 (provide 'emacs-llm-call-anthropic)
 

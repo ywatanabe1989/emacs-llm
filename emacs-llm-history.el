@@ -1,6 +1,6 @@
 ;;; -*- coding: utf-8; lexical-binding: t -*-
 ;;; Author: ywatanabe
-;;; Timestamp: <2025-02-27 09:24:41>
+;;; Timestamp: <2025-02-28 09:21:15>
 ;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/emacs-llm-history.el
 
 ;; Variables
@@ -36,54 +36,8 @@
   '()
   "List to keep track of conversation history.")
 
-;; History File Handling
-;; ----------------------------------------
-
-(defun --el-history-varidate-state
-    ()
-  "Ensure history directory exists."
-  (--el-history-ensure-dir)
-  (--el-history-ensure-file)
-  (--el-history-backup-file-if))
-
-(defun --el-history-ensure-dir
-    ()
-  "Ensure history directory exists."
-  (unless
-      (file-exists-p --el-history-dir)
-    (make-directory --el-history-dir t)))
-
-(defun --el-history-ensure-file
-    ()
-  "Ensure history file exists."
-  (--el-history-ensure-file)
-  (unless
-      (file-exists-p --el-history-file)
-    (with-temp-file history-file
-      (insert ""))))
-
-(defun --el-history-backup-file-if
-    ()
-  "Backup history file with timestamp if it exceeds max size."
-  (when
-      (and
-       (file-exists-p --el-history-file)
-       (>
-        (file-attribute-size
-         (file-attributes --el-history-file))
-        --el-history-max-size))
-    (--el-history-ensure-file)
-    (let
-        ((backup-file
-          (expand-file-name
-           (format "history-%s.json"
-                   (format-time-string "%Y-%m-%d-%H-%M-%S"))
-           --el-history-dir)))
-      (copy-file --el-history-file backup-file)
-      (message "Backed up history to %s" backup-file)
-      ;; Create new empty history file
-      (with-temp-file --el-history-file
-        (insert "[]")))))
+(define-derived-mode --el-history-mode markdown-mode "Emacs-LLM History"
+  "Major mode for viewing Emacs-LLM conversation history.")
 
 (defun el-history-clear
     ()
@@ -94,43 +48,149 @@
   (--el-history-save)
   (message "Emacs-LLM conversation history cleared."))
 
-;; Loader/Saver
+;; Saving
 ;; ----------------------------------------
-
-(defun --el-history-load
-    ()
-  "Load conversation history from `--el-history-file`."
-  (--el-history-backup-file-if)
-  (when
-      (file-exists-p --el-history-file)
-    (with-temp-buffer
-      (insert-file-contents --el-history-file)
-      (setq --el-history
-            (json-read-from-string
-             (buffer-string))))))
 
 (defun --el-history-save
     ()
   "Save conversation history to `--el-history-file`."
-  (--el-history-ensure-file)
+  (--el-history-ensure)
   (with-temp-file --el-history-file
     (insert
      (json-encode --el-history))))
 
 (defun --el-history-append
     (role content &optional template)
-  "Append a message with ROLE and CONTENT to the conversation history.
-If TEMPLATE is provided, include it as part of the metadata."
-  (let
-      ((entry
-        `((role . ,role)
-          (content . ,content)
-          ,@(when template
-              `((template . ,template))))))
+  "Append a new message with ROLE and CONTENT to history JSON.
+Optional TEMPLATE is the template name used for user messages."
+  (let*
+      ((history
+        (or
+         (--el-history-load-recent-as-json)
+         '()))
+       (entry
+        (cond
+         ((string= role "user")
+          (if template
+              `(("role" . "user")
+                ("content" . ,content)
+                ("template" . ,template))
+            `(("role" . "user")
+              ("content" . ,content))))
+         (t
+          `(("role" . ,role)
+            ("content" . ,content)))))
+       (updated-history
+        (append history
+                (list entry))))
+
+    ;; Write back to file
+    (when --el-history-file
+      (with-temp-file --el-history-file
+        (insert
+         (json-encode updated-history))))))
+
+;; Loading
+;; ----------------------------------------
+
+(defun --el-history-load
+    ()
+  "Load conversation history from `--el-history-file`."
+  (--el-history-ensure)
+  (with-temp-buffer
+    (insert-file-contents --el-history-file)
     (setq --el-history
-          (append --el-history
-                  (list entry)))
-    (--el-history-save)))
+          (json-read-from-string
+           (buffer-string)))))
+
+;; (defun --el-history-load-recent
+;;     ()
+;;   "Load recent conversation history limited to `--el-n-histories` entries.
+;; Returns the most recent entries from the conversation history."
+;;   (let
+;;       ((history
+;;         (--el-history-load-recent-as-json)))
+;;     (when history
+;;       ;; Take only the most recent entries based on --el-n-histories
+;;       (if
+;;           (>
+;;            (length history)
+;;            --el-n-histories)
+;;           (nthcdr
+;;            (-
+;;             (length history)
+;;             --el-n-histories)
+;;            history)
+;;         history))))
+
+(defun --el-history-load-recent
+    ()
+  "Load recent conversation history limited to `--el-n-histories` entries.
+Returns the most recent entries from the conversation history."
+  (let
+      ((history
+        (--el-history-load-recent-as-json)))
+    (when history
+      ;; Replace engine names with proper role
+      (mapcar
+       (lambda
+         (msg)
+         (let
+             ((role
+               (cdr
+                (assoc "role" msg))))
+           (when
+               (not
+                (or
+                 (equal role "user")
+                 (equal role "assistant")))
+             ;; Replace any engine name with "assistant"
+             (setf
+              (cdr
+               (assoc "role" msg))
+              "assistant"))
+           msg))
+       history)
+      ;; Take only the most recent entries based on --el-n-histories
+      (if
+          (>
+           (length history)
+           --el-n-histories)
+          (nthcdr
+           (-
+            (length history)
+            --el-n-histories)
+           history)
+        history))))
+
+(defun --el-history-load-recent-as-json
+    ()
+  "Load recent conversation history from the history file as JSON.
+Returns nil if the file doesn't exist or is empty."
+  (when
+      (and --el-history-file
+           (file-exists-p --el-history-file)
+           (>
+            (file-attribute-size
+             (file-attributes --el-history-file))
+            0))
+    (with-temp-buffer
+      (insert-file-contents --el-history-file)
+      (goto-char
+       (point-min))
+      (condition-case err
+          (let
+              ((json-array-type 'list)
+               (json-object-type 'alist)
+               (json-key-type 'string))
+            (json-read))
+        (error
+         (message "Error reading JSON history: %s"
+                  (error-message-string err))
+         nil)))))
+
+;; Displaying
+;; ----------------------------------------
 
 ;;;###autoload
 (defun el-history-show
@@ -187,22 +247,62 @@ Show NUM-INTERACTIONS most recent interactions (default: 20)."
         (--el-history-mode)
         (display-buffer buffer)))))
 
-(defun --el-history-get-recent
-    (&optional n-histories)
-  "Get the most recent conversation history limited by `--el-n-histories`."
-  (--el-history-load)
-  (let*
-      ((history-length
-        (length --el-history))
-       (n-histories
-        (or n-histories --el-n-histories))
-       (start-index
-        (max 0
-             (- history-length n-histories))))
-    (if
-        (> history-length 0)
-        (cl-subseq --el-history start-index)
-      nil)))
+;; Ensure History File
+;; ----------------------------------------
+
+(defun --el-history-ensure
+    ()
+  "Ensure history directory, file, and backup exist for conversation management."
+  (--el-history-ensure-dir)
+  (--el-history-ensure-file)
+  (--el-history-ensure-rotation))
+
+(defun --el-history-ensure-dir
+    ()
+  "Ensure history directory exists for storing conversation data."
+  (unless
+      (file-exists-p --el-history-dir)
+    (make-directory --el-history-dir t)))
+
+(defun --el-history-ensure-file
+    ()
+  "Ensure history file exists for writing conversation data."
+  (--el-history-ensure-dir)
+  (if
+      (file-exists-p --el-history-file)
+      ;; Check if file exists but is empty
+      (when
+          (= 0
+             (file-attribute-size
+              (file-attributes --el-history-file)))
+        (with-temp-file --el-history-file
+          (insert "[]")))
+    ;; File doesn't exist, create it with empty array
+    (with-temp-file --el-history-file
+      (insert "[]"))))
+
+(defun --el-history-ensure-rotation
+    ()
+  "Backup history file with timestamp if its size exceeds `--el-history-max-size'."
+  (--el-history-ensure-dir)
+  (--el-history-ensure-file)
+  (when
+      (and
+       (file-exists-p --el-history-file)
+       (>
+        (file-attribute-size
+         (file-attributes --el-history-file))
+        --el-history-max-size))
+    (let
+        ((backup-file
+          (expand-file-name
+           (format "history-%s.json"
+                   (format-time-string "%Y-%m-%d-%H-%M-%S"))
+           --el-history-dir)))
+      (copy-file --el-history-file backup-file)
+      (message "Backed up history to %s" backup-file)
+      ;; Create new empty history file
+      (--el-history-ensure-file))))
 
 (provide 'emacs-llm-history)
 
