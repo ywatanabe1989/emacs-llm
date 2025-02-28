@@ -1,6 +1,6 @@
 ;;; -*- coding: utf-8; lexical-binding: t -*-
 ;;; Author: ywatanabe
-;;; Timestamp: <2025-02-28 10:10:19>
+;;; Timestamp: <2025-02-28 23:18:32>
 ;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/emacs-llm-call/emacs-llm-call-any.el
 
 (require 'emacs-llm-process)
@@ -9,8 +9,6 @@
 (require 'emacs-llm-call-google)
 (require 'emacs-llm-call-anthropic)
 (require 'emacs-llm-call-deepseek)
-
-;; (el-llm-call "hi" "openai")
 
 (defun el-llm-call
     (prompt &optional provider template-name)
