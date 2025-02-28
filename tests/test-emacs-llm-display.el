@@ -8,7 +8,7 @@
   "Test that the LLM buffer can be prepared correctly."
   (let
       ((buffer-name
-        (--el-prepare-llm-buffer "Test prompt" "TEST" "test-engine")))
+        (--el-display-buffer "Test prompt" "TEST" "test-engine")))
     (should
      (get-buffer buffer-name))
     (with-current-buffer buffer-name
@@ -32,7 +32,7 @@
        (provider "TEST-PROVIDER")
        (engine "test-engine")
        (buffer-name
-        (--el-prepare-llm-buffer prompt provider engine)))
+        (--el-display-buffer prompt provider engine)))
 
     (should
      (get-buffer buffer-name))
@@ -76,7 +76,7 @@
        (engine "test-engine")
        (template "test-template")
        (buffer-name
-        (--el-prepare-llm-buffer prompt provider engine template)))
+        (--el-display-buffer prompt provider engine template)))
 
     (should
      (get-buffer buffer-name))
@@ -106,7 +106,7 @@
       (insert "Initial content\n"))
 
     ;; Prepare buffer
-    (--el-prepare-llm-buffer "Test prompt" "TEST" "test-engine")
+    (--el-display-buffer "Test prompt" "TEST" "test-engine")
 
     (with-current-buffer buffer
       (should

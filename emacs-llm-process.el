@@ -1,6 +1,6 @@
 ;;; -*- coding: utf-8; lexical-binding: t -*-
 ;;; Author: ywatanabe
-;;; Timestamp: <2025-02-28 09:29:23>
+;;; Timestamp: <2025-03-01 05:30:55>
 ;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/emacs-llm-process.el
 
 (require 'emacs-llm-dired)
@@ -9,6 +9,8 @@
     ()
   "Cancel the LLM spinner timer if active."
   (when --el-spinner-timer
+    (--el-stop-spinner)
+    ;; added
     (cancel-timer --el-spinner-timer)
     (setq --el-spinner-timer nil)))
 
@@ -109,15 +111,8 @@
                  (substring error-output 0
                             (min 500
                                  (length error-output)))))
-      (when
-          (and prompt provider)
-        ;; Only append to history after we have a complete response
-        (--el-history-append "user" prompt template)
-        (when
-            (and content
-                 (not
-                  (string-empty-p content)))
-          (--el-history-append "assistant" content template)))
+      ;; History
+      (--el-history-append "assistant" content template)
       ;; Clean up temp buffer
       (when-let
           ((tb

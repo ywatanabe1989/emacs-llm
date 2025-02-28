@@ -1,28 +1,17 @@
 ;;; -*- coding: utf-8; lexical-binding: t -*-
 ;;; Author: ywatanabe
-;;; Timestamp: <2025-02-28 10:09:52>
+;;; Timestamp: <2025-03-01 08:58:37>
 ;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/emacs-llm-call/emacs-llm-call-openai.el
 
 (defun --el-construct-openai-curl-command
     (prompt)
-  "Construct curl command for OpenAI API with PAYLOAD."
+  "Construct curl command for OpenAI API with PROMPT."
   (let*
       ((url "https://api.openai.com/v1/chat/completions")
        (auth-header
         (format "Bearer %s"
                 (or --el-api-key-openai --el-api-key)))
-       (payload
-        (--el-construct-openai-payload prompt))
-       (escaped-payload
-        (shell-quote-argument payload)))
-    (format "curl -N %s -H \"Content-Type: application/json\" -H \"Authorization: %s\" -d %s"
-            url auth-header escaped-payload)))
-
-(defun --el-construct-openai-payload
-    (prompt)
-  "Construct the JSON payload for OpenAI API with PROMPT."
-  (let*
-      ((engine-name
+       (engine-name
         (or --el-openai-engine --el-default-engine-openai))
        (max-tokens
         (or
@@ -56,16 +45,20 @@
        (payload
         `(("model" . ,actual-engine)
           ("messages" . ,messages)
-          ("stream" . t))))
-    ;; Add reasoning_effort if specified
-    (when effort
-      (push
-       (cons "reasoning_effort" effort)
-       payload))
-    (let
-        ((json-result
-          (json-encode payload)))
-      json-result)))
+          ("stream" . t)))
+       ;; Add reasoning_effort if specified
+       (payload-with-effort
+        (if effort
+            (cons
+             (cons "reasoning_effort" effort)
+             payload)
+          payload))
+       (json-payload
+        (json-encode payload-with-effort))
+       (escaped-payload
+        (shell-quote-argument json-payload)))
+    (format "curl -N %s -H \"Content-Type: application/json\" -H \"Authorization: %s\" -d %s"
+            url auth-header escaped-payload)))
 
 (defun --el-parse-openai-chunk
     (chunk)
@@ -158,15 +151,16 @@
               (when text
                 (with-current-buffer
                     (process-get proc 'target-buffer)
-                  (goto-char
-                   (point-max))
-                  (insert text))
-                (process-put proc 'content
-                             (concat
-                              (or
-                               (process-get proc 'content)
-                               "")
-                              text))))))))))
+                  (save-excursion
+                    (goto-char
+                     (point-max))
+                    (insert text))
+                  (process-put proc 'content
+                               (concat
+                                (or
+                                 (process-get proc 'content)
+                                 "")
+                                text)))))))))))
 
 (defun --el-parse-openai-engine
     (engine-string)

@@ -1,6 +1,6 @@
 ;;; -*- coding: utf-8; lexical-binding: t -*-
 ;;; Author: ywatanabe
-;;; Timestamp: <2025-02-28 10:08:28>
+;;; Timestamp: <2025-03-01 09:00:18>
 ;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/emacs-llm-call/emacs-llm-call-deepseek.el
 
 ;; Helper
@@ -19,6 +19,40 @@
         (shell-quote-argument payload)))
     (format "curl -v -N %s -H \"Content-Type: application/json\" -H \"Authorization: %s\" -d %s 2>&1"
             url auth-header escaped-payload)))
+
+(defun --el-construct-deepseek-payload
+    (prompt)
+  "Construct the JSON payload for DeepSeek API with PROMPT."
+  (let*
+      ((actual-engine
+        (or --el-deepseek-engine --el-default-engine-deepseek))
+       (max-tokens
+        (or
+         (alist-get actual-engine --el-deepseek-engine-max-tokens-alist nil nil 'string=)
+         8192))
+       ;; Get history in correct format
+       (history
+        (--el-history-load-recent))
+       ;; Format messages properly for DeepSeek
+       (messages
+        (append
+         (when history
+           (mapcar
+            (lambda
+              (msg)
+              `(("role" . ,(cdr
+                            (assoc "role" msg)))
+                ("content" . ,(cdr
+                               (assoc "content" msg)))))
+            history))
+         `((("role" . "user")
+            ("content" . ,prompt))))))
+    (json-encode
+     `(("model" . ,actual-engine)
+       ("messages" . ,messages)
+       ("temperature" . ,--el-temperature)
+       ("max_tokens" . ,max-tokens)
+       ("stream" . t)))))
 
 (defun --el-parse-deepseek-chunk
     (chunk)
@@ -98,49 +132,16 @@
               (when text
                 (with-current-buffer
                     (process-get proc 'target-buffer)
-                  (goto-char
-                   (point-max))
-                  (insert text))
-                (process-put proc 'content
-                             (concat
-                              (or
-                               (process-get proc 'content)
-                               "")
-                              text))))))))))
-
-(defun --el-construct-deepseek-payload
-    (prompt)
-  "Construct the JSON payload for DeepSeek API with PROMPT."
-  (let*
-      ((actual-engine
-        (or --el-deepseek-engine --el-default-engine-deepseek))
-       (max-tokens
-        (or
-         (alist-get actual-engine --el-deepseek-engine-max-tokens-alist nil nil 'string=)
-         8192))
-       ;; Get history in correct format
-       (history
-        (--el-history-load-recent))
-       ;; Format messages properly for DeepSeek
-       (messages
-        (append
-         (when history
-           (mapcar
-            (lambda
-              (msg)
-              `(("role" . ,(cdr
-                            (assoc "role" msg)))
-                ("content" . ,(cdr
-                               (assoc "content" msg)))))
-            history))
-         `((("role" . "user")
-            ("content" . ,prompt))))))
-    (json-encode
-     `(("model" . ,actual-engine)
-       ("messages" . ,messages)
-       ("temperature" . ,--el-temperature)
-       ("max_tokens" . ,max-tokens)
-       ("stream" . t)))))
+                  (save-excursion  ;; Use save-excursion to not move cursor
+                    (goto-char
+                     (point-max))
+                    (insert text))
+                  (process-put proc 'content
+                               (concat
+                                (or
+                                 (process-get proc 'content)
+                                 "")
+                                text)))))))))))
 
 (provide 'emacs-llm-call-deepseek)
 

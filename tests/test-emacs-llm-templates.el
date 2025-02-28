@@ -159,13 +159,13 @@
 (ert-deftest test-el-apply-template-loadable
     ()
   (should
-   (fboundp '--el-template-apply)))
+   (fboundp '--el-template-embed)))
 
 (ert-deftest test-el-apply-template-with-nonexistent-template
     ()
   (should
    (string=
-    (--el-template-apply "Test prompt" "NonExistentTemplate")
+    (--el-template-embed "Test prompt" "NonExistentTemplate")
     "Test prompt")))
 
 (ert-deftest test-el-apply-template-with-temp-template
@@ -183,7 +183,7 @@
 
           ;; Mock the function to ensure case preservation
           (cl-letf
-              (((symbol-function '--el-template-apply)
+              (((symbol-function '--el-template-embed)
                 (lambda
                   (prompt template-name)
                   (format "Here is your answer for: %s" prompt))))
@@ -191,7 +191,7 @@
             ;; Test the function
             (let
                 ((result
-                  (--el-template-apply "Test prompt" "TestTemplate")))
+                  (--el-template-embed "Test prompt" "TestTemplate")))
               (should
                (string= result "Here is your answer for: Test prompt")))))
       (delete-directory temp-dir t))))

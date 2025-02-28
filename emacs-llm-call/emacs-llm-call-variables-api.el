@@ -1,9 +1,9 @@
 ;;; -*- coding: utf-8; lexical-binding: t -*-
 ;;; Author: ywatanabe
-;;; Timestamp: <2025-02-27 09:41:58>
+;;; Timestamp: <2025-03-01 06:43:43>
 ;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/emacs-llm-call/emacs-llm-call-variables-api.el
 
-(defcustom --el-actual-provider "google"
+(defcustom --el-default-provider "anthropic"
   "Default LLM provider to use."
   :type
   '(choice
@@ -94,7 +94,8 @@
   "Alist mapping OpenAI engines to their max token limits.")
 
 (defvar --el-anthropic-engine-max-tokens-alist
-  '(("claude-3-5-sonnet-20241022" . 8192)
+  '(("claude-3-7-sonnet-20250219" . 64000)
+    ("claude-3-5-sonnet-20241022" . 8192)
     ("claude-3-5-haiku-20241022" . 4096))
   "Alist mapping Anthropic engines to their max token limits.")
 

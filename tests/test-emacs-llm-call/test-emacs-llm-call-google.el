@@ -131,7 +131,7 @@
             (prompt)
             (setq constructed-payload prompt)
             "{\"mock\":\"payload\"}"))
-         ((symbol-function '--el-prepare-llm-buffer)
+         ((symbol-function '--el-display-buffer)
           (lambda
             (prompt engine engine template)
             (setq prepared-buffer

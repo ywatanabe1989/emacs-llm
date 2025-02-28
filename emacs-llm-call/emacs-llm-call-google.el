@@ -1,6 +1,6 @@
 ;;; -*- coding: utf-8; lexical-binding: t -*-
 ;;; Author: ywatanabe
-;;; Timestamp: <2025-02-28 10:06:58>
+;;; Timestamp: <2025-03-01 09:07:42>
 ;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/emacs-llm-call/emacs-llm-call-google.el
 
 (defun --el-construct-google-curl-command
@@ -14,20 +14,98 @@
        (url
         (format "https://generativelanguage.googleapis.com/v1beta/models/%s:streamGenerateContent?alt=sse&key=%s"
                 actual-engine api-key))
-       ;; Create simple Google payload format matching the example
+       ;; Get history in correct format
+       (history
+        (--el-history-load-recent))
+       ;; Build Google-specific payload structure
+       (parts
+        (apply #'vector
+               (append
+                ;; Format previous messages as text
+                (when history
+                  (mapcar
+                   (lambda
+                     (msg)
+                     `(("text" . ,(format "%s: %s"
+                                          (cdr
+                                           (assoc "role" msg))
+                                          (cdr
+                                           (assoc "content" msg))))))
+                   history))
+                ;; Add current prompt
+                `((("text" . ,prompt))))))
+       (content
+        `(("parts" . ,parts)))
        (payload
         (json-encode
-         `((contents .
-                     [((parts .
-                              [((text . ,prompt))]))]))
-         ))
+         `(("contents" .
+            [,content])
+           ("generationConfig" .
+            (("maxOutputTokens" . 2048))))))
        (escaped-payload
-        (shell-quote-argument payload))
-       (command
-        (format "curl \"%s\" -H \"Content-Type: application/json\" --no-buffer -d %s 2>&1"
-                url escaped-payload)))
-    ;; (message "DEBUG Google curl command: %s" command)
-    command))
+        (shell-quote-argument payload)))
+    (format "curl \"%s\" -H \"Content-Type: application/json\" --no-buffer -d %s 2>&1"
+            url escaped-payload)))
+
+;; (defun --el-construct-google-curl-command
+;;     (prompt)
+;;   "Construct curl command for Google API with PROMPT."
+;;   (let*
+;;       ((actual-engine
+;;         (or --el-google-engine --el-default-engine-google))
+;;        (api-key
+;;         (or --el-api-key-google --el-google-api-key))
+;;        (url
+;;         (format "https://generativelanguage.googleapis.com/v1beta/models/%s:streamGenerateContent?alt=sse&key=%s"
+;;                 actual-engine api-key))
+;;        ;; Create simple Google payload format matching the example
+;;        (payload
+;;         (json-encode
+;;          `((contents .
+;;                      [((parts .
+;;                               [((text . ,prompt))]))]))
+;;          ))
+;;        (escaped-payload
+;;         (shell-quote-argument payload))
+;;        (command
+;;         (format "curl \"%s\" -H \"Content-Type: application/json\" --no-buffer -d %s 2>&1"
+;;                 url escaped-payload)))
+;;     ;; (message "DEBUG Google curl command: %s" command)
+;;     command))
+
+;; (defun --el-construct-google-payload
+;;     (prompt)
+;;   "Construct the JSON payload for Google Gemini API with PROMPT."
+;;   (let*
+;;       ((actual-engine
+;;         (or --el-google-engine --el-default-engine-google))
+;;        (max-tokens
+;;         (or
+;;          (alist-get actual-engine --el-google-engine-max-tokens-alist nil nil 'string=)
+;;          100000))
+;;        ;; Get history in correct format
+;;        (history
+;;         (--el-history-load-recent))
+;;        ;; Build contents with proper format for Google
+;;        (contents
+;;         (append
+;;          (when history
+;;            (mapcar
+;;             (lambda
+;;               (msg)
+;;               `(
+;;                 ;;             (assoc "role" msg)))
+;;                 ("parts" .
+;;                  ((("text" . ,(cdr
+;;                                (assoc "content" msg))))))))
+;;             history))
+;;          `((
+;;             ("parts" .
+;;              ((("text" . ,prompt)))))))))
+;;     (json-encode
+;;      `(("contents" . ,contents)
+;;        ("generationConfig" .
+;;         (("maxOutputTokens" . ,max-tokens)))))))
 
 (defun --el-parse-google-chunk
     (chunk)
@@ -120,49 +198,16 @@
               (when text
                 (with-current-buffer
                     (process-get proc 'target-buffer)
-                  (goto-char
-                   (point-max))
-                  (insert text))
-                (process-put proc 'content
-                             (concat
-                              (or
-                               (process-get proc 'content)
-                               "")
-                              text))))))))))
-
-(defun --el-construct-google-payload
-    (prompt)
-  "Construct the JSON payload for Google Gemini API with PROMPT."
-  (let*
-      ((actual-engine
-        (or --el-google-engine --el-default-engine-google))
-       (max-tokens
-        (or
-         (alist-get actual-engine --el-google-engine-max-tokens-alist nil nil 'string=)
-         100000))
-       ;; Get history in correct format
-       (history
-        (--el-history-load-recent))
-       ;; Build contents with proper format for Google
-       (contents
-        (append
-         (when history
-           (mapcar
-            (lambda
-              (msg)
-              `(;; ("role" . ,(cdr
-                ;;             (assoc "role" msg)))
-                ("parts" .
-                 ((("text" . ,(cdr
-                               (assoc "content" msg))))))))
-            history))
-         `((;; ("role" . "user")
-            ("parts" .
-             ((("text" . ,prompt)))))))))
-    (json-encode
-     `(("contents" . ,contents)
-       ("generationConfig" .
-        (("maxOutputTokens" . ,max-tokens)))))))
+                  (save-excursion
+                    (goto-char
+                     (point-max))
+                    (insert text))
+                  (process-put proc 'content
+                               (concat
+                                (or
+                                 (process-get proc 'content)
+                                 "")
+                                text)))))))))))
 
 (provide 'emacs-llm-call-google)
 
