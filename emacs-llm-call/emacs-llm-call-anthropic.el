@@ -1,6 +1,6 @@
 ;;; -*- coding: utf-8; lexical-binding: t -*-
 ;;; Author: ywatanabe
-;;; Timestamp: <2025-03-01 08:53:48>
+;;; Timestamp: <2025-03-01 09:20:00>
 ;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/emacs-llm-call/emacs-llm-call-anthropic.el
 
 ;; (defun --el-construct-anthropic-curl-command
@@ -193,64 +193,6 @@
                                          (process-get proc 'content)
                                          "")
                                         text)))))))))))))))
-
-;; (lle-shell-run-cmd (--el-construct-anthropic-curl-command "hi"))
-;; ("% Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
-;;                                  Dload  Upload   Total   Spent    Left  Speed
-;;   0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0100   289    0     0  100   289      0    236  0:00:01  0:00:01 --:--:--   236event: message_start
-;; data: {\"type\":\"message_start\",\"message\":{\"id\":\"msg_01MX76pKx3wVYvYH1GKcXsGa\",\"type\":\"message\",\"role\":\"assistant\",\"model\":\"claude-3-7-sonnet-20250219\",\"content\":[],\"stop_reason\":null,\"stop_sequence\":null,\"usage\":{\"input_tokens\":38,\"cache_creation_input_tokens\":0,\"cache_read_input_tokens\":0,\"output_tokens\":2}}    }
-
-;; 100   626    0   337  100   289    220    188  0:00:01  0:00:01 --:--:--   408event: content_block_start
-;; data: {\"type\":\"content_block_start\",\"index\":0,\"content_block\":{\"type\":\"thinking\",\"thinking\":\"\",\"signature\":\"\"}      }
-
-;; event: ping
-;; data: {\"type\": \"ping\"}
-
-;; event: content_block_delta
-;; data: {\"type\":\"content_block_delta\",\"index\":0,\"delta\":{\"type\":\"thinking_delta\",\"thinking\":\"This\"}  }
-
-;; event: content_block_delta
-;; data: {\"type\":\"content_block_delta\",\"index\":0,\"delta\":{\"type\":\"thinking_delta\",\"thinking\":\" is a very brief greeting from the user. I should respond in\"}               }
-
-;; event: content_block_delta
-;; data: {\"type\":\"content_block_delta\",\"index\":0,\"delta\":{\"type\":\"thinking_delta\",\"thinking\":\" a friendly and welcoming manner, matching their casual tone. I\"}}
-
-;; event: content_block_delta
-;; data: {\"type\":\"content_block_delta\",\"index\":0,\"delta\":{\"type\":\"thinking_delta\",\"thinking\":\" can offer to help with any questions or tasks they\"}             }
-
-;; 100  1508    0  1219  100   289    518    123  0:00:02  0:00:02 --:--:--   641event: content_block_delta
-;; data: {\"type\":\"content_block_delta\",\"index\":0,\"delta\":{\"type\":\"thinking_delta\",\"thinking\":\" might have.\"}   }
-
-;; event: content_block_delta
-;; data: {\"type\":\"content_block_delta\",\"index\":0,\"delta\":{\"type\":\"signature_delta\",\"signature\":\"ErUBCkYIARgCIkA9J5EnttUy5ihxhY2Zu/awdlwv6Ml/cNUHx+G9qVOEYAQAmwxAQV3cwPcXQrScYtxYwC68W4H/LeOpetExwXYgEgw8F+/4K58y30SrFhsaDASFhu4dR3gbd8eKfSIwEuwg9wft77tdozkiJOxScxJeAlqxwTta5fblGEfvrJSg+JwPi4QEJCsOlPo6eJapKh1W4h/9cQO4yrQjW8whhFt08CPCYJnemED4aJ5qlQ==\"}     }
-
-;; event: content_block_stop
-;; data: {\"type\":\"content_block_stop\",\"index\":0   }
-
-;; event: content_block_start
-;; data: {\"type\":\"content_block_start\",\"index\":1,\"content_block\":{\"type\":\"text\",\"text\":\"\"}}
-
-;; event: content_block_delta
-;; data: {\"type\":\"content_block_delta\",\"index\":1,\"delta\":{\"type\":\"text_delta\",\"text\":\"Hello! How are you today? I'm here to help if you\"}           }
-
-;; event: content_block_delta
-;; data: {\"type\":\"content_block_delta\",\"index\":1,\"delta\":{\"type\":\"text_delta\",\"text\":\" have any questions or if there's anything you\"} }
-
-;; event: content_block_delta
-;; data: {\"type\":\"content_block_delta\",\"index\":1,\"delta\":{\"type\":\"text_delta\",\"text\":\"'d like to discuss. How can I assist you?\"}         }
-
-;; event: content_block_stop
-;; data: {\"type\":\"content_block_stop\",\"index\":1               }
-
-;; event: message_delta
-;; data: {\"type\":\"message_delta\",\"delta\":{\"stop_reason\":\"end_turn\",\"stop_sequence\":null},\"usage\":{\"output_tokens\":86}           }
-
-;; event: message_stop
-;; data: {\"type\":\"message_stop\"           }
-
-;; 100  3018    0  2729  100   289    930     98  0:00:02  0:00:02 --:--:--  1028" . 0)
-
-;; (el-run "hi" "hello")
 
 (provide 'emacs-llm-call-anthropic)
 
