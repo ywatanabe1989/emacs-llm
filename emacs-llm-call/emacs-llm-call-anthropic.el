@@ -1,6 +1,6 @@
 ;;; -*- coding: utf-8; lexical-binding: t -*-
 ;;; Author: ywatanabe
-;;; Timestamp: <2025-03-01 09:20:00>
+;;; Timestamp: <2025-03-01 16:09:54>
 ;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/emacs-llm-call/emacs-llm-call-anthropic.el
 
 ;; (defun --el-construct-anthropic-curl-command
@@ -104,10 +104,10 @@
 (defun --el-anthropic-filter
     (proc chunk)
   "Filter for Anthropic stream PROC processing CHUNK."
-  (message "Received chunk: %s"
-           (substring chunk 0
-                      (min 100
-                           (length chunk))))
+  ;; (message "Received chunk: %s"
+  ;;          (substring chunk 0
+  ;;                     (min 100
+  ;;                          (length chunk))))
   (let*
       ((partial
         (or
@@ -171,7 +171,7 @@
                         (and delta
                              (alist-get 'type delta nil nil 'string=))))
 
-                    (message "Delta type: %s" delta-type)
+                    ;; (message "Delta type: %s" delta-type)
 
                     (when
                         (and delta-type
@@ -179,7 +179,7 @@
                       (let
                           ((text
                             (alist-get 'text delta nil nil 'string=)))
-                        (message "Found text: %s" text)
+                        ;; (message "Found text: %s" text)
                         (when text
                           (with-current-buffer
                               (process-get proc 'target-buffer)
