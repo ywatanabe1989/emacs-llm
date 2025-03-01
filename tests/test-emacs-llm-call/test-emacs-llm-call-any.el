@@ -1,12 +1,12 @@
 ;;; -*- coding: utf-8; lexical-binding: t -*-
 ;;; Author: ywatanabe
 ;;; Timestamp: <2025-03-01 08:44:32>
-;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-call/test-emacs-llm-call-any.el
+;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/tests/test-emacs-llm-call/test-emacs-llm-call-core.el
 
 ;;; -*- coding: utf-8; lexical-binding: t -*-
 
 (require 'ert)
-(require 'emacs-llm-call-any)
+(require 'emacs-llm-call-core)
 
 (ert-deftest test-el-llm-call-openai
     ()
@@ -89,12 +89,12 @@
       (process-get proc 'template)
       "test-template"))))
 
-(provide 'test-emacs-llm-call-any)
+(provide 'test-emacs-llm-call-core)
 
-(provide 'test-emacs-llm-call-any)
+(provide 'test-emacs-llm-call-core)
 
 (when
     (not load-file-name)
-  (message "test-emacs-llm-call-any.el loaded."
+  (message "test-emacs-llm-call-core.el loaded."
            (file-name-nondirectory
             (or load-file-name buffer-file-name))))

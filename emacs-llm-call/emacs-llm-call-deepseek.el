@@ -1,6 +1,6 @@
 ;;; -*- coding: utf-8; lexical-binding: t -*-
 ;;; Author: ywatanabe
-;;; Timestamp: <2025-03-01 09:00:18>
+;;; Timestamp: <2025-03-01 16:47:36>
 ;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/emacs-llm-call/emacs-llm-call-deepseek.el
 
 ;; Helper
@@ -91,7 +91,6 @@
 (defun --el-deepseek-filter
     (proc chunk)
   "Filter for DeepSeek stream PROC processing CHUNK."
-
   (let*
       ((partial
         (or
@@ -129,19 +128,34 @@
             (let
                 ((text
                   (--el-parse-deepseek-chunk jsonstr)))
-              (when text
-                (with-current-buffer
-                    (process-get proc 'target-buffer)
-                  (save-excursion  ;; Use save-excursion to not move cursor
-                    (goto-char
-                     (point-max))
-                    (insert text))
-                  (process-put proc 'content
-                               (concat
-                                (or
-                                 (process-get proc 'content)
-                                 "")
-                                text)))))))))))
+              (when
+                  (and text
+                       (not
+                        (string-empty-p text)))
+                ;; Call callback if set
+                (when-let
+                    ((callback
+                      (process-get proc 'callback)))
+                  (funcall callback text nil proc))
+                ;; Update buffer if target buffer is set
+                (when-let
+                    ((target-buffer
+                      (process-get proc 'target-buffer)))
+                  (when
+                      (buffer-live-p
+                       (get-buffer target-buffer))
+                    (with-current-buffer target-buffer
+                      (save-excursion
+                        (goto-char
+                         (point-max))
+                        (insert text)))))
+                ;; Store content
+                (process-put proc 'content
+                             (concat
+                              (or
+                               (process-get proc 'content)
+                               "")
+                              text))))))))))
 
 (provide 'emacs-llm-call-deepseek)
 

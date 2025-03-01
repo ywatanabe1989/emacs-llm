@@ -1,6 +1,6 @@
 ;;; -*- coding: utf-8; lexical-binding: t -*-
 ;;; Author: ywatanabe
-;;; Timestamp: <2025-03-01 07:00:54>
+;;; Timestamp: <2025-03-01 17:24:51>
 ;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/emacs-llm-templates.el
 
 (require 'cl-lib)
@@ -30,6 +30,20 @@ Example: Template shortcuts can be customized as:
 ;; Main
 ;; ----------------------------------------
 
+;; The error "replace-regexp-in-string: Invalid use of '\' in replacement text"
+;; (defun --el-template-embed
+;;     (prompt &optional template-name-or-manual-instruction)
+;;   "Apply template TEMPLATE-NAME-OR-MANUAL-INSTRUCTION to PROMPT.
+;; Returns a new prompt with the template applied."
+;;   (let*
+;;       ((template-name
+;;         (--el-template-select template-name-or-manual-instruction))
+;;        (template-contents
+;;         (--el-template-get template-name)))
+;;     (if template-contents
+;;         (replace-regexp-in-string "PLACEHOLDER" prompt template-contents)
+;;       prompt)))
+
 (defun --el-template-embed
     (prompt &optional template-name-or-manual-instruction)
   "Apply template TEMPLATE-NAME-OR-MANUAL-INSTRUCTION to PROMPT.
@@ -40,7 +54,11 @@ Returns a new prompt with the template applied."
        (template-contents
         (--el-template-get template-name)))
     (if template-contents
-        (replace-regexp-in-string "PLACEHOLDER" prompt template-contents)
+        ;; Fix: Use fixed-string literal to avoid backslash interpretation
+        (let
+            ((fixed-prompt
+              (replace-regexp-in-string "[\\]" "\\\\" prompt)))
+          (replace-regexp-in-string "PLACEHOLDER" fixed-prompt template-contents t t))
       prompt)))
 
 ;; Core

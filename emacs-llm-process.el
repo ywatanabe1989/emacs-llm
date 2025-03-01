@@ -1,6 +1,6 @@
 ;;; -*- coding: utf-8; lexical-binding: t -*-
 ;;; Author: ywatanabe
-;;; Timestamp: <2025-03-01 05:30:55>
+;;; Timestamp: <2025-03-01 16:13:01>
 ;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/emacs-llm-process.el
 
 (require 'emacs-llm-dired)
@@ -120,6 +120,38 @@
         (when
             (buffer-live-p tb)
           (kill-buffer tb))))))
+
+(defun emacs-llm--process-sentinel-core
+    (proc event)
+  "Core process sentinel for LLM processes.
+PROC is the process and EVENT is the process event."
+  (let
+      ((status
+        (substring event 0 -1))
+                                        ; Remove trailing newline
+       (callback
+        (process-get proc 'callback))
+       (temp-buffer
+        (process-get proc 'temp-buffer)))
+
+    ;; Handle process completion
+    (when
+        (string= status "finished")
+      ;; Call callback with completion status if provided
+      (when callback
+        (funcall callback nil 'finished proc)))
+
+    ;; Handle process errors
+    (when
+        (string-match "\\(exited abnormally\\|failed\\)" status)
+      ;; Call callback with error status if provided
+      (when callback
+        (funcall callback nil 'error status)))
+
+    ;; Clean up temp buffer
+    (when
+        (buffer-live-p temp-buffer)
+      (kill-buffer temp-buffer))))
 
 (provide 'emacs-llm-process)
 

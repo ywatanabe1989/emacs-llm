@@ -1,7 +1,7 @@
 ;;; -*- coding: utf-8; lexical-binding: t -*-
 ;;; Author: ywatanabe
-;;; Timestamp: <2025-03-01 16:03:26>
-;;; File: /home/ywatanabe/.emacs.d/lisp/emacs-llm/emacs-llm-display.el
+;;; Timestamp: <2025-03-01 16:53:40>
+;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/emacs-llm-display.el
 
 (defun --el-display-buffer
     (prompt provider engine &optional template-name)

@@ -1,5 +1,5 @@
 <!-- ---
-!-- Timestamp: 2025-02-26 16:36:52
+!-- Timestamp: 2025-03-01 16:20:28
 !-- Author: ywatanabe
 !-- File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/README.md
 !-- --- -->
@@ -78,5 +78,9 @@ Templates for common prompt types are stored in the `templates/` directory.
 - Google (Gemini Pro, Gemini Flash, etc.)
 - Anthropic (Claude 3, etc.)
 - DeepSeek (DeepSeek Chat, DeepSeek Coder, etc.)
+
+(define-key global-map
+            (kbd "C-M-g")
+            'genai-on-region)
 
 <!-- EOF -->

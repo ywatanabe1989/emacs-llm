@@ -1,12 +1,13 @@
 ;;; -*- coding: utf-8; lexical-binding: t -*-
 ;;; Author: ywatanabe
-;;; Timestamp: <2025-03-01 04:08:54>
+;;; Timestamp: <2025-03-01 17:22:07>
 ;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/emacs-llm-run.el
 
 (require 'emacs-llm-dired)
 (require 'emacs-llm-process)
 
 ;;;###autoload
+
 (defun el-run
     (&optional prompt template-name)
   "Run El command on selected region, dired files or prompt.
@@ -36,7 +37,7 @@ The response will be displayed in the *El* buffer."
             (progn
               (--el-template-select)))))
     ;; Use the abstraction
-    (el-llm-call prompt --el-default-provider template-name)))
+    (el-llm-call prompt template-name --el-default-provider)))
 
 (provide 'emacs-llm-run)
 

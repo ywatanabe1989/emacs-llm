@@ -1,6 +1,6 @@
 ;;; -*- coding: utf-8; lexical-binding: t -*-
 ;;; Author: ywatanabe
-;;; Timestamp: <2025-03-01 09:07:42>
+;;; Timestamp: <2025-03-01 16:47:54>
 ;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/emacs-llm-call/emacs-llm-call-google.el
 
 (defun --el-construct-google-curl-command
@@ -46,66 +46,6 @@
         (shell-quote-argument payload)))
     (format "curl \"%s\" -H \"Content-Type: application/json\" --no-buffer -d %s 2>&1"
             url escaped-payload)))
-
-;; (defun --el-construct-google-curl-command
-;;     (prompt)
-;;   "Construct curl command for Google API with PROMPT."
-;;   (let*
-;;       ((actual-engine
-;;         (or --el-google-engine --el-default-engine-google))
-;;        (api-key
-;;         (or --el-api-key-google --el-google-api-key))
-;;        (url
-;;         (format "https://generativelanguage.googleapis.com/v1beta/models/%s:streamGenerateContent?alt=sse&key=%s"
-;;                 actual-engine api-key))
-;;        ;; Create simple Google payload format matching the example
-;;        (payload
-;;         (json-encode
-;;          `((contents .
-;;                      [((parts .
-;;                               [((text . ,prompt))]))]))
-;;          ))
-;;        (escaped-payload
-;;         (shell-quote-argument payload))
-;;        (command
-;;         (format "curl \"%s\" -H \"Content-Type: application/json\" --no-buffer -d %s 2>&1"
-;;                 url escaped-payload)))
-;;     ;; (message "DEBUG Google curl command: %s" command)
-;;     command))
-
-;; (defun --el-construct-google-payload
-;;     (prompt)
-;;   "Construct the JSON payload for Google Gemini API with PROMPT."
-;;   (let*
-;;       ((actual-engine
-;;         (or --el-google-engine --el-default-engine-google))
-;;        (max-tokens
-;;         (or
-;;          (alist-get actual-engine --el-google-engine-max-tokens-alist nil nil 'string=)
-;;          100000))
-;;        ;; Get history in correct format
-;;        (history
-;;         (--el-history-load-recent))
-;;        ;; Build contents with proper format for Google
-;;        (contents
-;;         (append
-;;          (when history
-;;            (mapcar
-;;             (lambda
-;;               (msg)
-;;               `(
-;;                 ;;             (assoc "role" msg)))
-;;                 ("parts" .
-;;                  ((("text" . ,(cdr
-;;                                (assoc "content" msg))))))))
-;;             history))
-;;          `((
-;;             ("parts" .
-;;              ((("text" . ,prompt)))))))))
-;;     (json-encode
-;;      `(("contents" . ,contents)
-;;        ("generationConfig" .
-;;         (("maxOutputTokens" . ,max-tokens)))))))
 
 (defun --el-parse-google-chunk
     (chunk)
@@ -153,11 +93,6 @@
 (defun --el-google-filter
     (proc chunk)
   "Filter for Google stream PROC processing CHUNK."
-  ;; Debug logging for Google chunks
-  ;; (message "Google chunk received: %s"
-  ;;          (substring chunk 0
-  ;;                     (min 100
-  ;;                          (length chunk))))
   (let*
       ((partial
         (or
@@ -195,19 +130,34 @@
             (let
                 ((text
                   (--el-parse-google-chunk jsonstr)))
-              (when text
-                (with-current-buffer
-                    (process-get proc 'target-buffer)
-                  (save-excursion
-                    (goto-char
-                     (point-max))
-                    (insert text))
-                  (process-put proc 'content
-                               (concat
-                                (or
-                                 (process-get proc 'content)
-                                 "")
-                                text)))))))))))
+              (when
+                  (and text
+                       (not
+                        (string-empty-p text)))
+                ;; Call callback if set
+                (when-let
+                    ((callback
+                      (process-get proc 'callback)))
+                  (funcall callback text nil proc))
+                ;; Update buffer if target buffer is set
+                (when-let
+                    ((target-buffer
+                      (process-get proc 'target-buffer)))
+                  (when
+                      (buffer-live-p
+                       (get-buffer target-buffer))
+                    (with-current-buffer target-buffer
+                      (save-excursion
+                        (goto-char
+                         (point-max))
+                        (insert text)))))
+                ;; Store content
+                (process-put proc 'content
+                             (concat
+                              (or
+                               (process-get proc 'content)
+                               "")
+                              text))))))))))
 
 (provide 'emacs-llm-call-google)
 
