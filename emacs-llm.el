@@ -1,3 +1,8 @@
+;;; -*- coding: utf-8; lexical-binding: t -*-
+;;; Author: ywatanabe
+;;; Timestamp: <2025-03-01 20:15:28>
+;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/emacs-llm.el
+
 ;;; ----- /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/emacs-llm.el -----
 ;;; -*- coding: utf-8; lexical-binding: t -*-
 ;;; Author: ywatanabe
@@ -87,6 +92,9 @@
 ;; Preparation
 (require 'emacs-llm-path-and-load)
 
+;; Externals
+(require 'emacs-spinner)
+
 ;; LLM
 (require 'emacs-llm-variables)
 (require 'emacs-llm-display)
@@ -95,7 +103,6 @@
 (require 'emacs-llm-switch)
 
 ;; Utils
-(require 'emacs-llm-spinner)
 (require 'emacs-llm-scroll)
 (require 'emacs-llm-code-navigation)
 (require 'emacs-llm-history)

@@ -3,43 +3,8 @@
 ;;; Timestamp: <2025-03-01 05:45:17>
 ;;; File: /home/ywatanabe/.emacs.d/lisp/emacs-llm/emacs-llm-switch.el
 
-;; ;;;###autoload
-;; (defun el-switch
-;;     (&optional provider engine)
-;;   "Switch the LLM provider and select a engine."
-;;   (interactive
-;;    (list
-;;     (completing-read "Select LLM provider: "
-;;                      '("openai" "anthropic" "google" "deepseek")
-;;                      nil t)))
-;;   (setq --el-default-provider provider)
-
-;;   (let*
-;;       ((provider-engines
-;;         (cond
-;;          ((string= provider "openai")
-;;           --el-openai-engines)
-;;          ((string= provider "anthropic")
-;;           --el-anthropic-engines)
-;;          ((string= provider "google")
-;;           --el-google-engines)
-;;          ((string= provider "deepseek")
-;;           --el-deepseek-engines)))
-;;        (selected-engine
-;;         (completing-read "Select engine: " provider-engines nil t)))
-
-;;     (cond
-;;      ((string= provider "openai")
-;;       (setq --el-openai-engine selected-engine))
-;;      ((string= provider "anthropic")
-;;       (setq --el-anthropic-engine selected-engine))
-;;      ((string= provider "google")
-;;       (setq --el-google-engine selected-engine))
-;;      ((string= provider "deepseek")
-;;       (setq --el-deepseek-engine selected-engine))
-;;      )
-
 ;;;###autoload
+
 (defun el-switch
     (&optional provider engine)
   "Switch the LLM provider and select a engine.

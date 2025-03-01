@@ -1,6 +1,6 @@
 ;;; -*- coding: utf-8; lexical-binding: t -*-
 ;;; Author: ywatanabe
-;;; Timestamp: <2025-03-01 17:27:16>
+;;; Timestamp: <2025-03-01 20:38:33>
 ;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/emacs-llm-call/emacs-llm-call-ui.el
 
 (require 'emacs-llm-process)
@@ -38,92 +38,34 @@ OPTIONAL TEMPLATE-NAME is the name of the template used."
               (when text
                 (with-current-buffer
                     (get-buffer buffer-name)
-                  (goto-char
-                   (point-max))
-                  (insert text)
-                  (when --el-scroll-to-last-separator
+                  (save-excursion
                     (goto-char
-                     (point-max)))))
+                     (point-max))
+                    (insert text)
+                    (when --el-scroll-to-last-separator
+                      (goto-char
+                       (point-max)))))
 
-              ;; Handle completion
-              (when
-                  (eq status 'finished)
-                (--el-stop-spinner)
-                (--el-history-append
-                 actual-provider
-                 (process-get
-                  (car args)
-                  'content)
-                 template-name))
+                ;; Handle completion
+                (when
+                    (eq status 'finished)
+                  (--el-history-append
+                   actual-provider
+                   (process-get
+                    (car args)
+                    'content)
+                   template-name))
 
-              ;; Handle errors
-              (when
-                  (eq status 'error)
-                (--el-stop-spinner)
-                (message "LLM process error: %s"
-                         (cadr args))))))
+                ;; Handle errors
+                (when
+                    (eq status 'error)
+                  (message "LLM process error: %s"
+                           (cadr args)))))))
 
-        ;; Start spinner and append to history
-        (--el-start-spinner)
         (--el-history-append "user" prompt template-name)
 
         ;; Call the core function with our UI callback
         (emacs-llm-call-core prompt actual-provider nil template-name ui-callback)))))
-
-;; (defun ui-callback
-;;     (text status &optional proc)
-;;   "UI callback for LLM responses.
-;; TEXT is the response text chunk.
-;; STATUS may be 'finished or 'error when process completes.
-;; PROC is the process object."
-;;   (let
-;;       ((buffer-name
-;;         (if proc
-;;             (when-let
-;;                 ((buf
-;;                   (process-get proc 'target-buffer)))
-;;               (get-buffer buf))
-;;           (current-buffer))))
-;;     (cond
-;;      ;; Handle text chunks
-;;      ((and text
-;;            (not
-;;             (string-empty-p text)))
-;;       (when buffer-name
-;;         (with-current-buffer buffer-name
-;;           (goto-char
-;;            (point-max))
-;;           (insert text)
-;;           (when
-;;               (boundp '--el-scroll-to-last-separator)
-;;             (when --el-scroll-to-last-separator
-;;               (goto-char
-;;                (point-max)))))))
-
-;;      ;; Handle completion
-;;      ((eq status 'finished)
-;;       (when
-;;           (fboundp '--el-stop-spinner)
-;;         (--el-stop-spinner))
-;;       (when proc
-;;         (let
-;;             ((provider
-;;               (process-get proc 'provider))
-;;              (content
-;;               (process-get proc 'content))
-;;              (template-name
-;;               (process-get proc 'template)))
-;;           (when
-;;               (fboundp '--el-history-append)
-;;             (--el-history-append provider content template-name)))))
-
-;;      ;; Handle errors
-;;      ((eq status 'error)
-;;       (when
-;;           (fboundp '--el-stop-spinner)
-;;         (--el-stop-spinner))
-;;       (message "LLM process error: %s"
-;;                (or proc "Unknown error"))))))
 
 ;; ;; ;; Example usage:
 ;; ;; (el-switch "openai" "o3-mini-low")

@@ -1,18 +1,9 @@
 ;;; -*- coding: utf-8; lexical-binding: t -*-
 ;;; Author: ywatanabe
-;;; Timestamp: <2025-03-01 16:13:01>
+;;; Timestamp: <2025-03-01 20:43:39>
 ;;; File: /home/ywatanabe/.dotfiles/.emacs.d/lisp/emacs-llm/emacs-llm-process.el
 
 (require 'emacs-llm-dired)
-
-(defun --el-cancel-timer
-    ()
-  "Cancel the LLM spinner timer if active."
-  (when --el-spinner-timer
-    (--el-stop-spinner)
-    ;; added
-    (cancel-timer --el-spinner-timer)
-    (setq --el-spinner-timer nil)))
 
 (defun --el-process-chunk
     (proc chunk parse-func)
@@ -78,7 +69,7 @@
   "Process sentinel for PROC handling EVENT."
   (when
       (string-match-p "\\(finished\\|exited\\|failed\\)" event)
-    (--el-stop-spinner)
+    (emacs-spinner-stop spinner-id)
     (let
         ((prompt
           (process-get proc 'prompt))
@@ -137,6 +128,7 @@ PROC is the process and EVENT is the process event."
     ;; Handle process completion
     (when
         (string= status "finished")
+      (emacs-spinner-stop spinner-id)
       ;; Call callback with completion status if provided
       (when callback
         (funcall callback nil 'finished proc)))
@@ -144,6 +136,7 @@ PROC is the process and EVENT is the process event."
     ;; Handle process errors
     (when
         (string-match "\\(exited abnormally\\|failed\\)" status)
+      (emacs-spinner-stop spinner-id)
       ;; Call callback with error status if provided
       (when callback
         (funcall callback nil 'error status)))
@@ -151,6 +144,7 @@ PROC is the process and EVENT is the process event."
     ;; Clean up temp buffer
     (when
         (buffer-live-p temp-buffer)
+      (emacs-spinner-stop spinner-id)
       (kill-buffer temp-buffer))))
 
 (provide 'emacs-llm-process)
